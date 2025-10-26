@@ -46,8 +46,8 @@ controls.add("* 1 to change to track1");
 controls.add("* 2 to change to track2");
 controls.show();
 
-createHavac(scene);
 render();
+// createHavac(scene);
 function render()
 {
   keyboardUpdate(keyboard);
@@ -67,14 +67,14 @@ function keyboardUpdate(keyboard) {
     clearScene(scene);
     scene = createTrack1(scene);
     light = initDefaultBasicLight(scene);
-    scene = createHavac(scene);
+    // scene = createHavac(scene);
    }
 
    if (keyboard.down("2")) {
     clearScene(scene);
     scene = createTrack2(scene);
     light = initDefaultBasicLight(scene);
-    scene = createHavac(scene);
+    // scene = createHavac(scene);
    }
 }
 
