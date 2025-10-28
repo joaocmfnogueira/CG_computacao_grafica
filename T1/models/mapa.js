@@ -59,8 +59,6 @@ export function createTrack1(scene) {
     blockConer4.position.set(90, 0, 0);
     blockConer.name = "block_coner4";
     scene.add(blockConer4);
-
-    return scene
 }
 
 // Criar a segunda pista
@@ -145,8 +143,6 @@ export function createTrack2(scene) {
     blockConer6.position.set(90, 0, 0);
     blockConer.name = "block_coner5";
     scene.add(blockConer6);
-
-    return scene
 }
 
 // Cria os dois tipos de blocos (piso + mureta):
