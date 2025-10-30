@@ -54,7 +54,7 @@ render();
 
 function render() {
    const dt = clock.getDelta();
-   const result = keyboardUpdate(keyboard, velocidade, aceleracao, clock, scene);
+   const result = keyboardUpdate(keyboard, velocidade, aceleracao, dt, scene);
    velocidade = result.velocidade;
    aceleracao = result.aceleracao;
 
@@ -88,7 +88,7 @@ function createSpeedDisplay() {
 
 function updateSpeedDisplay() {
    const speed = Math.abs(velocidade);
-   speedDisplay.textContent = `Speed: ${speed.toFixed(10) * 1000} km/h`;
+   speedDisplay.textContent = `Speed: ${speed.toFixed(2)} km/h`;
    
    // Update controls display as well
    updateControlsSpeedDisplay(speed);
