@@ -12,6 +12,10 @@ import KeyboardState from '../libs/util/KeyboardState.js';
 import { createHavac } from './models/veiculo.js';
 import {keyboardUpdate, updateVehicleMovement} from './control.js';
 
+
+
+
+
 let scene, renderer, camera, light, orbit;
 scene = new THREE.Scene();
 renderer = initRenderer();
@@ -31,6 +35,8 @@ createTrack1(scene);
 let velocidade = 0;
 let aceleracao = 0;
 
+// variavel para pausar o jogo quando acontece troca de telas e outros eventos similares
+let isPaused = false;
 
 var clock = new THREE.Clock();
 
@@ -47,12 +53,16 @@ controls.show();
 
 createHavac(scene);
 
-// Create speed display
+// Constante para exibir o a velocidade do veiculo
 const speedDisplay = createSpeedDisplay();
 
 render();
 
 function render() {
+   requestAnimationFrame(render);
+
+   if (isPaused) return
+
    const dt = clock.getDelta();
    const result = keyboardUpdate(keyboard, velocidade, aceleracao, dt, scene);
    velocidade = result.velocidade;
@@ -60,12 +70,10 @@ function render() {
 
    updateVehicleMovement(dt, scene, velocidade, keyboard);
    updateSpeedDisplay();
-   requestAnimationFrame(render);
    renderer.render(scene, camera);
 }
 
-
-
+// métodos para criar e atualizar a tela com a velocidade do veiculo
 function createSpeedDisplay() {
    const speedDiv = document.createElement('div');
    speedDiv.style.position = 'absolute';
@@ -87,16 +95,45 @@ function createSpeedDisplay() {
 }
 
 function updateSpeedDisplay() {
-   const speed = Math.abs(velocidade);
+   const speed = Math.abs(velocidade * 20);
    speedDisplay.textContent = `Speed: ${speed.toFixed(2)} km/h`;
-   
-   // Update controls display as well
-   updateControlsSpeedDisplay(speed);
 }
 
-function updateControlsSpeedDisplay(speed) {
-   // This function would update the InfoBox speed display
-   // Implementation depends on your InfoBox API
-   const speedText = `Speed: ${speed.toFixed(1)} km/h`;
-   // You might need to modify this based on how your InfoBox works
+
+/* 
+Eventos e método auxiliares para em caso de troca de aba ou saída de tela garanta que 
+que o jogo pause no momento que saiu.
+*/
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    isPaused = true;
+    console.log("Jogo pausado");
+    resetKeyboardState(); // prevent stuck keys
+  } else {
+    isPaused = false;
+    clock.elapsedTime = 0;
+    clock.start(); // avoid dt jump
+    console.log("Jogo voltou");
+  }
+});
+
+window.addEventListener('blur', () => {
+  isPaused = true;
+  console.log("Jogo pausado");
+  resetKeyboardState();
+});
+
+window.addEventListener('focus', () => {
+  isPaused = false;
+  clock.elapsedTime = 0;
+  clock.start();
+  console.log("Jogo voltou");
+});
+
+function resetKeyboardState() {
+  if (KeyboardState.status) {
+    for (let key in KeyboardState.status) {
+      delete KeyboardState.status[key];
+    }
+  }
 }
