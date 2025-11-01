@@ -17,6 +17,7 @@ let scene, renderer, camera, light, orbit;
 scene = new THREE.Scene();
 renderer = initRenderer();
 
+// adicionando a camera
 let position_camera = new THREE.Vector3(50, 25, 0);
 camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.copy(position_camera);
