@@ -7,14 +7,11 @@ import {
    InfoBox,
    onWindowResize
 } from "../libs/util/util.js";
-import { createTrack1 } from "./models/mapa.js"
 import KeyboardState from '../libs/util/KeyboardState.js';
+import { createTrack1 } from "./models/mapa.js"
 import { createHavac } from './models/veiculo.js';
+import {createSpeedDisplay, updateSpeedDisplay} from './utils.js';
 import {keyboardUpdate, updateVehicleMovement} from './control.js';
-
-
-
-
 
 let scene, renderer, camera, light, orbit;
 scene = new THREE.Scene();
@@ -29,6 +26,7 @@ var keyboard = new KeyboardState();
 // Listen window size changes
 window.addEventListener('resize', function () { onWindowResize(camera, renderer) }, false);
 
+// Criando a pista inicial
 createTrack1(scene);
 
 // Vehicle physics parameters - TUNED FOR BETTER GAMEPLAY
@@ -69,34 +67,8 @@ function render() {
    aceleracao = result.aceleracao;
 
    updateVehicleMovement(dt, scene, velocidade, keyboard);
-   updateSpeedDisplay();
+   updateSpeedDisplay(velocidade, speedDisplay);
    renderer.render(scene, camera);
-}
-
-// métodos para criar e atualizar a tela com a velocidade do veiculo
-function createSpeedDisplay() {
-   const speedDiv = document.createElement('div');
-   speedDiv.style.position = 'absolute';
-   speedDiv.style.top = '10px';
-   speedDiv.style.right = '10px';
-   speedDiv.style.color = '#44ff44';
-   speedDiv.style.fontFamily = 'Arial, sans-serif';
-   speedDiv.style.fontSize = '24px';
-   speedDiv.style.fontWeight = 'bold';
-   speedDiv.style.backgroundColor = 'rgba(0,0,0,0.7)';
-   speedDiv.style.padding = '15px';
-   speedDiv.style.borderRadius = '10px';
-   speedDiv.style.border = '2px solid #333';
-   speedDiv.style.textShadow = '2px 2px 4px rgba(0,0,0,0.5)';
-   speedDiv.id = 'speedDisplay';
-   document.body.appendChild(speedDiv);
-   
-   return speedDiv;
-}
-
-function updateSpeedDisplay() {
-   const speed = Math.abs(velocidade * 20);
-   speedDisplay.textContent = `Speed: ${speed.toFixed(2)} km/h`;
 }
 
 

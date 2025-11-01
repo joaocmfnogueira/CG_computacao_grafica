@@ -1,28 +1,3 @@
-
-/*
-pensar em talvez usar a ideia de alocar os objetos em outra 
-variavel e só usar o metodo remove (ganharia em desempenho
-porém aumentaria o gasto de memoria):
-
-
-// Cache for temporarily removed objects
-const cache = [];
-
-function hideAllObjects(scene) {
-    while (scene.children.length > 0) {
-        const obj = scene.children.pop();
-        cache.push(obj); // store reference
-    }
-}
-
-function restoreAllObjects(scene) {
-    for (const obj of cache) {
-        scene.add(obj);
-    }
-    cache.length = 0; // clear cache after restoring
-}
-*/
-
 // Função para remover todos os objetos de uma cena
 export function clearScene(scene) {
     while (scene.children.length > 0) {
@@ -66,4 +41,31 @@ function disposeMaterial(material) {
         }
     }
     material.dispose();
+}
+
+
+// métodos para criar e atualizar a tela com a velocidade do veiculo
+export function createSpeedDisplay() {
+   const speedDiv = document.createElement('div');
+   speedDiv.style.position = 'absolute';
+   speedDiv.style.top = '10px';
+   speedDiv.style.right = '10px';
+   speedDiv.style.color = '#44ff44';
+   speedDiv.style.fontFamily = 'Arial, sans-serif';
+   speedDiv.style.fontSize = '24px';
+   speedDiv.style.fontWeight = 'bold';
+   speedDiv.style.backgroundColor = 'rgba(0,0,0,0.7)';
+   speedDiv.style.padding = '15px';
+   speedDiv.style.borderRadius = '10px';
+   speedDiv.style.border = '2px solid #333';
+   speedDiv.style.textShadow = '2px 2px 4px rgba(0,0,0,0.5)';
+   speedDiv.id = 'speedDisplay';
+   document.body.appendChild(speedDiv);
+   
+   return speedDiv;
+}
+
+export function updateSpeedDisplay(velocidade, speedDisplay) {
+   const speed = Math.abs(velocidade * 20);
+   speedDisplay.textContent = `Speed: ${speed.toFixed(2)} km/h`;
 }
