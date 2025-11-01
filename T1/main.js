@@ -11,7 +11,7 @@ import KeyboardState from '../libs/util/KeyboardState.js';
 import { createTrack1 } from "./models/mapa.js"
 import { createHavac } from './models/veiculo.js';
 import {createSpeedDisplay, updateSpeedDisplay} from './utils.js';
-import {keyboardUpdate, updateVehicleMovement} from './control.js';
+import {keyboardUpdate, updateVehicleMovement, updateCamera} from './control.js';
 
 let scene, renderer, camera, light, orbit;
 scene = new THREE.Scene();
@@ -21,7 +21,7 @@ renderer = initRenderer();
 let position_camera = new THREE.Vector3(50, 25, 0);
 camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.copy(position_camera);
-camera.lookAt(new THREE.Vector3(-1, 0, 0)); // or camera.lookAt(0, 0, 0);
+camera.lookAt(new THREE.Vector3(1, 0, 0)); // or camera.lookAt(0, 0, 0);
 
 let cameraHolder = new THREE.Object3D();
 cameraHolder.add(camera);
@@ -74,6 +74,8 @@ function render() {
    aceleracao = result.aceleracao;
 
    updateVehicleMovement(dt, scene, velocidade, keyboard, cameraHolder);
+   updateCamera(dt, scene, velocidade, aceleracao, keyboard, cameraHolder);
+
    updateSpeedDisplay(velocidade, speedDisplay);
    renderer.render(scene, camera);
 }
