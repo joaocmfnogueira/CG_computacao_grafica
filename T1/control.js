@@ -23,7 +23,7 @@ const BRAKE_POWER = 100;         // freio forte
 const FRICTION = 0.98;          // atrito mais leve
 const ROTATION_SENSITIVITY = 1.8; // rotação mais fluida
 
-export function keyboardUpdate(keyboard, velocidade, aceleracao, dt, scene) {
+export function keyboardUpdate(keyboard, velocidade, aceleracao, dt, scene, cameraHolder) {
    keyboard.update();
 
    /* 
@@ -83,12 +83,12 @@ export function keyboardUpdate(keyboard, velocidade, aceleracao, dt, scene) {
       aceleracao = 0;
    } 
    if (keyboard.down("1")){
-      switchTrack(1, scene, velocidade, aceleracao);
+      switchTrack(1, scene, cameraHolder);
       velocidade = 0;
       aceleracao = 0;
    } 
    if (keyboard.down("2")){
-      switchTrack(2, scene, velocidade, aceleracao);
+      switchTrack(2, scene, cameraHolder);
       velocidade = 0;
       aceleracao = 0;
    } 
@@ -96,7 +96,7 @@ export function keyboardUpdate(keyboard, velocidade, aceleracao, dt, scene) {
    return { velocidade, aceleracao };
 }
 
-export function updateVehicleMovement(dt, scene, velocidade, keyboard) {
+export function updateVehicleMovement(dt, scene, velocidade, keyboard, cameraHolder) {
    const vehicle = scene.getObjectByName("veiculo_principal");
    if (!vehicle) return;
 
@@ -104,14 +104,21 @@ export function updateVehicleMovement(dt, scene, velocidade, keyboard) {
    const speedFactor = Math.min(Math.abs(velocidade) / MAX_FORWARD_SPEED, 1);
    const effectiveRotationSpeed = ROTATION_SENSITIVITY * (1 - speedFactor * 0.6);
 
-   if (keyboard.pressed("left") && (velocidade < -0.05 || velocidade > 0.05))  vehicle.rotation.y += effectiveRotationSpeed * dt;
-   if (keyboard.pressed("right") && (velocidade < -0.05 || velocidade > 0.05)) vehicle.rotation.y -= effectiveRotationSpeed * dt;
+   if (keyboard.pressed("left") && (velocidade < -0.05 || velocidade > 0.05)){
+      vehicle.rotation.y += effectiveRotationSpeed * dt;
+      cameraHolder.rotation.y += effectiveRotationSpeed * dt;
+   }  
+   if (keyboard.pressed("right") && (velocidade < -0.05 || velocidade > 0.05)){
+      vehicle.rotation.y -= effectiveRotationSpeed * dt;
+      cameraHolder.rotation.y -= effectiveRotationSpeed * dt;
+   } 
 
    vehicle.translateX(-velocidade * dt * BLOCK_SIZE);
+   cameraHolder.translateX(-velocidade * dt * BLOCK_SIZE);
    
 }
 
-function switchTrack(trackNumber, scene, velocidade, aceleracao) {
+function switchTrack(trackNumber, scene, cameraHolder) {
    clearScene(scene);
 
    if (trackNumber === 1) createTrack1(scene);
@@ -120,6 +127,7 @@ function switchTrack(trackNumber, scene, velocidade, aceleracao) {
    initDefaultBasicLight(scene);
    createHavac(scene);
    resetVehicle(scene);
+   scene.add(cameraHolder);
 }
 
 function resetVehicle(scene) {

@@ -59,7 +59,6 @@ function render()
     esphere1.position.lerp(lerpConfig_esphere1.destination, lerpConfig_esphere1.alpha);
   if(lerpConfig_esphere2.move) 
     esphere2.position.lerp(lerpConfig_esphere2.destination, lerpConfig_esphere2.alpha);
-
   requestAnimationFrame(render);
   renderer.render(scene, camera) // Render scene
 }

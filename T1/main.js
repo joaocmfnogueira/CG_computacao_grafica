@@ -16,15 +16,21 @@ import {keyboardUpdate, updateVehicleMovement} from './control.js';
 let scene, renderer, camera, light, orbit;
 scene = new THREE.Scene();
 renderer = initRenderer();
-camera = initCamera(new THREE.Vector3(0, 150, 230));
+
+let position_camera = new THREE.Vector3(50, 25, 0);
+camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.copy(position_camera);
+camera.lookAt(new THREE.Vector3(-1, 0, 0)); // or camera.lookAt(0, 0, 0);
+
+let cameraHolder = new THREE.Object3D();
+cameraHolder.add(camera);
+
+scene.add(cameraHolder);
+
 light = initDefaultBasicLight(scene);
-orbit = new OrbitControls(camera, renderer.domElement);
 
 // To use the keyboard
-var keyboard = new KeyboardState();
-
-// Listen window size changes
-window.addEventListener('resize', function () { onWindowResize(camera, renderer) }, false);
+let keyboard = new KeyboardState();
 
 // Criando a pista inicial
 createTrack1(scene);
@@ -33,10 +39,10 @@ createTrack1(scene);
 let velocidade = 0;
 let aceleracao = 0;
 
-// variavel para pausar o jogo quando acontece troca de telas e outros eventos similares
+// letiavel para pausar o jogo quando acontece troca de telas e outros eventos similares
 let isPaused = false;
 
-var clock = new THREE.Clock();
+let clock = new THREE.Clock();
 
 // Use this to show information onscreen
 let controls = new InfoBox();
@@ -62,11 +68,11 @@ function render() {
    if (isPaused) return
 
    const dt = clock.getDelta();
-   const result = keyboardUpdate(keyboard, velocidade, aceleracao, dt, scene);
+   const result = keyboardUpdate(keyboard, velocidade, aceleracao, dt, scene, cameraHolder);
    velocidade = result.velocidade;
    aceleracao = result.aceleracao;
 
-   updateVehicleMovement(dt, scene, velocidade, keyboard);
+   updateVehicleMovement(dt, scene, velocidade, keyboard, cameraHolder);
    updateSpeedDisplay(velocidade, speedDisplay);
    renderer.render(scene, camera);
 }
