@@ -101,7 +101,7 @@ function render() {
    const car = scene.getObjectByName("veiculo_principal");
    if (car) {
       const carPosition = car.getWorldPosition(new THREE.Vector3());
-      console.log(carPosition)
+      // console.log(carPosition)
       
       checkLapCompletion(carPosition);
    }
