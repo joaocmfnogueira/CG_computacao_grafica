@@ -12,17 +12,34 @@ import {initRenderer,
         initDefaultDirectionalLighting,
         createGroundPlane,
         createLightSphere,        
-        onWindowResize} from "../libs/util/util.js";
+        onWindowResize,
+        initDefaultBasicLight} from "../libs/util/util.js";
+import { DirectionalLight } from '../build/three.core.js';
 
 let scene, renderer, camera, light, lightSphere, lightPosition, orbit; // Initial variables
 scene = new THREE.Scene();    // Create main scene
-renderer = initRenderer();    // Init a basic renderer
+
+// criando renderer
+renderer = initRenderer("rgb(30, 30, 42)");
+// initDefaultBasicLight(scene);
+
+let ambientLight = new THREE.AmbientLight("rgb(150,150,150)");
+scene.add( ambientLight );
+
 camera = initCamera(new THREE.Vector3(1, 1.5, 3.0)); // Init camera in this position
 scene.add(camera); // Add camera to the scene
 orbit = new OrbitControls( camera, renderer.domElement ); // Enable mouse rotation, pan, zoom etc.
-
+// criando luz direcional
 lightPosition = new THREE.Vector3(1.6, 0.8, 1.6);
-light = initDefaultSpotlight(scene, lightPosition, 5); // Use default light
+light = new THREE.DirectionalLight("rgb(255, 255,255)", 5);
+light.position.copy(lightPosition);
+light.castShadow = true;
+light.shadow.mapSize.width = 2048;
+light.shadow.mapSize.height = 2048;
+
+
+scene.add(light);
+
 lightSphere = createLightSphere(scene, 0.1, 10, 10, lightPosition);
 
 
@@ -38,45 +55,42 @@ var groundPlane = createGroundPlane(4.0, 4.0, 50, 50); // width and height
   groundPlane.rotateX(THREE.MathUtils.degToRad(-90));
 scene.add(groundPlane);
 
-// create a cube
-// let cubeGeometry = new THREE.BoxGeometry(4, 4, 4);
-// let cube = new THREE.Mesh(cubeGeometry, material);
-// // position the cube
-// cube.position.set(0.0, 2.0, 0.0);
-// // add the cube to the scene
-// scene.add(cube);
-
-// Use this to show information onscreen
-
-// create a teapot
+// criando bule de chá
 let teaPotGeometry = new TeapotGeometry(0.3);
 let teaPotMaterial = new THREE.MeshPhongMaterial({
     color: "rgb(255,20,20)",
-    shininess: 400
+    shininess: 300
 });
 let teaPot = new THREE.Mesh(teaPotGeometry, teaPotMaterial);
 teaPot.castShadow = true;
-teaPot.position.set(0,0.25,0);
+teaPot.receiveShadow = true;
+teaPot.position.set(0,0.3,0.3);
 scene.add(teaPot);
-let sphereGeometry = new THREE.SphereGeometry(0.4);
+
+
+// criando esfera
+let sphereGeometry = new THREE.SphereGeometry(0.3);
 let sphereMaterial = new THREE.MeshLambertMaterial({
     color: "rgba(90, 218, 109, 1)",
 });
 let sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
 sphere.castShadow = true;
+sphere.receiveShadow = true;
 scene.add(sphere);
-sphere.position.set(-1, 0.4, -1);
+sphere.position.set(-0.75, 0.3, -0.4);
 
-let coneGeometry = new THREE.ConeGeometry(0.4, 1.2);
+// criando cone
+let coneGeometry = new THREE.CylinderGeometry(0.05, 0.4, 1.2, 20);
 let coneMaterial = new THREE.MeshPhongMaterial({
-    color: "rgba(114, 232, 210, 1)",
-    shininess: 200,
+    color: "rgba(159, 218, 226, 1)",
     flatShading: true
 });
 let cone = new THREE.Mesh(coneGeometry, coneMaterial);
 cone.castShadow = true;
 cone.position.set(1, 0.6, 1);
 scene.add(cone);
+
+
 render();
 function render()
 {
