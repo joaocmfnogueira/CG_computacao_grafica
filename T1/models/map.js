@@ -41,7 +41,6 @@ export function createTrack1(scene) {
         block.rotateZ(THREE.MathUtils.degToRad(90));
         block.position.set(60 - 30 * index, 0, 0);
         block.name = "block_horizontal1_" + index;
-        updateBoundingBoxes(block);
         registerWallsForCollision(block);
         scene.add(block);
         debugShowBoundingBoxes(block, scene);
@@ -51,7 +50,6 @@ export function createTrack1(scene) {
     blockConer.rotateZ(THREE.MathUtils.degToRad(180));
     blockConer.position.set(-180, 0, 0);
     blockConer.name = "block_coner1";
-    updateBoundingBoxes(blockConer);
     registerWallsForCollision(blockConer);
     scene.add(blockConer);
     debugShowBoundingBoxes(blockConer, scene);
@@ -62,7 +60,6 @@ export function createTrack1(scene) {
         block.rotateZ(THREE.MathUtils.degToRad(180));
         block.position.set(-180, 0, -30 - 30 * index);
         block.name = "block_vertical1_" + index;
-        updateBoundingBoxes(block);
         registerWallsForCollision(block);
         scene.add(block);
         debugShowBoundingBoxes(block, scene);
@@ -73,7 +70,6 @@ export function createTrack1(scene) {
     blockConer2.rotateZ(THREE.MathUtils.degToRad(90));
     blockConer2.position.set(-180, 0, -270);
     blockConer2.name = "block_coner2";
-    updateBoundingBoxes(blockConer2);
     registerWallsForCollision(blockConer2);
     scene.add(blockConer2);
     debugShowBoundingBoxes(blockConer2, scene);
@@ -84,7 +80,6 @@ export function createTrack1(scene) {
         block.rotateZ(THREE.MathUtils.degToRad(270));
         block.position.set(-150 + 30 * index, 0, -270);
         block.name = "block_horizontal2_" + index;
-        updateBoundingBoxes(block);
         registerWallsForCollision(block);
         scene.add(block);
         debugShowBoundingBoxes(block, scene);
@@ -95,7 +90,6 @@ export function createTrack1(scene) {
     blockConer3.rotateZ(THREE.MathUtils.degToRad(0));
     blockConer3.position.set(90, 0, -270);
     blockConer3.name = "block_coner3";
-    updateBoundingBoxes(blockConer3);
     registerWallsForCollision(blockConer3);
     scene.add(blockConer3);
     debugShowBoundingBoxes(blockConer3, scene);
@@ -105,7 +99,6 @@ export function createTrack1(scene) {
         let block = createBlock(1, "rgb(100,100,100)", "rgb(255,30,30)");
         block.position.set(90, 0, -240 + 30 * index);
         block.name = "block_vertical2_" + index;
-        updateBoundingBoxes(block);
         registerWallsForCollision(block);
         scene.add(block);
         debugShowBoundingBoxes(block, scene);
@@ -116,7 +109,6 @@ export function createTrack1(scene) {
     blockConer4.rotateZ(THREE.MathUtils.degToRad(-90));
     blockConer4.position.set(90, 0, 0);
     blockConer4.name = "block_coner4";
-    updateBoundingBoxes(blockConer4);
     registerWallsForCollision(blockConer4);
     scene.add(blockConer4);
     debugShowBoundingBoxes(blockConer4, scene);
@@ -139,7 +131,6 @@ export function createTrack2(scene) {
         block.rotateZ(THREE.MathUtils.degToRad(90));
         block.position.set(60 - 30 * index, 0, 0);
         block.name = "block_horizontal1_" + index;
-        updateBoundingBoxes(block);
         registerWallsForCollision(block);
         scene.add(block);
         debugShowBoundingBoxes(block, scene);
@@ -150,7 +141,6 @@ export function createTrack2(scene) {
     blockConer.rotateZ(THREE.MathUtils.degToRad(180));
     blockConer.position.set(-180, 0, 0);
     blockConer.name = "block_coner1";
-    updateBoundingBoxes(blockConer);
     registerWallsForCollision(blockConer);
     scene.add(blockConer);
     debugShowBoundingBoxes(blockConer, scene);
@@ -161,7 +151,6 @@ export function createTrack2(scene) {
         block.rotateZ(THREE.MathUtils.degToRad(180));
         block.position.set(-180, 0, -30 - 30 * index);
         block.name = "block_vertical1_" + index;
-        updateBoundingBoxes(block);
         registerWallsForCollision(block);
         scene.add(block);
         debugShowBoundingBoxes(block, scene);
@@ -172,7 +161,6 @@ export function createTrack2(scene) {
     blockConer2.rotateZ(THREE.MathUtils.degToRad(90));
     blockConer2.position.set(-180, 0, -270);
     blockConer2.name = "block_coner2";
-    updateBoundingBoxes(blockConer2);
     registerWallsForCollision(blockConer2);
     scene.add(blockConer2);
     debugShowBoundingBoxes(blockConer2, scene);
@@ -183,7 +171,6 @@ export function createTrack2(scene) {
         block.rotateZ(THREE.MathUtils.degToRad(270));
         block.position.set(-150 + 30 * index, 0, -270);
         block.name = "block_horizontal2_" + index;
-        updateBoundingBoxes(block);
         registerWallsForCollision(block);
         scene.add(block);
         debugShowBoundingBoxes(block, scene);
@@ -193,7 +180,6 @@ export function createTrack2(scene) {
     let blockConer3 = createBlock(2, "rgb(190,190,190)", "rgb(255,165,0)");
     blockConer3.position.set(-30, 0, -270);
     blockConer3.name = "block_coner3";
-    updateBoundingBoxes(blockConer3);
     registerWallsForCollision(blockConer3);
     scene.add(blockConer3);
     debugShowBoundingBoxes(blockConer3, scene);
@@ -203,7 +189,6 @@ export function createTrack2(scene) {
         let block = createBlock(1, "rgb(190,190,190)", "rgb(255,165,0)");
         block.position.set(-30, 0, -240 + 30 * index);
         block.name = "block_vertical2_" + index;
-        updateBoundingBoxes(block);
         registerWallsForCollision(block);
         scene.add(block);
         debugShowBoundingBoxes(block, scene);
@@ -214,7 +199,6 @@ export function createTrack2(scene) {
     blockConer4.rotateZ(THREE.MathUtils.degToRad(180));
     blockConer4.position.set(-30, 0, -120);
     blockConer4.name = "block_coner4";
-    updateBoundingBoxes(blockConer4);
     registerWallsForCollision(blockConer4);
     scene.add(blockConer4);
     debugShowBoundingBoxes(blockConer4, scene);
@@ -225,7 +209,6 @@ export function createTrack2(scene) {
         block.rotateZ(THREE.MathUtils.degToRad(-90))
         block.position.set(30 * index, 0, -120);
         block.name = "block_horizontal3_" + index;
-        updateBoundingBoxes(block);
         registerWallsForCollision(block);
         scene.add(block);
         debugShowBoundingBoxes(block, scene);
@@ -235,7 +218,6 @@ export function createTrack2(scene) {
     let blockConer5 = createBlock(2, "rgb(190,190,190)", "rgb(255,165,0)");
     blockConer5.position.set(90, 0, -120);
     blockConer5.name = "block_coner5";
-    updateBoundingBoxes(blockConer5);
     registerWallsForCollision(blockConer5);
     scene.add(blockConer5);
     debugShowBoundingBoxes(blockConer5, scene);
@@ -246,7 +228,6 @@ export function createTrack2(scene) {
         // block.rotateZ(THREE.MathUtils.degToRad(-90))
         block.position.set(90, 0, -90 + 30 * index);
         block.name = "block_vertical3_" + index;
-        updateBoundingBoxes(block);
         registerWallsForCollision(block);
         scene.add(block);
         debugShowBoundingBoxes(block, scene);
@@ -257,7 +238,6 @@ export function createTrack2(scene) {
     blockConer6.rotateZ(THREE.MathUtils.degToRad(-90));
     blockConer6.position.set(90, 0, 0);
     blockConer6.name = "block_coner6";
-    updateBoundingBoxes(blockConer6);
     registerWallsForCollision(blockConer6);
     scene.add(blockConer6);
     debugShowBoundingBoxes(blockConer6, scene);
@@ -290,13 +270,13 @@ function auxCreateBlock_parallel(colorFloor, colorWall) {
             let wall = createWall("rgb(255,255,255)", new THREE.Vector3(1, 0, 0));
             wall.name = "leftWall" + index;
             floor.add(wall);
-            wall.translateX(12.5).translateZ(1).translateY(-12.5 + 5 * index);
+            wall.translateX(12.5).translateZ(0.5).translateY(-12.5 + 5 * index);
         }
         else {
             let wall = createWall(colorWall, new THREE.Vector3(1, 0, 0));
             wall.name = "leftWall" + index;
             floor.add(wall);
-            wall.translateX(12.5).translateZ(1).translateY(-12.5 + 5 * index);
+            wall.translateX(12.5).translateZ(0.5).translateY(-12.5 + 5 * index);
         }
     }
 
@@ -305,13 +285,13 @@ function auxCreateBlock_parallel(colorFloor, colorWall) {
             let wall = createWall("rgb(255,255,255)", new THREE.Vector3(-1, 0, 0));
             wall.name = "rightWall" + index;
             floor.add(wall);
-            wall.translateX(-12.5).translateZ(1).translateY(-12.5 + 5 * index);
+            wall.translateX(-12.5).translateZ(0.5).translateY(-12.5 + 5 * index);
         }
         else {
             let wall = createWall(colorWall, new THREE.Vector3(-1, 0, 0));
             wall.name = "rightWall" + index;
             floor.add(wall);
-            wall.translateX(-12.5).translateZ(1).translateY(-12.5 + 5 * index);
+            wall.translateX(-12.5).translateZ(0.5).translateY(-12.5 + 5 * index);
         }
     }
     // console.log(floor);
@@ -327,13 +307,13 @@ function auxCreateCreate_Adjacent(colorFloor, colorWall, type_pattern = 1, color
                 let wall = createWall("rgb(255,255,255)", new THREE.Vector3(1, 0, 0));
                 wall.name = "leftWall" + index;
                 floor.add(wall);
-                wall.translateX(12.5).translateZ(1).translateY(-12.5 + 5 * index);
+                wall.translateX(12.5).translateZ(0.5).translateY(-12.5 + 5 * index);
             }
             else {
                 let wall = createWall(colorWall, new THREE.Vector3(1, 0, 0));
                 wall.name = "leftWall" + index;
                 floor.add(wall);
-                wall.translateX(12.5).translateZ(1).translateY(-12.5 + 5 * index);
+                wall.translateX(12.5).translateZ(0.5).translateY(-12.5 + 5 * index);
             }
         }
 
@@ -342,21 +322,26 @@ function auxCreateCreate_Adjacent(colorFloor, colorWall, type_pattern = 1, color
                 let wall = createWall("rgb(255,255,255)", new THREE.Vector3(0, 0, -1));
                 wall.name = "rightWall" + index;
                 floor.add(wall);
-                wall.translateX(-12.5 + 5 * index).translateZ(1).translateY(12.5);
+                wall.translateX(-12.5 + 5 * index).translateZ(0.5).translateY(12.5);
             }
             else {
                 let wall = createWall(colorWall, new THREE.Vector3(0, 0, -1));
                 wall.name = "rightWall" + index;
                 floor.add(wall);
-                wall.translateX(-12.5 + 5 * index).translateZ(1).translateY(12.5);
+                wall.translateX(-12.5 + 5 * index).translateZ(0.5).translateY(12.5);
             }
         }
         // console.log(floor);
-
-        let wallConer = createWall(colorConer, new THREE.Vector3(1, 0, 0));
-        wallConer.name = "conerWall";
-        floor.add(wallConer);
-        wallConer.translateX(-12.5).translateZ(1).translateY(-12.5);
+        if (!floor.getObjectByName("conerWall")) {
+            const wallConer = createWall(colorConer, new THREE.Vector3(1, 0, 0));
+            wallConer.name = "conerWall";
+            floor.add(wallConer);
+            wallConer.translateX(-12.5).translateZ(0.5).translateY(-12.5);
+        }
+        // let wallConer = createWall(colorConer, new THREE.Vector3(1, 0, 0));
+        // wallConer.name = "conerWall";
+        // floor.add(wallConer);
+        // wallConer.translateX(-12.5).translateZ(0.5).translateY(-12.5);
 
         return floor;
     }
@@ -367,13 +352,13 @@ function auxCreateCreate_Adjacent(colorFloor, colorWall, type_pattern = 1, color
                 let wall = createWall(colorWall, new THREE.Vector3(1, 0, 0));
                 wall.name = "leftWall" + index;
                 floor.add(wall);
-                wall.translateX(12.5).translateZ(1).translateY(-12.5 + 5 * index);
+                wall.translateX(12.5).translateZ(0.5).translateY(-12.5 + 5 * index);
             }
             else {
                 let wall = createWall("rgb(255,255,255)", new THREE.Vector3(1, 0, 0));
                 wall.name = "leftWall" + index;
                 floor.add(wall);
-                wall.translateX(12.5).translateZ(1).translateY(-12.5 + 5 * index);
+                wall.translateX(12.5).translateZ(0.5).translateY(-12.5 + 5 * index);
             }
         }
 
@@ -382,13 +367,13 @@ function auxCreateCreate_Adjacent(colorFloor, colorWall, type_pattern = 1, color
                 let wall = createWall(colorWall, new THREE.Vector3(0, 0, -1));
                 wall.name = "rightWall" + index;
                 floor.add(wall);
-                wall.translateX(-12.5 + 5 * index).translateZ(1).translateY(12.5);
+                wall.translateX(-12.5 + 5 * index).translateZ(0.5).translateY(12.5);
             }
             else {
                 let wall = createWall("rgb(255,255,255)", new THREE.Vector3(0, 0, -1));
                 wall.name = "rightWall" + index;
                 floor.add(wall);
-                wall.translateX(-12.5 + 5 * index).translateZ(1).translateY(12.5);
+                wall.translateX(-12.5 + 5 * index).translateZ(0.5).translateY(12.5);
             }
         }
         // console.log(floor);
@@ -396,7 +381,7 @@ function auxCreateCreate_Adjacent(colorFloor, colorWall, type_pattern = 1, color
         let wallConer = createWall(colorConer, new THREE.Vector3(1, 0, 0));
         wallConer.name = "conerWall";
         floor.add(wallConer);
-        wallConer.translateX(-12.5).translateZ(1).translateY(-12.5);
+        wallConer.translateX(-12.5).translateZ(0.5).translateY(-12.5);
 
         return floor;
     }
@@ -418,8 +403,6 @@ function createWall(color, normal = new THREE.Vector3(0, 0, 1)) {
     const cube = new THREE.Mesh(cubeGeometry, material);
 
     // Criando e armazenando a caixa delimitadora na mureta
-    let bbCube = new THREE.Box3().setFromObject(cube);
-    cube.userData.boundingBox = bbCube;
     cube.userData.surfaceNormal = normal; 
     
     return cube;
@@ -427,21 +410,25 @@ function createWall(color, normal = new THREE.Vector3(0, 0, 1)) {
 
 // Registras as muretas no sistema de colisão
 function registerWallsForCollision(block) {
-    block.traverse((child) => {
-        if (child.name && child.name.includes("Wall")) {
-            collisionSystem.addWall(child);
-        }
-    });
-}
-
-// Atualiza a posição das boudingbox
-function updateBoundingBoxes(block) {
-  block.traverse(child => {
-    if (child.userData.boundingBox) {
-      child.userData.boundingBox.setFromObject(child);
+  block.traverse((child) => {
+    if (child.name && child.name.includes("Wall")) {
+      const bb = new THREE.Box3().setFromObject(child);
+      // shrink bounding box a little so touching walls don’t overlap
+      bb.min.addScalar(0.5);
+      bb.max.addScalar(-0.5);
+      child.userData.boundingBox = bb;
+      collisionSystem.addWall(child);
     }
   });
 }
+
+// // Atualiza a posição das boudingbox {
+//   block.traverse(child => {
+//     if (child.userData.boundingBox) {
+//       child.userData.boundingBox.setFromObject(child);
+//     }
+//   });
+// }
 
 // Visualizador de boudingbox
 function debugShowBoundingBoxes(block, scene) {
