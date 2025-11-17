@@ -24,7 +24,29 @@ export function createSky(scene) {
     scene.background = new THREE.Color(0x87CEEB); 
 }
 
+export function createTrack0(scene) {
 
+    createGround(scene);
+    
+    createSky(scene);
+
+    for (let index = 0; index < 1; index++) {
+        let block
+        if(index == 2)
+            block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(255,30,30)");
+        else
+            block = createBlock(1, "rgb(100,100,100)", "rgb(255,30,30)");
+        // block.rotateZ(THREE.MathUtils.degToRad(90));
+        // block.position.set(60 - 30 * index, 0, 0);
+        block.name = "block_horizontal1_" + index;
+        scene.add(block);
+        registerWallsForCollision(block);
+        debugShowBoundingBoxes(block, scene);
+    }
+
+    
+
+}
 // Criar a primeira pista
 export function createTrack1(scene) {
 
@@ -267,7 +289,7 @@ function auxCreateBlock_parallel(colorFloor, colorWall) {
 
     const floor = createFloor(colorFloor);
 
-    for (let index = 0; index < 6; index++) {
+    for (let index = 0; index < 1; index++) {
         const col = (index % 2 === 0) 
             ? "rgb(255,255,255)" 
             : colorWall;
@@ -277,14 +299,10 @@ function auxCreateBlock_parallel(colorFloor, colorWall) {
 
         floor.add(wall);
 
-        wall.position.set(
-            12.5,                     // x
-            -12.5 + 5 * index,        // y
-            0.5                       // z
-        );
+        wall.position.set(12.5, -12.5 + 5 * index, 0.5);
     }
 
-    for (let index = 0; index < 6; index++) {
+    for (let index = 0; index < 1; index++) {
         const col = (index % 2 === 0) 
             ? "rgb(255,255,255)" 
             : colorWall;
@@ -294,11 +312,7 @@ function auxCreateBlock_parallel(colorFloor, colorWall) {
 
         floor.add(wall);
 
-        wall.position.set(
-            -12.5,                    // x
-            -12.5 + 5 * index,        // y
-            0.5                       // z
-        );
+        wall.position.set(-12.5, -12.5 + 5 * index, 0.5);
     }
 
     return floor;
@@ -396,21 +410,6 @@ function createWall(color, normal = new THREE.Vector3(0, 0, 1)) {
     return cube;
 }
 
-// Registras as muretas no sistema de colisão
-// function registerWallsForCollision(block) {
-//   block.traverse((child) => {
-//     if (child.name && child.name.includes("Wall")) {
-//       child.updateWorldMatrix(true, false);
-//       const bb = new THREE.Box3().setFromObject(child);
-//       // shrink bounding box a little so touching walls don’t overlap
-//     //   bb.min.addScalar(0.5);
-//     //   bb.max.addScalar(-0.5);
-//       child.userData.boundingBox = bb;
-//       collisionSystem.addWall(child);
-//     }
-//   });
-// }
-
 function registerWallsForCollision(block) {
   // Make sure world matrices are up-to-date
   block.updateMatrixWorld(true);
@@ -426,9 +425,6 @@ function registerWallsForCollision(block) {
     }
   });
 }
-
-
-
 
 // Visualizador de boudingbox
 function debugShowBoundingBoxes(block, scene) {

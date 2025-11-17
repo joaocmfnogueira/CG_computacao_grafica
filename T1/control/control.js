@@ -119,11 +119,17 @@ export function updateVehicleMovement(dt, scene, velocity, keyboard, cameraHolde
    const speedFactor = Math.min(Math.abs(velocity) / MAX_FORWARD_SPEED, 1);
    const effectiveRotationSpeed = ROTATION_SENSITIVITY * (1 - speedFactor * 1.5);
 
-   if (keyboard.pressed("left") && (velocity < -0.1 || velocity > 0.1)){
+   if (keyboard.pressed("left") && (velocity > 0.1)){
       vehicle.rotation.y += effectiveRotationSpeed * dt;
    }  
-   if (keyboard.pressed("right") && (velocity < -0.1 || velocity > 0.1)){
+   if (keyboard.pressed("right") && (velocity > 0.1)){
       vehicle.rotation.y -= effectiveRotationSpeed * dt;
+   } 
+   if (keyboard.pressed("left") && (velocity < -0.1)){
+      vehicle.rotation.y -= effectiveRotationSpeed * dt;
+   }  
+   if (keyboard.pressed("right") && (velocity < -0.1)){
+      vehicle.rotation.y += effectiveRotationSpeed * dt;
    } 
 
    vehicle.translateX(-velocity * dt * BLOCK_SIZE);

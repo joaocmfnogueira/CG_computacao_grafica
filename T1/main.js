@@ -5,7 +5,7 @@ import {
    InfoBox
 } from "../libs/util/util.js";
 import KeyboardState from '../libs/util/KeyboardState.js';
-import { createTrack1 } from "./models/map.js"
+import { createTrack1, createTrack0} from "./models/map.js"
 import { createHavac } from './models/vehicle.js';
 import {createSpeedDisplay, updateSpeedDisplay, createLapsCount, updateLapDisplay, showFinishScreen} from './utils.js';
 import {keyboardUpdate, updateVehicleMovement, updateCamera, resetVehicle} from './control/control.js';
@@ -30,7 +30,7 @@ light = initDefaultBasicLight(scene);
 let keyboard = new KeyboardState();
 
 // Criando a pista inicial
-createTrack1(scene);
+createTrack0(scene);
 
 let velocity = 0;
 let aceleration = 0;
