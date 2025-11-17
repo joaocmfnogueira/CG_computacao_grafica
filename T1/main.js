@@ -67,6 +67,7 @@ const lapsDisplay = createLapsCount();
 render();
 
 function render() {
+   scene.updateMatrixWorld(true);
    requestAnimationFrame(render);
 
    // Avalia se algum evento de troca de tela ou perca de foco aconteceu, se acontecer, congela as atualizações 
@@ -146,7 +147,7 @@ window.addEventListener('focus', () => {
 });
 
 function checkCarCollision(carMesh) {
-    if (collisionSystem.checkCollision(carMesh)) {
+    if (collisionSystem.checkCollision(carMesh, scene)) {
         // Handle collision - stop car, play sound, etc.
         console.log("Collision detected!");
         return true;

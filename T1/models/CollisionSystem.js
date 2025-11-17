@@ -5,26 +5,44 @@ export class CollisionSystem {
         this.wallBoundingBoxes = [];
     }
 
-    // Adiciona a mureta na lista de boundingBoxes
     addWall(wallMesh) {
-        const boundingBox = new THREE.Box3().setFromObject(wallMesh);
+        wallMesh.updateMatrixWorld(true);
+        console.log("wall world pos:", wallMesh.getWorldPosition(new THREE.Vector3()));
+        console.log("wall matrixWorld:", wallMesh.matrixWorld);
+        const boundingBox = wallMesh.userData.boundingBox;
+
         this.wallBoundingBoxes.push({
             mesh: wallMesh,
             boundingBox: boundingBox
         });
     }
 
-    // Avalia se o veiculo colidiu com alguma boundingBox
-    checkCollision(objectMesh) {
+    checkCollision(objectMesh, scene) {
         const objectBox = new THREE.Box3().setFromObject(objectMesh);
-        
+
         for (const wall of this.wallBoundingBoxes) {
-            wall.boundingBox.setFromObject(wall.mesh);
-            
+
             if (objectBox.intersectsBox(wall.boundingBox)) {
-                return true; 
+                debugWallBounding(scene, wall);
+                console.log(wall);
+                return true;
             }
         }
         return false;
     }
+}
+
+export function debugWallBounding(scene, wall) {
+    // wall = { mesh, boundingBox }
+
+    const bb = wall.boundingBox.clone();
+
+    const bbHelper = new THREE.Box3Helper(bb, 0xff0000);
+    const meshHelper = new THREE.BoxHelper(wall.mesh, 0x00ff00);
+    meshHelper.update();
+
+    scene.add(bbHelper);
+    scene.add(meshHelper);
+
+    wall.mesh.userData._debug = [bbHelper, meshHelper];
 }
