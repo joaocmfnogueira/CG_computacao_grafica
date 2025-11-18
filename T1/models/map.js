@@ -24,25 +24,101 @@ export function createSky(scene) {
     scene.background = new THREE.Color(0x87CEEB); 
 }
 
+// Pista de teste
 export function createTrack0(scene) {
 
     createGround(scene);
     
     createSky(scene);
-
-    for (let index = 0; index < 1; index++) {
-        let block
+    for (let index = 0; index < 8; index++) {
+        let block;
         if(index == 2)
-            block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(255,30,30)");
+            block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(255,165,0)");
         else
-            block = createBlock(1, "rgb(100,100,100)", "rgb(255,30,30)");
-        // block.rotateZ(THREE.MathUtils.degToRad(90));
-        // block.position.set(60 - 30 * index, 0, 0);
+            block = createBlock(1, "rgb(190,190,190)", "rgb(255,165,0)");
+        block.rotateZ(THREE.MathUtils.degToRad(90));
+        block.position.set(60 - 30 * index, 0, 0);
         block.name = "block_horizontal1_" + index;
         scene.add(block);
         registerWallsForCollision(block);
         debugShowBoundingBoxes(block, scene);
+
     }
+
+    let blockConer = createBlock(2, "rgb(190,190,190)", "rgb(255,165,0)");
+    blockConer.rotateZ(THREE.MathUtils.degToRad(180));
+    blockConer.position.set(-180, 0, 0);
+    blockConer.name = "block_coner1";
+    scene.add(blockConer);
+    registerWallsForCollision(blockConer);
+    debugShowBoundingBoxes(blockConer, scene);
+
+
+    for (let index = 0; index < 8; index++) {
+        let block = createBlock(1, "rgb(190,190,190)", "rgb(255,165,0)");
+        block.rotateZ(THREE.MathUtils.degToRad(180));
+        block.position.set(-180, 0, -30 - 30 * index);
+        block.name = "block_vertical1_" + index;
+        scene.add(block);
+        registerWallsForCollision(block);
+        debugShowBoundingBoxes(block, scene);
+
+    }
+
+    for (let index = 0; index < 8; index++) {
+        let block = createBlock(1, "rgb(190,190,190)", "rgb(255,165,0)");
+        block.rotateZ(THREE.MathUtils.degToRad(180));
+        block.position.set(-180, 0, -30 - 30 * index);
+        block.name = "block_vertical1_" + index;
+        scene.add(block);
+        registerWallsForCollision(block);
+        debugShowBoundingBoxes(block, scene);
+
+    }
+
+    let blockConer2 = createBlock(2, "rgb(190,190,190)", "rgb(255,165,0)", 2, "rgb(255,165,0)");
+    blockConer2.rotateZ(THREE.MathUtils.degToRad(90));
+    blockConer2.position.set(-180, 0, -270);
+    blockConer2.name = "block_coner2";
+    scene.add(blockConer2);
+    registerWallsForCollision(blockConer2);
+    debugShowBoundingBoxes(blockConer2, scene);
+
+    for (let index = 0; index < 4; index++) {
+        let block = createBlock(1, "rgb(190,190,190)", "rgb(255,165,0)");
+        block.rotateZ(THREE.MathUtils.degToRad(270));
+        block.position.set(-150 + 30 * index, 0, -270);
+        block.name = "block_horizontal2_" + index;
+        scene.add(block);
+        registerWallsForCollision(block);
+        debugShowBoundingBoxes(block, scene);
+
+    }
+
+    let blockConer3 = createBlock(2, "rgb(190,190,190)", "rgb(255,165,0)");
+    blockConer3.position.set(-30, 0, -270);
+    blockConer3.name = "block_coner3";
+    scene.add(blockConer3);
+    registerWallsForCollision(blockConer3);
+    debugShowBoundingBoxes(blockConer3, scene);
+
+    for (let index = 0; index < 4; index++) {
+        let block = createBlock(1, "rgb(190,190,190)", "rgb(255,165,0)");
+        block.position.set(-30, 0, -240 + 30 * index);
+        block.name = "block_vertical2_" + index;
+        scene.add(block);
+        registerWallsForCollision(block);
+        debugShowBoundingBoxes(block, scene);
+
+    }
+
+    let blockConer4 = createBlock(2, "rgb(190,190,190)", "rgb(255,165,0)", 2, "rgb(255,165,0)");
+    blockConer4.rotateZ(THREE.MathUtils.degToRad(180));
+    blockConer4.position.set(-30, 0, -120);
+    blockConer4.name = "block_coner4";
+    scene.add(blockConer4);
+    registerWallsForCollision(blockConer4);
+    debugShowBoundingBoxes(blockConer4, scene);
 
     
 
@@ -289,7 +365,7 @@ function auxCreateBlock_parallel(colorFloor, colorWall) {
 
     const floor = createFloor(colorFloor);
 
-    for (let index = 0; index < 1; index++) {
+    for (let index = 0; index < 6; index++) {
         const col = (index % 2 === 0) 
             ? "rgb(255,255,255)" 
             : colorWall;
@@ -302,7 +378,7 @@ function auxCreateBlock_parallel(colorFloor, colorWall) {
         wall.position.set(12.5, -12.5 + 5 * index, 0.5);
     }
 
-    for (let index = 0; index < 1; index++) {
+    for (let index = 0; index < 6; index++) {
         const col = (index % 2 === 0) 
             ? "rgb(255,255,255)" 
             : colorWall;
@@ -324,9 +400,6 @@ function auxCreateCreate_Adjacent(colorFloor, colorWall, type_pattern = 1, color
 
     const floor = createFloor(colorFloor);
 
-    //-------------------------------------------------------
-    // LEFT WALLS (6 walls)
-    //-------------------------------------------------------
     for (let index = 0; index < 6; index++) {
 
         const isEven = (index % 2 === 0);
@@ -339,16 +412,9 @@ function auxCreateCreate_Adjacent(colorFloor, colorWall, type_pattern = 1, color
 
         floor.add(wall);
 
-        wall.position.set(
-            12.5,                     // x
-            -12.5 + 5 * index,        // y
-            0.5                       // z
-        );
+        wall.position.set(12.5, -12.5 + 5 * index, 0.5);
     }
 
-    //-------------------------------------------------------
-    // RIGHT WALLS (5 walls)
-    //-------------------------------------------------------
     for (let index = 0; index < 5; index++) {
 
         const isEven = (index % 2 === 0);
@@ -361,16 +427,9 @@ function auxCreateCreate_Adjacent(colorFloor, colorWall, type_pattern = 1, color
 
         floor.add(wall);
 
-        wall.position.set(
-            -12.5 + 5 * index,    // x
-            12.5,                 // y  (ALWAYS 12.5 in both patterns)
-            0.5                   // z
-        );
+        wall.position.set(-12.5 + 5 * index, 12.5, 0.5);
     }
 
-    //-------------------------------------------------------
-    // CORNER WALL
-    //-------------------------------------------------------
     if (!floor.getObjectByName("conerWall")) {
 
         const wallConer = createWall(colorConer, new THREE.Vector3(1, 0, 0));
@@ -378,11 +437,7 @@ function auxCreateCreate_Adjacent(colorFloor, colorWall, type_pattern = 1, color
 
         floor.add(wallConer);
 
-        wallConer.position.set(
-            -12.5,
-            -12.5,
-            0.5
-        );
+        wallConer.position.set(-12.5, -12.5, 0.5);
     }
 
     return floor;
@@ -410,8 +465,8 @@ function createWall(color, normal = new THREE.Vector3(0, 0, 1)) {
     return cube;
 }
 
+// Função para registrar as colisões
 function registerWallsForCollision(block) {
-  // Make sure world matrices are up-to-date
   block.updateMatrixWorld(true);
 
   block.traverse(child => {
@@ -437,14 +492,6 @@ function debugShowBoundingBoxes(block, scene) {
     }
   });
 }
-
-// // Atualiza a posição das boudingbox {
-//   block.traverse(child => {
-//     if (child.userData.boundingBox) {
-//       child.userData.boundingBox.setFromObject(child);
-//     }
-//   });
-// }
 
 
 

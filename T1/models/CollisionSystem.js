@@ -7,8 +7,8 @@ export class CollisionSystem {
 
     addWall(wallMesh) {
         wallMesh.updateMatrixWorld(true);
-        console.log("wall world pos:", wallMesh.getWorldPosition(new THREE.Vector3()));
-        console.log("wall matrixWorld:", wallMesh.matrixWorld);
+        // console.log("wall world pos:", wallMesh.getWorldPosition(new THREE.Vector3()));
+        // console.log("wall matrixWorld:", wallMesh.matrixWorld);
         const boundingBox = wallMesh.userData.boundingBox;
 
         this.wallBoundingBoxes.push({
@@ -24,7 +24,7 @@ export class CollisionSystem {
 
             if (objectBox.intersectsBox(wall.boundingBox)) {
                 debugWallBounding(scene, wall);
-                console.log(wall);
+                // console.log(wall);
                 return true;
             }
         }
@@ -33,7 +33,6 @@ export class CollisionSystem {
 }
 
 export function debugWallBounding(scene, wall) {
-    // wall = { mesh, boundingBox }
 
     const bb = wall.boundingBox.clone();
 

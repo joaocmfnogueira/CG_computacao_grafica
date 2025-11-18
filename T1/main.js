@@ -5,7 +5,7 @@ import {
    InfoBox
 } from "../libs/util/util.js";
 import KeyboardState from '../libs/util/KeyboardState.js';
-import { createTrack1, createTrack0} from "./models/map.js"
+import { createTrack2, createTrack1, createTrack0} from "./models/map.js"
 import { createHavac } from './models/vehicle.js';
 import {createSpeedDisplay, updateSpeedDisplay, createLapsCount, updateLapDisplay, showFinishScreen} from './utils.js';
 import {keyboardUpdate, updateVehicleMovement, updateCamera, resetVehicle} from './control/control.js';
@@ -30,14 +30,12 @@ light = initDefaultBasicLight(scene);
 let keyboard = new KeyboardState();
 
 // Criando a pista inicial
-createTrack0(scene);
+createTrack2(scene);
 
 let velocity = 0;
 let aceleration = 0;
 let laps_count = 0;
 let canCompleteLap = false;
-
-
 
 // Variavel para pausar o jogo quando acontece troca de telas e outros eventos similares
 let isPaused = false;

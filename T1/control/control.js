@@ -7,6 +7,8 @@ import {
 import { createTrack1, createTrack2 } from "../models/map.js"
 import { createHavac } from '../models/vehicle.js';
 import { clearScene } from '../utils.js';
+// import { collisionSystem } from './models/map.js';
+
 
 // Ajuste para pista 
 const BLOCK_SIZE = 30;
@@ -21,7 +23,7 @@ const CAMERA_LOOK_AHEAD = 0.4;
 
 // Parâmetros de movimento ajustados à escala 
 const MAX_FORWARD_SPEED = 10;  
-const MAX_REVERSE_SPEED = -4;   
+const MAX_REVERSE_SPEED = -0.5;   
 const ACCELERATION_RATE = 30;    
 const DECELERATION_RATE = 40;  
 const BRAKE_POWER = 100;       
@@ -227,7 +229,7 @@ export function updateCamera(dt, scene, velocity, aceleration, keyboard, cameraH
  }
 
 function switchTrack(trackNumber, scene, cameraHolder) {
-   clearScene(scene);
+   clearScene(scene, { ignore: [cameraHolder] });
 
    if (trackNumber === 1) createTrack1(scene);
    else if (trackNumber === 2) createTrack2(scene);
@@ -235,8 +237,11 @@ function switchTrack(trackNumber, scene, cameraHolder) {
    initDefaultBasicLight(scene);
    createHavac(scene);
    resetVehicle(scene);
+
+   // cameraHolder was preserved, so just re-add it
    scene.add(cameraHolder);
 }
+
 
 export function resetVehicle(scene) {
    const vehicle = scene.getObjectByName("veiculo_principal");

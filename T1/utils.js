@@ -1,51 +1,90 @@
-import * as THREE from 'three';
-import {resetVehicle} from './control/control.js';
+import { collisionSystem } from './models/map.js';
+
+
 
 let finishScreen = null;
 let gameCompleted = false;
 
 // Função para remover todos os objetos de uma cena
-export function clearScene(scene) {
-    while (scene.children.length > 0) {
-        const object = scene.children[0];
-
-        scene.remove(object);
-
-        disposeObject(object);
+export function clearScene(scene, options = {}, renderer) {
+    if (!scene) {
+        console.warn('clearScene: No scene provided');
+        return;
     }
+
+    const { ignore = [] } = options;
+    
+    // Build ignore set (including all descendants)
+    const ignoreSet = new Set();
+    ignore.forEach(rootIgnored => {
+        if (rootIgnored) {
+            rootIgnored.traverse(child => ignoreSet.add(child));
+        }
+    });
+
+    // Remove non-ignored objects safely
+    const childrenToRemove = scene.children.filter(child => !ignoreSet.has(child));
+    childrenToRemove.forEach(child => {
+        removeAndDispose(child, ignoreSet);
+        scene.remove(child);
+    });
+
+    // Clear external systems (pass as parameter!)
+    if (collisionSystem) {
+        collisionSystem.wallBoundingBoxes.length = 0;
+        // collisionSystem.dynamicObjects.length = 0;
+    }
+
+    // Clear renderer caches ONLY
+    if (renderer?.renderLists) {
+        renderer.renderLists.dispose();
+    }
+    console.log(scene);
+}
+
+function removeAndDispose(object, ignoreSet) {
+    if (!object || ignoreSet.has(object)) return;
+
+    // Process children from a static snapshot
+    const children = [...object.children];
+    children.forEach(child => {
+        removeAndDispose(child, ignoreSet);
+        object.remove(child);
+    });
+
+    disposeObject(object);
 }
 
 function disposeObject(object) {
+    // Geometry
     if (object.geometry) {
         object.geometry.dispose();
     }
 
+    // Material(s)
     if (object.material) {
         if (Array.isArray(object.material)) {
-            object.material.forEach(material => disposeMaterial(material));
+            object.material.forEach(disposeMaterial);
         } else {
             disposeMaterial(object.material);
         }
     }
 
-    if (object.material && object.material.map) {
-        object.material.map.dispose();
-    }
-
-    if (object.children) {
-        for (let i = 0; i < object.children.length; i++) {
-            disposeObject(object.children[i]);
-        }
-    }
+    // Clean up user data
+    object.userData = {};
 }
 
 function disposeMaterial(material) {
-    for (const key in material) {
-        const value = material[key];
-        if (value && value.isTexture) {
+    // Check material exists and hasn't been disposed
+    if (!material || material.disposed) return;
+
+    // Dispose textures
+    Object.values(material).forEach(value => {
+        if (value?.isTexture) {
             value.dispose();
         }
-    }
+    });
+
     material.dispose();
 }
 
