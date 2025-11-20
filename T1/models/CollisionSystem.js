@@ -17,13 +17,12 @@ export class CollisionSystem {
         });
     }
 
-    checkCollision(objectMesh, scene) {
-        const objectBox = new THREE.Box3().setFromObject(objectMesh);
+    checkCollision(objectOBB, scene) {
 
         for (const wall of this.wallBoundingBoxes) {
 
-            if (objectBox.intersectsBox(wall.boundingBox)) {
-                debugWallBounding(scene, wall);
+            if (objectOBB.intersectsBox3(wall.boundingBox)) {
+                // debugWallBounding(scene, wall);
                 // console.log(wall);
                 return true;
             }

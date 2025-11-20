@@ -30,7 +30,7 @@ light = initDefaultBasicLight(scene);
 let keyboard = new KeyboardState();
 
 // Criando a pista inicial
-createTrack2(scene);
+createTrack1(scene);
 
 let velocity = 0;
 let aceleration = 0;
@@ -80,7 +80,7 @@ function render() {
    updateVehicleMovement(dt, scene, velocity, keyboard, cameraHolder);
    
   // Avalia a colisão
-  if (checkCarCollision(scene.getObjectByName("veiculo_principal"))) {
+  if (checkCarCollision(scene.getObjectByName("veiculo_principal").userData.obb)) {
     let aux = velocity;
     velocity = 0;
     aceleration = 0;
@@ -144,8 +144,8 @@ window.addEventListener('focus', () => {
   console.log("Jogo voltou");
 });
 
-function checkCarCollision(carMesh) {
-    if (collisionSystem.checkCollision(carMesh, scene)) {
+function checkCarCollision(carBox) {
+    if (collisionSystem.checkCollision(carBox, scene)) {
         // Handle collision - stop car, play sound, etc.
         console.log("Collision detected!");
         return true;

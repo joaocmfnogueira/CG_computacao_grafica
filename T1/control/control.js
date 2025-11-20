@@ -135,7 +135,8 @@ export function updateVehicleMovement(dt, scene, velocity, keyboard, cameraHolde
    } 
 
    vehicle.translateX(-velocity * dt * BLOCK_SIZE);
-   
+   vehicle.userData.boundingBox.setFromObject(vehicle);
+   vehicle.userData.updateOBB();
 }
 
 export function updateCamera(dt, scene, velocity, aceleration, keyboard, cameraHolder) {
@@ -258,3 +259,5 @@ export function resetVehicle(scene) {
     turnProgressLeft = 0;
     turnProgressRight = 0;
 }
+
+

@@ -2,14 +2,15 @@ import * as THREE from 'three';
 import {
     setDefaultMaterial
 } from "../../libs/util/util.js";
+import {OBB} from "./OBB.js"
 
 export function createHavac(scene) {    
-    // --- Materials ---
+    // Materiais
     const materialBase = setDefaultMaterial("rgba(235, 126, 211, 1)"); 
     const materialBody = setDefaultMaterial("rgba(136, 83, 167, 1)"); 
     const materialAntenna = setDefaultMaterial("rgba(136, 83, 167, 1)");
 
-    // --- Base (main oval body) ---
+    // Base
     const base = createBase(materialBase);
     const antenna = createAntenna(materialAntenna, "rgba(235, 126, 211, 1)");
     const body = createBody(materialBody)
@@ -21,10 +22,43 @@ export function createHavac(scene) {
     base.add(body);
 
 
-
-
     base.name = "veiculo_principal";
     scene.add(base);
+
+    base.userData.boundingBox = new THREE.Box3().setFromObject(base);
+    const obb = new OBB().fromBox3(base.userData.boundingBox);
+    base.userData.obb = obb;
+
+    const obbHelper = createOBBHelper(base.userData.obb, "rgb(255, 255, 255)");
+
+    // impedir do helper desaparecer depois de um tempo
+    obbHelper.frustumCulled = false;
+
+    obbHelper.name = "obbHelper";
+    obbHelper.visible = false;
+    scene.add(obbHelper);
+
+    // Constantes temporarias 
+    const tempMat4 = new THREE.Matrix4();
+    const tempMat3 = new THREE.Matrix3();
+
+    base.userData.updateOBB = function() {
+        base.updateMatrixWorld(true);
+
+        const mw = base.matrixWorld;
+
+        // Atualiza o centro
+        base.userData.obb.center.setFromMatrixPosition(mw);
+
+        // Obtem a rotação
+        tempMat4.extractRotation(mw);           
+        tempMat3.setFromMatrix4(tempMat4); 
+
+        base.userData.obb.rotation.copy(tempMat3);
+
+        // Atualiza o helper
+        updateOBBHelper(base.userData.obb, obbHelper);
+    };
 }
 
 
@@ -162,5 +196,109 @@ function createAntenna(materialAntenna){
     return cone;
 }
 
+function createBBHelper(bb, color = "rgb(255, 255, 255)")
+{
+   let helper = new THREE.Box3Helper( bb, color );
+   scene.add( helper );
+   return helper;
+}
+
+function createOBBHelper(obb, color = "rgb(255, 255, 255)") {
+    const geometry = new THREE.BufferGeometry();
+
+    // 8 corner points of the OBB
+    const pts = [];
+    const half = obb.halfSize;
+
+    const signs = [
+        [+1, +1, +1],
+        [+1, +1, -1],
+        [+1, -1, +1],
+        [+1, -1, -1],
+        [-1, +1, +1],
+        [-1, +1, -1],
+        [-1, -1, +1],
+        [-1, -1, -1],
+    ];
+
+    for (const s of signs) {
+        const p = new THREE.Vector3(
+            s[0] * half.x,
+            s[1] * half.y,
+            s[2] * half.z
+        );
+        // transform by OBB rotation + position
+        p.applyMatrix3(obb.rotation).add(obb.center);
+        pts.push(p);
+    }
+
+    // Edges between corners
+    const indices = [
+        0,1, 0,2, 0,4,
+        7,6, 7,5, 7,3,
+        1,3, 1,5,
+        2,3, 2,6,
+        4,5, 4,6
+    ];
+
+    const vertices = [];
+    for (let i = 0; i < indices.length; i++) {
+        const p = pts[indices[i]];
+        vertices.push(p.x, p.y, p.z);
+    }
+
+    geometry.setAttribute(
+        'position',
+        new THREE.Float32BufferAttribute(vertices, 3)
+    );
+
+    const material = new THREE.LineBasicMaterial({ color });
+    return new THREE.LineSegments(geometry, material);
+}
+
+function updateOBBHelper(obb, helper) {
+    const pos = helper.geometry.attributes.position;
+    const vertices = pos.array;
+
+    const half = obb.halfSize;
+    const signs = [
+        [+1, +1, +1],
+        [+1, +1, -1],
+        [+1, -1, +1],
+        [+1, -1, -1],
+        [-1, +1, +1],
+        [-1, +1, -1],
+        [-1, -1, +1],
+        [-1, -1, -1],
+    ];
+
+    const corners = [];
+    for (const s of signs) {
+        const p = new THREE.Vector3(
+            s[0] * half.x,
+            s[1] * half.y,
+            s[2] * half.z
+        );
+        p.applyMatrix3(obb.rotation).add(obb.center);
+        corners.push(p);
+    }
+
+    const idx = [
+        0,1, 0,2, 0,4,
+        7,6, 7,5, 7,3,
+        1,3, 1,5,
+        2,3, 2,6,
+        4,5, 4,6
+    ];
+
+    for (let i = 0; i < idx.length; i++) {
+        const p = corners[idx[i]];
+        vertices[i * 3] = p.x;
+        vertices[i * 3 + 1] = p.y;
+        vertices[i * 3 + 2] = p.z;
+    }
+
+    pos.needsUpdate = true;
+}
 
 
