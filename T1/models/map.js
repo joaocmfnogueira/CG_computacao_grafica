@@ -295,7 +295,7 @@ function auxCreateBlock_parallel(colorFloor, colorWall) {
             ? "rgb(255,255,255)" 
             : colorWall;
 
-        const wall = createWall(col, new THREE.Vector3(1, 0, 0));
+        const wall = createWall(col);
         wall.name = "leftWall" + index;
 
         floor.add(wall);
@@ -308,7 +308,7 @@ function auxCreateBlock_parallel(colorFloor, colorWall) {
             ? "rgb(255,255,255)" 
             : colorWall;
 
-        const wall = createWall(col, new THREE.Vector3(-1, 0, 0));
+        const wall = createWall(col);
         wall.name = "rightWall" + index;
 
         floor.add(wall);
@@ -332,7 +332,7 @@ function auxCreateCreate_Adjacent(colorFloor, colorWall, type_pattern = 1, color
             ? (isEven ? "rgb(255,255,255)" : colorWall)
             : (isEven ? colorWall : "rgb(255,255,255)");
 
-        const wall = createWall(col, new THREE.Vector3(1, 0, 0));
+        const wall = createWall(col);
         wall.name = "leftWall" + index;
 
         floor.add(wall);
@@ -347,7 +347,7 @@ function auxCreateCreate_Adjacent(colorFloor, colorWall, type_pattern = 1, color
             ? (isEven ? "rgb(255,255,255)" : colorWall)
             : (isEven ? colorWall : "rgb(255,255,255)");
 
-        const wall = createWall(col, new THREE.Vector3(0, 0, -1));
+        const wall = createWall(col);
         wall.name = "rightWall" + index;
 
         floor.add(wall);
@@ -357,7 +357,7 @@ function auxCreateCreate_Adjacent(colorFloor, colorWall, type_pattern = 1, color
 
     if (!floor.getObjectByName("conerWall")) {
 
-        const wallConer = createWall(colorConer, new THREE.Vector3(1, 0, 0));
+        const wallConer = createWall(colorConer);
         wallConer.name = "conerWall";
 
         floor.add(wallConer);
@@ -379,13 +379,10 @@ function createFloor(color) {
 }
 
 // Cria uma mureta
-function createWall(color, normal = new THREE.Vector3(0, 0, 1)) {
+function createWall(color) {
     const cubeGeometry = new THREE.BoxGeometry(5, 5, 2);
     const material = setDefaultMaterial(color, null);
     const cube = new THREE.Mesh(cubeGeometry, material);
-
-    // Criando e armazenando a caixa delimitadora na mureta
-    cube.userData.surfaceNormal = normal; 
     
     return cube;
 }
