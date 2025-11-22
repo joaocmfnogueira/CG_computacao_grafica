@@ -296,7 +296,7 @@ function auxCreateBlock_parallel(colorFloor, colorWall) {
             : colorWall;
 
         const wall = createWall(col);
-        wall.name = "leftWall" + index;
+        wall.name = "Pararell_leftWall";
 
         floor.add(wall);
 
@@ -309,7 +309,7 @@ function auxCreateBlock_parallel(colorFloor, colorWall) {
             : colorWall;
 
         const wall = createWall(col);
-        wall.name = "rightWall" + index;
+        wall.name = "Pararell_rightWall";
 
         floor.add(wall);
 
@@ -333,7 +333,7 @@ function auxCreateCreate_Adjacent(colorFloor, colorWall, type_pattern = 1, color
             : (isEven ? colorWall : "rgb(255,255,255)");
 
         const wall = createWall(col);
-        wall.name = "leftWall" + index;
+        wall.name = "Adjacent_leftWall";
 
         floor.add(wall);
 
@@ -348,7 +348,7 @@ function auxCreateCreate_Adjacent(colorFloor, colorWall, type_pattern = 1, color
             : (isEven ? colorWall : "rgb(255,255,255)");
 
         const wall = createWall(col);
-        wall.name = "rightWall" + index;
+        wall.name = "Adjacent_rightWall";
 
         floor.add(wall);
 
@@ -393,6 +393,13 @@ function registerWallsForCollision(block) {
 
   block.traverse(child => {
     if (child.name && child.name.includes("Wall") && child.geometry) {
+        if (child.material) {
+            if (Array.isArray(child.material)) {
+                child.material.forEach(m => (m.side = THREE.DoubleSide));
+            } else {
+                child.material.side = THREE.DoubleSide;
+            }
+        }
 
       child.userData.boundingBox = new THREE.Box3().setFromObject(child);
 
@@ -427,7 +434,7 @@ function debugShowBoundingBoxes(block, scene) {
       const helper = createOBBHelper(child.userData.obb);
       scene.add(helper);
       child.userData._bbHelper = helper;
-    //   addWallNormalHelper(child, scene, 80, 0x00ff00);
+      addWallNormalHelper(child, scene, 5, 0x00ff00);
     }
   });
   
@@ -436,7 +443,7 @@ function debugShowBoundingBoxes(block, scene) {
 
 export function addWallNormalHelper(wallMesh, scene, length = 2, color = 0xff0000) {
     // Normal of a plane in local space (pointing +Z in this case)
-    const localNormal = new THREE.Vector3(0, 0, 0);
+    const localNormal = new THREE.Vector3(1, 0, 0);
 
     // Transform it to world space
     const worldNormal = localNormal.clone().applyQuaternion(wallMesh.getWorldQuaternion(new THREE.Quaternion()));
