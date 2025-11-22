@@ -2,7 +2,9 @@ import * as THREE from 'three';
 import {
     setDefaultMaterial
 } from "../../libs/util/util.js";
-import {OBB} from "./OBB.js"
+import {OBB} from "./OBB.js";
+import {createOBBHelper} from "../utils.js";
+
 
 export function createHavac(scene) {    
     // Materiais
@@ -203,58 +205,6 @@ function createBBHelper(bb, color = "rgb(255, 255, 255)")
    return helper;
 }
 
-function createOBBHelper(obb, color = "rgb(255, 255, 255)") {
-    const geometry = new THREE.BufferGeometry();
-
-    // 8 corner points of the OBB
-    const pts = [];
-    const half = obb.halfSize;
-
-    const signs = [
-        [+1, +1, +1],
-        [+1, +1, -1],
-        [+1, -1, +1],
-        [+1, -1, -1],
-        [-1, +1, +1],
-        [-1, +1, -1],
-        [-1, -1, +1],
-        [-1, -1, -1],
-    ];
-
-    for (const s of signs) {
-        const p = new THREE.Vector3(
-            s[0] * half.x,
-            s[1] * half.y,
-            s[2] * half.z
-        );
-        // transform by OBB rotation + position
-        p.applyMatrix3(obb.rotation).add(obb.center);
-        pts.push(p);
-    }
-
-    // Edges between corners
-    const indices = [
-        0,1, 0,2, 0,4,
-        7,6, 7,5, 7,3,
-        1,3, 1,5,
-        2,3, 2,6,
-        4,5, 4,6
-    ];
-
-    const vertices = [];
-    for (let i = 0; i < indices.length; i++) {
-        const p = pts[indices[i]];
-        vertices.push(p.x, p.y, p.z);
-    }
-
-    geometry.setAttribute(
-        'position',
-        new THREE.Float32BufferAttribute(vertices, 3)
-    );
-
-    const material = new THREE.LineBasicMaterial({ color });
-    return new THREE.LineSegments(geometry, material);
-}
 
 function updateOBBHelper(obb, helper) {
     const pos = helper.geometry.attributes.position;

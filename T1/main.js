@@ -80,7 +80,7 @@ function render() {
    updateVehicleMovement(dt, scene, velocity, keyboard, cameraHolder);
    
   // Avalia a colisão
-  if (checkCarCollision(scene.getObjectByName("veiculo_principal").userData.obb)) {
+  if (checkCarCollision(scene.getObjectByName("veiculo_principal"), scene.getObjectByName("veiculo_principal").userData.obb)) {
     let aux = velocity;
     velocity = 0;
     aceleration = 0;
@@ -144,8 +144,8 @@ window.addEventListener('focus', () => {
   console.log("Jogo voltou");
 });
 
-function checkCarCollision(carBox) {
-    if (collisionSystem.checkCollision(carBox, scene)) {
+function checkCarCollision(car, carBox) {
+    if (collisionSystem.checkCollision(car, carBox, scene)) {
         // Handle collision - stop car, play sound, etc.
         console.log("Collision detected!");
         return true;

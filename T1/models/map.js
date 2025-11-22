@@ -3,6 +3,8 @@ import {
     setDefaultMaterial
 } from "../../libs/util/util.js";
 import { CollisionSystem } from './CollisionSystem.js';
+import {OBB} from "./OBB.js";
+import {createOBBHelper} from "../utils.js";
 
 export const collisionSystem = new CollisionSystem();
 
@@ -395,17 +397,23 @@ function registerWallsForCollision(block) {
   block.traverse(child => {
     if (child.name && child.name.includes("Wall") && child.geometry) {
 
-      // store the world-space box (clone so later recomputes don't overwrite)
       child.userData.boundingBox = new THREE.Box3().setFromObject(child);
 
-      // register with collision system
+      child.userData.obb = new OBB().fromBox3(child.userData.boundingBox);
+        
+      child.userData.normals = getWallNormalsFromOBB(child.userData.obb);
       collisionSystem.addWall(child);
+
+    //   console.log(child.userData.obb);
     }
   });
 }
 
+
+
 // Visualizador de boudingbox
 function debugShowBoundingBoxes(block, scene) {
+// // helper from box3
 //   block.traverse(child => {
 //     if (child.userData && child.userData.boundingBox && child.geometry) {
 //       // create a helper and store it so we can update later
@@ -414,7 +422,69 @@ function debugShowBoundingBoxes(block, scene) {
 //       child.userData._bbHelper = helper;
 //     }
 //   });
+
+// // helper from OBB
+  block.traverse(child => {
+    if (child.userData && child.userData.obb && child.geometry) {
+      // create a helper and store it so we can update later
+      const helper = createOBBHelper(child.userData.obb);
+      scene.add(helper);
+      child.userData._bbHelper = helper;
+    //   addWallNormalHelper(child, scene, 80, 0x00ff00);
+    }
+  });
+  
 }
+
+
+export function addWallNormalHelper(wallMesh, scene, length = 2, color = 0xff0000) {
+    // Normal of a plane in local space (pointing +Z in this case)
+    const localNormal = new THREE.Vector3(0, 0, 0);
+
+    // Transform it to world space
+    const worldNormal = localNormal.clone().applyQuaternion(wallMesh.getWorldQuaternion(new THREE.Quaternion()));
+
+    // Create the helper
+    const arrowHelper = new THREE.ArrowHelper(
+        worldNormal.clone().normalize(),
+        wallMesh.getWorldPosition(new THREE.Vector3()),
+        length,
+        color
+    );
+
+    arrowHelper.userData.wall = wallMesh; // store reference
+    scene.add(arrowHelper);
+
+    return arrowHelper;
+}
+
+function getWallNormalsFromOBB(obb) {
+
+    const normals = [];
+
+    // Extract axes from OBB.rotation
+    const rot = obb.rotation;
+
+    const axisX = new THREE.Vector3(rot.elements[0], rot.elements[1], rot.elements[2]).normalize();
+    const axisY = new THREE.Vector3(rot.elements[3], rot.elements[4], rot.elements[5]).normalize();
+    const axisZ = new THREE.Vector3(rot.elements[6], rot.elements[7], rot.elements[8]).normalize();
+
+    // 6 face normals
+    normals.push(axisX.clone());
+    normals.push(axisX.clone().negate());
+
+    normals.push(axisY.clone());
+    normals.push(axisY.clone().negate());
+
+    normals.push(axisZ.clone());
+    normals.push(axisZ.clone().negate());
+
+    // console.log(normals);
+    return normals;
+}
+
+
+
 
 
 
