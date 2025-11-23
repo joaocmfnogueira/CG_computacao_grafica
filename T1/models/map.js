@@ -457,7 +457,7 @@ export function addWallNormalHelper(wallMesh, scene, length = 2, color = 0xff000
     );
 
     arrowHelper.userData.wall = wallMesh; // store reference
-    scene.add(arrowHelper);
+    // scene.add(arrowHelper);
 
     return arrowHelper;
 }

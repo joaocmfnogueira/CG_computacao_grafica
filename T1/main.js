@@ -62,6 +62,9 @@ const speedDisplay = createSpeedDisplay();
 // Constante para exibir a quantidade de voltas que o veiculo fez
 const lapsDisplay = createLapsCount();
 
+// Variaveis que definem se houve colisão e em qual angulo
+
+
 render();
 
 function render() {
@@ -80,19 +83,81 @@ function render() {
    updateVehicleMovement(dt, scene, velocity, keyboard, cameraHolder);
    
   // Avalia a colisão
-  if (checkCarCollision(scene.getObjectByName("veiculo_principal"), scene.getObjectByName("veiculo_principal").userData.obb)) {
-    let aux = velocity;
-    velocity = 0;
-    aceleration = 0;
-    // if(aux > 0){
-    //   scene.getObjectByName("veiculo_principal").translateX(0.5);
-    // }
-    // else{
-    //   scene.getObjectByName("veiculo_principal").translateX(-0.5);
-    // }
+  const [isColided, angle, normal] = checkCarCollision(scene.getObjectByName("veiculo_principal"), scene.getObjectByName("veiculo_principal").userData.obb);
+//   if (isColided) {
+//     const car = scene.getObjectByName("veiculo_principal");
+//     console.log("RIGHT VECTOR BEFORE:", car.getWorldDirection(new THREE.Vector3()).clone());
+//     console.log("LEFT AXIS BEFORE:", new THREE.Vector3(1,0,0).applyQuaternion(car.quaternion));
 
+//     if(angle < 35 && velocity > 0){
+//       // velocity /= 10;
+//       console.log(velocity*20);
+//       console.log(Math.log(velocity*20));
+//       if(velocity > 2){
+//         // let recuo = THREE.MathUtils.lerp(0,Math.log(velocity*20), dt);
+//         // scene.getObjectByName("veiculo_principal").translateX(0.5);
+//         // scene.getObjectByName("veiculo_principal").translateX(recuo);
+//         scene.getObjectByName("veiculo_principal").translateX(0.5 + Math.log(velocity*20));
+//       }
+//       else{
+//         scene.getObjectByName("veiculo_principal").translateX(0.5);
+//       }
+//       velocity = -velocity/2;
+//       aceleration = -aceleration;
+      
+//     }
+//     else if(angle < 35 && velocity < 0){
+//       if(velocity < -2){
+//         scene.getObjectByName("veiculo_principal").translateX(-0.5 - Math.log(-velocity*20));
+//       }
+//       else{
+//         scene.getObjectByName("veiculo_principal").translateX(-0.5);
+//       }
+
+//       velocity = -velocity/2;
+//       aceleration = -aceleration;
+//     }
+//     else if(angle >= 35 && angle < 45){
+//           velocity = 0;
+//           aceleration = 0;
+//     }
+//     else if (angle >= 45) {
+
+//     // diminui a velocidade conforme o ângulo
+//     velocity = velocity / (90 / (90 - (90 - angle)));
+
+    
+
+//     // --- rotação segura ---
+//     const targetAngle = THREE.MathUtils.degToRad(90 - angle);
+//     const desvio = THREE.MathUtils.lerp(0, targetAngle, dt * (90 - angle));
+
+//     car.rotateY(desvio);
+
+//     // empurra levemente para frente
+//     car.translateZ(0.25);
+//     console.log("RIGHT VECTOR AFTER:", car.getWorldDirection(new THREE.Vector3()).clone());
+//     console.log("LEFT AXIS AFTER:", new THREE.Vector3(1,0,0).applyQuaternion(car.quaternion));
+// }
+//     else{
+//       let aux = velocity;
+//           velocity = 0;
+//           aceleration = 0;
+//           // if(aux > 0){
+//           //   scene.getObjectByName("veiculo_principal").translateX(0.5);
+//           // }
+//           // else{
+//           //   scene.getObjectByName("veiculo_principal").translateX(-0.5);
+//           // }
+//     }
+//   }
+  if (isColided){
+    const car = scene.getObjectByName("veiculo_principal");
+    [velocity, aceleration] = applyCollisionResponse(car, angle, normal, dt, velocity, aceleration);
   }
   
+  
+
    updateCamera(dt, scene, velocity, aceleration, keyboard, cameraHolder);
 
    updateSpeedDisplay(velocity, speedDisplay);
@@ -145,12 +210,13 @@ window.addEventListener('focus', () => {
 });
 
 function checkCarCollision(car, carBox) {
-    if (collisionSystem.checkCollision(car, carBox, scene)) {
+  const [isColided, angle, normal] = collisionSystem.checkCollision(car, carBox, scene)
+    if (isColided) {
         // Handle collision - stop car, play sound, etc.
         console.log("Collision detected!");
-        return true;
+        return [true, angle, normal];
     }
-    return false;
+    return [false, null, null];
 }
 
 function resetKeyboardState() {
@@ -177,6 +243,63 @@ function checkLapCompletion(carPos) {
       canCompleteLap = false;
       console.log(`Lap ${laps_count} completed!`);
    }
+}
+
+
+function applyCollisionResponse(car, angle, normal, dt, velocity, acceleration) {
+
+    // segurança absoluta – evitar quaternions degenerados
+    car.quaternion.normalize();
+    console.log(velocity)
+    if (angle < 35 && velocity > 0) {
+
+        const bump = velocity > 2
+            ? 0.5 + Math.log(velocity * 20)
+            : 0.5;
+        console.log(bump);
+        car.translateX(bump);
+        velocity = -velocity / 2;
+        acceleration = -acceleration;
+    }
+    else if (angle < 35 && velocity < 0) {
+
+        const bump = velocity < -2
+            ? -0.5 - Math.log(-velocity * 20)
+            : -0.5;
+
+        car.translateX(bump);
+        velocity = -velocity / 2;
+        acceleration = -acceleration;
+    }
+    else if (angle >= 35 && angle < 45) {
+
+        velocity = 0;
+        acceleration = 0;
+    }
+    else if (angle >= 45) {
+
+        // desvio lateral sem inverter eixo
+        const target = THREE.MathUtils.degToRad(90 - angle);
+        const desvio = THREE.MathUtils.lerp(0, target, dt * (90 - angle));
+
+        // rotação suave
+        car.rotateY(desvio);
+
+        // empurra o carro para longe da parede
+        car.position.addScaledVector(normal, 0.25);
+
+        // diminui velocidade dependendo de quão "lateral" é o choque
+        const smooth = 0.01;
+        velocity = velocity / (1 + (90 - angle)*smooth);
+    }
+    else {
+        velocity = 0;
+        acceleration = 0;
+    }
+
+    // **garante que eixos não invertam nunca**
+    car.quaternion.normalize();
+    return [velocity, acceleration];
 }
 
 

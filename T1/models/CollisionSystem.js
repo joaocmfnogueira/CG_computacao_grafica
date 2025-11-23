@@ -23,8 +23,8 @@ export class CollisionSystem {
     checkCollision(car, objectOBB, scene) {
 
         for (const wall of this.wallBoundingBoxes) {
-
-            if (objectOBB.intersectsOBB(wall.boundingBox)) {
+            const result = objectOBB.intersectsOBB(wall.boundingBox);
+            if (result) {
                 // debugWallBounding(scene, wall);
                 // console.log(wall.boundingBox);
                 const normals = wall.normals;
@@ -38,10 +38,11 @@ export class CollisionSystem {
                 console.log(collisionNormal)
                 console.log("Collision angle:", angleDeg);
                 // console.log(wall.mesh)
-                return true;
+                
+                return [true, angleDeg, collisionNormal];
             }
         }
-        return false;
+        return [false, null, null];
     }
 }
 
