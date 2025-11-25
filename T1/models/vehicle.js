@@ -25,6 +25,8 @@ export function createHavac(scene) {
 
 
     base.name = "veiculo_principal";
+    base.castShadow = true;
+    base.receiveShadow = true;
     scene.add(base);
 
     base.userData.boundingBox = new THREE.Box3().setFromObject(base);

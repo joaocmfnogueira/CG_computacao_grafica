@@ -375,6 +375,7 @@ function createFloor(color) {
     const material = setDefaultMaterial(color, null);
     const plane = new THREE.Mesh(geometry, material);
     plane.rotation.x = THREE.MathUtils.degToRad(-90);
+    plane.receiveShadow = true;
     return plane;
 }
 
@@ -383,6 +384,8 @@ function createWall(color) {
     const cubeGeometry = new THREE.BoxGeometry(5, 5, 2);
     const material = setDefaultMaterial(color, null);
     const cube = new THREE.Mesh(cubeGeometry, material);
+    cube.receiveShadow = true;
+    cube.castShadow = true;
     
     return cube;
 }
