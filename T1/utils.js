@@ -273,17 +273,16 @@ export function createOBBHelper(obb, color = "rgb(255, 255, 255)") {
     return new THREE.LineSegments(geometry, material);
 }
 
-export function initLight(scene, castShadow = false, position = new THREE.Vector3(2, 1, 1),
-   shadowSide = 16, shadowMapSize = 512, shadowNear = 0.1, shadowFar = 100) {
+export function initLight(scene, castShadow = true, position = new THREE.Vector3(10, 50, 50)) {
    let power = Math.PI;
    const ambientLight = new THREE.HemisphereLight(
       'white', // bright sky color
       'darkslategrey', // dim ground color
-      0.5 * power, // intensity
+      0.2 * power, // intensity
    );
    scene.add(ambientLight);
    
-   const mainLight = new THREE.DirectionalLight('white', 0.7 * power);
+   const mainLight = new THREE.DirectionalLight('white', 1 * power);
    mainLight.position.copy(position);
    mainLight.castShadow = castShadow;
    scene.add(mainLight);
@@ -292,15 +291,36 @@ export function initLight(scene, castShadow = false, position = new THREE.Vector
    // and its left, right, bottom, top, near and far parameters are, respectively,
    // (-5, 5, -5, 5, 0.5, 500).    
    const shadow = mainLight.shadow;
-   shadow.mapSize.width = shadowMapSize;
-   shadow.mapSize.height = shadowMapSize;
-   shadow.camera.near = shadowNear;
-   shadow.camera.far = shadowFar;
-   shadow.camera.left = -shadowSide / 2;
-   shadow.camera.right = shadowSide / 2;
-   shadow.camera.bottom = -shadowSide / 2;
-   shadow.camera.top = shadowSide / 2;
+   shadow.mapSize.width = 2048;
+   shadow.mapSize.height = 2048;
+   shadow.camera.left = -150;
+   shadow.camera.right = 150;
+   shadow.camera.top = 20;
+   shadow.camera.bottom = -20;
+
+   shadow.camera.near = 1;
+   shadow.camera.far = 500;
+
+   shadow.bias = -0.0005;
+
 
 
    return mainLight;
+}
+
+export function initRenderer(color = "rgb(0, 0, 0)", shadowMapType = THREE.PCFSoftShadowMap ) {
+
+   //var props = (typeof additionalProperties !== 'undefined' && additionalProperties) ? additionalProperties : {};
+   var renderer = new THREE.WebGLRenderer();
+   //renderer.useLegacyLights = true;
+   renderer.shadowMap.enabled = true;
+   renderer.shadowMapSoft = true;
+   renderer.shadowMap.type = shadowMapType;
+
+   renderer.setClearColor(new THREE.Color(color));
+   renderer.setSize(window.innerWidth, window.innerHeight);
+   renderer.shadowMap.enabled = true;
+   document.getElementById("webgl-output").appendChild(renderer.domElement);
+
+   return renderer;
 }

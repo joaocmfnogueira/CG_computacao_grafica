@@ -1,13 +1,11 @@
 import * as THREE from 'three';
 import {
-   initRenderer,
-   initDefaultBasicLight,
    InfoBox
 } from "../libs/util/util.js";
 import KeyboardState from '../libs/util/KeyboardState.js';
 import { createTrack2, createTrack1, createTrack0} from "./models/map.js"
 import { createHavac } from './models/vehicle.js';
-import {createSpeedDisplay, updateSpeedDisplay, createLapsCount, updateLapDisplay, showFinishScreen} from './utils.js';
+import {createSpeedDisplay, updateSpeedDisplay, createLapsCount, updateLapDisplay, showFinishScreen, initLight, initRenderer} from './utils.js';
 import {keyboardUpdate, updateVehicleMovement, updateCamera, resetVehicle} from './control/control.js';
 import { collisionSystem } from './models/map.js';
 
@@ -26,7 +24,7 @@ cameraHolder.add(camera);
 scene.add(cameraHolder);
 
 // Criando a luz básica e o teclado
-light = initDefaultBasicLight(scene);
+light = initLight(scene);
 let keyboard = new KeyboardState();
 
 // Criando a pista inicial
@@ -80,7 +78,7 @@ function render() {
    aceleration = result.aceleration;
    laps_count = result.laps_count
 
-   updateVehicleMovement(dt, scene, velocity, keyboard, cameraHolder);
+   updateVehicleMovement(dt, scene, velocity, keyboard, light);
    
   // Avalia a colisão
   const [isColided, angle, normal] = checkCarCollision(scene.getObjectByName("veiculo_principal"), scene.getObjectByName("veiculo_principal").userData.obb);

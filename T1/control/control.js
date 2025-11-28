@@ -7,6 +7,8 @@ import {
 import { createTrack1, createTrack2 } from "../models/map.js"
 import { createHavac } from '../models/vehicle.js';
 import { clearScene } from '../utils.js';
+import { initLight} from '../utils.js';
+
 // import { collisionSystem } from './models/map.js';
 
 
@@ -113,7 +115,7 @@ export function keyboardUpdate(keyboard, velocity, aceleration, dt, scene, camer
    return { velocity, aceleration, laps_count };
 }
 
-export function updateVehicleMovement(dt, scene, velocity, keyboard, cameraHolder) {
+export function updateVehicleMovement(dt, scene, velocity, keyboard, light) {
    const vehicle = scene.getObjectByName("veiculo_principal");
    if (!vehicle) return;
 
@@ -137,6 +139,18 @@ export function updateVehicleMovement(dt, scene, velocity, keyboard, cameraHolde
    vehicle.translateX(-velocity * dt * BLOCK_SIZE);
    vehicle.userData.boundingBox.setFromObject(vehicle);
    vehicle.userData.updateOBB();
+   // console.log(vehicle.castShadow);
+
+   const worldPos = new THREE.Vector3();
+   vehicle.getWorldPosition(worldPos);
+
+   light.position.set(worldPos.x + 10, worldPos.y + 50, worldPos.z + 50);
+   light.target.position.set(worldPos.x, worldPos.y, worldPos.z);
+   light.target.updateMatrixWorld();
+
+
+   // console.log(light.position);
+   
 }
 
 export function updateCamera(dt, scene, velocity, aceleration, keyboard, cameraHolder) {
@@ -235,7 +249,7 @@ function switchTrack(trackNumber, scene, cameraHolder) {
    if (trackNumber === 1) createTrack1(scene);
    else if (trackNumber === 2) createTrack2(scene);
 
-   initDefaultBasicLight(scene);
+   initLight(scene);
    createHavac(scene);
    resetVehicle(scene);
 

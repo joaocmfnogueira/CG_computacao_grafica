@@ -15,6 +15,7 @@ export function createHavac(scene) {
     // Base
     const base = createBase(materialBase);
     const antenna = createAntenna(materialAntenna, "rgba(235, 126, 211, 1)");
+    antenna.castShadow = true;
     const body = createBody(materialBody)
 
     base.scale.set(1,1,1);
