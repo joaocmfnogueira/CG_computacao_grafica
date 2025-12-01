@@ -81,77 +81,11 @@ function render() {
    updateVehicleMovement(dt, scene, velocity, keyboard, light);
    
   // Avalia a colisão
-  const [isColided, angle, normal] = checkCarCollision(scene.getObjectByName("veiculo_principal"), scene.getObjectByName("veiculo_principal").userData.obb);
-//   if (isColided) {
-//     const car = scene.getObjectByName("veiculo_principal");
-//     console.log("RIGHT VECTOR BEFORE:", car.getWorldDirection(new THREE.Vector3()).clone());
-//     console.log("LEFT AXIS BEFORE:", new THREE.Vector3(1,0,0).applyQuaternion(car.quaternion));
+  const [isColided, angle, normal, wall] = checkCarCollision(scene.getObjectByName("veiculo_principal"), scene.getObjectByName("veiculo_principal").userData.obb);
 
-//     if(angle < 35 && velocity > 0){
-//       // velocity /= 10;
-//       console.log(velocity*20);
-//       console.log(Math.log(velocity*20));
-//       if(velocity > 2){
-//         // let recuo = THREE.MathUtils.lerp(0,Math.log(velocity*20), dt);
-//         // scene.getObjectByName("veiculo_principal").translateX(0.5);
-//         // scene.getObjectByName("veiculo_principal").translateX(recuo);
-//         scene.getObjectByName("veiculo_principal").translateX(0.5 + Math.log(velocity*20));
-//       }
-//       else{
-//         scene.getObjectByName("veiculo_principal").translateX(0.5);
-//       }
-//       velocity = -velocity/2;
-//       aceleration = -aceleration;
-      
-//     }
-//     else if(angle < 35 && velocity < 0){
-//       if(velocity < -2){
-//         scene.getObjectByName("veiculo_principal").translateX(-0.5 - Math.log(-velocity*20));
-//       }
-//       else{
-//         scene.getObjectByName("veiculo_principal").translateX(-0.5);
-//       }
-
-//       velocity = -velocity/2;
-//       aceleration = -aceleration;
-//     }
-//     else if(angle >= 35 && angle < 45){
-//           velocity = 0;
-//           aceleration = 0;
-//     }
-//     else if (angle >= 45) {
-
-//     // diminui a velocidade conforme o ângulo
-//     velocity = velocity / (90 / (90 - (90 - angle)));
-
-    
-
-//     // --- rotação segura ---
-//     const targetAngle = THREE.MathUtils.degToRad(90 - angle);
-//     const desvio = THREE.MathUtils.lerp(0, targetAngle, dt * (90 - angle));
-
-//     car.rotateY(desvio);
-
-//     // empurra levemente para frente
-//     car.translateZ(0.25);
-//     console.log("RIGHT VECTOR AFTER:", car.getWorldDirection(new THREE.Vector3()).clone());
-//     console.log("LEFT AXIS AFTER:", new THREE.Vector3(1,0,0).applyQuaternion(car.quaternion));
-// }
-//     else{
-//       let aux = velocity;
-//           velocity = 0;
-//           aceleration = 0;
-//           // if(aux > 0){
-//           //   scene.getObjectByName("veiculo_principal").translateX(0.5);
-//           // }
-//           // else{
-//           //   scene.getObjectByName("veiculo_principal").translateX(-0.5);
-//           // }
-//     }
-//   }
   if (isColided){
     const car = scene.getObjectByName("veiculo_principal");
-    [velocity, aceleration] = applyCollisionResponse(car, angle, normal, dt, velocity, aceleration);
+    [velocity, aceleration] = applyCollisionResponse(car, angle, normal, wall, dt, velocity, aceleration);
   }
   
   
@@ -208,13 +142,13 @@ window.addEventListener('focus', () => {
 });
 
 function checkCarCollision(car, carBox) {
-  const [isColided, angle, normal] = collisionSystem.checkCollision(car, carBox, scene)
+  const [isColided, angle, normal, wall] = collisionSystem.checkCollision(car, carBox, scene);
     if (isColided) {
         // Handle collision - stop car, play sound, etc.
         console.log("Collision detected!");
-        return [true, angle, normal];
+        return [true, angle, normal, wall];
     }
-    return [false, null, null];
+    return [false, null, null, null];
 }
 
 function resetKeyboardState() {
@@ -244,7 +178,7 @@ function checkLapCompletion(carPos) {
 }
 
 
-function applyCollisionResponse(car, angle, normal, dt, velocity, acceleration) {
+function applyCollisionResponse(car, angle, normal, wall, dt, velocity, acceleration) {
 
     // segurança absoluta – evitar quaternions degenerados
     car.quaternion.normalize();
@@ -269,27 +203,37 @@ function applyCollisionResponse(car, angle, normal, dt, velocity, acceleration) 
         velocity = -velocity / 2;
         acceleration = -acceleration;
     }
-    else if (angle >= 35 && angle < 45) {
+    // else if (angle >= 35 && angle < 45) {
 
-        velocity = 0;
-        acceleration = 0;
-    }
-    else if (angle >= 45) {
+    //     velocity = 0;
+    //     acceleration = 0;
+    // }
+    else if (angle >= 35) {
 
-        // desvio lateral sem inverter eixo
-        const target = THREE.MathUtils.degToRad(90 - angle);
-        const desvio = THREE.MathUtils.lerp(0, target, dt * (90 - angle));
+        // direction car → wall
+        const forward = new THREE.Vector3(-1,0,0)
+        .applyQuaternion(car.quaternion)
+        .normalize();
 
-        // rotação suave
-        car.rotateY(desvio);
+        // use wall normal, not wall.position
+        const wallNormal = normal.clone().normalize();
 
-        // empurra o carro para longe da parede
-        car.position.addScaledVector(normal, 0.1);
+        // rotation sign: should we rotate left or right to escape the wall?
+        const cross = new THREE.Vector3().crossVectors(forward, wallNormal);
+        let rotationSign = Math.sign(cross.y);
+        // if(wall.mesh.name.includes("rightWall"))
+        //     rotationSign *= -1;
+        console.log(wall.mesh.name);
+        // smooth rotation away from the wall
+        const maxRot = THREE.MathUtils.degToRad(0.5);
+        car.rotateY(rotationSign * maxRot);
 
-        // diminui velocidade dependendo de quão "lateral" é o choque
+        // push the car slightly away
+        car.position.addScaledVector(wallNormal, 0.1);
+
+        // slow down
         const smooth = 0.01;
-        velocity = velocity / (1 + (90 - angle)*smooth);
-        console.log("Colisão lateral")
+        velocity = velocity / (1 + (90 - angle) * smooth);
     }
     else {
       // pior caso, que não deve acontecer

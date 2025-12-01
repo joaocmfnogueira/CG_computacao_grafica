@@ -39,7 +39,7 @@ export class CollisionSystem {
                 console.log("Collision angle:", angleDeg);
                 // console.log(wall.mesh)
                 
-                return [true, angleDeg, collisionNormal];
+                return [true, angleDeg, collisionNormal, wall];
             }
         }
         return [false, null, null];
