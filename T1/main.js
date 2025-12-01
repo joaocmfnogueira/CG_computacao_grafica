@@ -284,13 +284,16 @@ function applyCollisionResponse(car, angle, normal, dt, velocity, acceleration) 
         car.rotateY(desvio);
 
         // empurra o carro para longe da parede
-        car.position.addScaledVector(normal, 0.25);
+        car.position.addScaledVector(normal, 0.1);
 
         // diminui velocidade dependendo de quão "lateral" é o choque
         const smooth = 0.01;
         velocity = velocity / (1 + (90 - angle)*smooth);
+        console.log("Colisão lateral")
     }
     else {
+      // pior caso, que não deve acontecer
+      console.log("Algum erro aconteceu com o angulo do veiculo!!!!");
         velocity = 0;
         acceleration = 0;
     }
