@@ -78,7 +78,7 @@ function render() {
    aceleration = result.aceleration;
    laps_count = result.laps_count
 
-   updateVehicleMovement(dt, scene, velocity, keyboard, light);
+   updateVehicleMovement(dt, scene, velocity, keyboard, scene.getObjectByName("light"));
    
   // Avalia a colisão
   const [isColided, angle, normal, wall] = checkCarCollision(scene.getObjectByName("veiculo_principal"), scene.getObjectByName("veiculo_principal").userData.obb);

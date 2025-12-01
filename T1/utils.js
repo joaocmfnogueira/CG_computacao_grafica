@@ -304,7 +304,7 @@ export function initLight(scene, castShadow = true, position = new THREE.Vector3
    shadow.bias = -0.0005;
 
 
-
+   mainLight.name = "light";
    return mainLight;
 }
 
