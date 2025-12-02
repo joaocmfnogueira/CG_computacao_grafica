@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import {
    InfoBox
 } from "../libs/util/util.js";
+import Stats from '../build/jsm/libs/stats.module.js';
 import KeyboardState from '../libs/util/KeyboardState.js';
 import { createTrack2, createTrack1, createTrack0} from "./models/map.js"
 import { createHavac } from './models/vehicle.js';
@@ -11,6 +12,9 @@ import { collisionSystem } from './models/map.js';
 
 
 let scene, renderer, camera, light;
+const container = document.getElementById( 'container' );
+const stats = new Stats();
+container.appendChild( stats.dom );
 scene = new THREE.Scene();
 renderer = initRenderer();
 
@@ -66,6 +70,7 @@ const lapsDisplay = createLapsCount();
 render();
 
 function render() {
+   stats.update();
    scene.updateMatrixWorld(true);
    requestAnimationFrame(render);
 
