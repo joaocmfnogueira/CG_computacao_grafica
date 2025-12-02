@@ -144,7 +144,7 @@ export function updateVehicleMovement(dt, scene, velocity, keyboard, light) {
    const worldPos = new THREE.Vector3();
    vehicle.getWorldPosition(worldPos);
 
-   light.position.set(worldPos.x + 10, worldPos.y + 50, worldPos.z + 50);
+   light.position.set(worldPos.x + 10, worldPos.y + 50, worldPos.z + 75);
    light.target.position.set(worldPos.x, worldPos.y, worldPos.z);
    light.target.updateMatrixWorld();
 
@@ -261,7 +261,7 @@ function switchTrack(trackNumber, scene, cameraHolder) {
 export function resetVehicle(scene) {
    const vehicle = scene.getObjectByName("veiculo_principal");
    if (vehicle) {
-      vehicle.position.set(0, 1, 0);
+      vehicle.position.set(0, 0.25, 0);
       vehicle.rotation.set(0, 0, 0);
    }
 

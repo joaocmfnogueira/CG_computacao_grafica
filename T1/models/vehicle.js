@@ -5,7 +5,7 @@ import {
 import {OBB} from "./OBB.js";
 import {createOBBHelper} from "../utils.js";
 
-
+// criar carro do jogador
 export function createHavac(scene) {    
     // Materiais
     const materialBase = setDefaultMaterial("rgba(235, 126, 211, 1)"); 
@@ -26,6 +26,64 @@ export function createHavac(scene) {
 
 
     base.name = "veiculo_principal";
+    base.castShadow = true;
+    base.receiveShadow = true;
+
+    // base.translateY(-0.5);
+    scene.add(base);
+
+    base.userData.boundingBox = new THREE.Box3().setFromObject(base);
+    const obb = new OBB().fromBox3(base.userData.boundingBox);
+    base.userData.obb = obb;
+
+    const obbHelper = createOBBHelper(base.userData.obb, "rgb(255, 255, 255)");
+
+    // impedir do helper desaparecer depois de um tempo
+    obbHelper.frustumCulled = false;
+
+    obbHelper.name = "obbHelper";
+    obbHelper.visible = false;
+    scene.add(obbHelper);
+
+    // Constantes temporarias 
+    const tempMat4 = new THREE.Matrix4();
+    const tempMat3 = new THREE.Matrix3();
+
+    base.userData.updateOBB = function() {
+        base.updateMatrixWorld(true);
+
+        const mw = base.matrixWorld;
+
+        // Atualiza o centro
+        base.userData.obb.center.setFromMatrixPosition(mw);
+
+        // Obtem a rotação
+        tempMat4.extractRotation(mw);           
+        tempMat3.setFromMatrix4(tempMat4); 
+
+        base.userData.obb.rotation.copy(tempMat3);
+
+        // Atualiza o helper
+        updateOBBHelper(base.userData.obb, obbHelper);
+    };
+}
+
+
+// criar carro dos inimigos
+function createHavacEnemy(materialBase, materialBody, materialAntenna, id){
+    const base = createBase(materialBase);
+    const antenna = createAntenna(materialAntenna, "rgba(235, 126, 211, 1)");
+    antenna.castShadow = true;
+    const body = createBody(materialBody)
+
+    base.scale.set(1,1,1);
+
+    body.add(antenna);
+    body.scale.set(1,1,1);
+    base.add(body);
+
+
+    base.name = "veiculo_inimigo_" + id;
     base.castShadow = true;
     base.receiveShadow = true;
     scene.add(base);
@@ -67,7 +125,6 @@ export function createHavac(scene) {
 }
 
 
-
 function createBase(materialBase){
     function createCapsule(height){
         const baseGeom = new THREE.CapsuleGeometry(0.25, height);
@@ -79,7 +136,7 @@ function createBase(materialBase){
     function create_base_back(){
         const boxGeo = new THREE.BoxGeometry(5, 0.5, 3);
         const box = new THREE.Mesh(boxGeo, materialBase);
-        box.position.y = 1;
+        box.position.y = 0.25;
 
         const capsule1 = createCapsule(5);
         capsule1.position.y = 0;

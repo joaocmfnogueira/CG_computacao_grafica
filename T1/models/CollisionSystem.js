@@ -75,7 +75,7 @@ function getCollisionNormal(carDir, wallNormals, wallMesh, carPosition) {
         return localNormal.clone().applyQuaternion(wallMesh.getWorldQuaternion(new THREE.Quaternion()));
     }
     if (wallMesh.name === "Adjacent_leftWall") {
-        const localNormal = new THREE.Vector3(1, 0, 0);
+        const localNormal = new THREE.Vector3(-1, 0, 0);
         return localNormal.clone().applyQuaternion(wallMesh.getWorldQuaternion(new THREE.Quaternion()));
     }
     if (wallMesh.name === "Adjacent_rightWall") {

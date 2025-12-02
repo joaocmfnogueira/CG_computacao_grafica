@@ -273,7 +273,7 @@ export function createOBBHelper(obb, color = "rgb(255, 255, 255)") {
     return new THREE.LineSegments(geometry, material);
 }
 
-export function initLight(scene, castShadow = true, position = new THREE.Vector3(10, 50, 50)) {
+export function initLight(scene, castShadow = true, position = new THREE.Vector3(10, 50, 75)) {
    let power = Math.PI;
    const ambientLight = new THREE.HemisphereLight(
       'white', // bright sky color
@@ -295,8 +295,8 @@ export function initLight(scene, castShadow = true, position = new THREE.Vector3
    shadow.mapSize.height = 2048;
    shadow.camera.left = -150;
    shadow.camera.right = 150;
-   shadow.camera.top = 20;
-   shadow.camera.bottom = -20;
+   shadow.camera.top = 50;
+   shadow.camera.bottom = -50;
 
    shadow.camera.near = 1;
    shadow.camera.far = 500;

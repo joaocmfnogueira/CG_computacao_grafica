@@ -188,7 +188,7 @@ function applyCollisionResponse(car, angle, normal, wall, dt, velocity, accelera
     // segurança absoluta – evitar quaternions degenerados
     car.quaternion.normalize();
     console.log(velocity)
-    if (angle < 35 && velocity > 0) {
+    if (angle < 40 && velocity > 0) {
 
         const bump = velocity > 2
             ? 0.5 + Math.log(velocity * 20)
@@ -198,7 +198,7 @@ function applyCollisionResponse(car, angle, normal, wall, dt, velocity, accelera
         velocity = -velocity / 2;
         acceleration = -acceleration;
     }
-    else if (angle < 35 && velocity < 0) {
+    else if (angle < 40 && velocity < 0) {
 
         const bump = velocity < -2
             ? -0.5 - Math.log(-velocity * 20)
@@ -213,7 +213,7 @@ function applyCollisionResponse(car, angle, normal, wall, dt, velocity, accelera
     //     velocity = 0;
     //     acceleration = 0;
     // }
-    else if (angle >= 35) {
+    else if (angle >= 40) {
 
         // direction car → wall
         const forward = new THREE.Vector3(-1,0,0)
@@ -251,5 +251,61 @@ function applyCollisionResponse(car, angle, normal, wall, dt, velocity, accelera
     car.quaternion.normalize();
     return [velocity, acceleration];
 }
+
+
+// Função que pretendia resolver o problema do angulo 40, não resolveu de fato
+// function applyCollisionResponse(car, angle, normal, wall, dt, velocity, acceleration) {
+
+//     car.quaternion.normalize();
+
+//     // --- transition factor for smooth physics ---------------------
+//     const t = THREE.MathUtils.clamp((angle - 35) / 10, 0, 1);
+
+//     // forward direction of car
+//     const forward = new THREE.Vector3(-1, 0, 0)
+//         .applyQuaternion(car.quaternion)
+//         .normalize();
+
+//     const wallNormal = normal.clone().normalize();
+//     const cross = new THREE.Vector3().crossVectors(forward, wallNormal);
+
+//     const rotationSign = Math.sign(cross.y);
+//     const maxRot = THREE.MathUtils.degToRad(0.5);
+
+//     // --- bump displacement ----------------------------------------
+//     let bump = 0;
+//     if (velocity > 0) {
+//         bump = velocity > 2 ? 0.5 + Math.log(velocity * 20) : 0.5;
+//     } else if (velocity < 0) {
+//         bump = velocity < -2 ? -0.5 - Math.log(-velocity * 20) : -0.5;
+//     }
+
+//     // blended bump: strong at angle <35, weak at angle>45
+//     const blendedBump = bump * (1 - t);
+//     car.translateX(blendedBump);
+
+//     // blended slide: weak at angle <35, strong at angle>45
+//     const slideAmount = 0.1 * t;
+//     car.position.addScaledVector(wallNormal, slideAmount);
+
+//     // blended rotation
+//     car.rotateY(rotationSign * maxRot * t);
+
+//     // blended velocity response
+//     if (t === 0) {
+//         // pure bump
+//         velocity = -velocity / 2;
+//         acceleration = -acceleration;
+//     } else {
+//         // slide mode dampening
+//         const smooth = 0.01;
+//         velocity = velocity / (1 + (90 - angle) * smooth);
+//     }
+
+//     car.quaternion.normalize();
+
+//     return [velocity, acceleration];
+// }
+
 
 

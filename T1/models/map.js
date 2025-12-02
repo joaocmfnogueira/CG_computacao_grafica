@@ -437,7 +437,7 @@ function debugShowBoundingBoxes(block, scene) {
       const helper = createOBBHelper(child.userData.obb);
       scene.add(helper);
       child.userData._bbHelper = helper;
-      addWallNormalHelper(child, scene, 5, 0x00ff00);
+    //   addWallNormalHelper(child, scene, 5, 0x00ff00);
     }
   });
   
@@ -446,7 +446,7 @@ function debugShowBoundingBoxes(block, scene) {
 
 export function addWallNormalHelper(wallMesh, scene, length = 2, color = 0xff0000) {
     // Normal of a plane in local space (pointing +Z in this case)
-    const localNormal = new THREE.Vector3(1, 0, 0);
+    const localNormal = new THREE.Vector3(0, -1, 0);
 
     // Transform it to world space
     const worldNormal = localNormal.clone().applyQuaternion(wallMesh.getWorldQuaternion(new THREE.Quaternion()));
@@ -460,7 +460,7 @@ export function addWallNormalHelper(wallMesh, scene, length = 2, color = 0xff000
     );
 
     arrowHelper.userData.wall = wallMesh; // store reference
-    // scene.add(arrowHelper);
+    scene.add(arrowHelper);
 
     return arrowHelper;
 }
