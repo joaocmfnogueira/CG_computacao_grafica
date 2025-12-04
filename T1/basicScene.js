@@ -9,7 +9,7 @@ import {initRenderer,
         createGroundPlaneXZ} from "../libs/util/util.js";
 
 import {createHavac} from "./models/vehicle.js";
-import{createTrack3} from "./models/map.js";
+import{createTrack1,createTrack2,createTrack3} from "./models/map.js";
 
 let scene, renderer, camera, material, light, orbit; // Initial variables
 scene = new THREE.Scene();    // Create main scene
@@ -30,7 +30,7 @@ scene.add( axesHelper );
 // create the ground plane
 // let plane = createGroundPlaneXZ(20, 20)
 // scene.add(plane);
-createTrack3(scene);
+createTrack1(scene);
 // createHavac(scene);
 
 

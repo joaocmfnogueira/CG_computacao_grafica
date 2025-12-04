@@ -93,7 +93,7 @@ function disposeMaterial(material) {
 export function createSpeedDisplay() {
    const speedDiv = document.createElement('div');
    speedDiv.style.position = 'absolute';
-   speedDiv.style.top = '10px';
+   speedDiv.style.bottom = '10px';
    speedDiv.style.right = '10px';
    speedDiv.style.color = '#44ff44';
    speedDiv.style.fontFamily = 'Arial, sans-serif';
@@ -119,14 +119,14 @@ export function updateSpeedDisplay(velocity, speedDisplay) {
 // Métodos para criar e atualizar a tela de contador de voltas
 export function updateLapDisplay(lap_count, lapDisplay) {
     const laps = lap_count;
-    lapDisplay.textContent = `Lap: ${laps}`;
+    lapDisplay.textContent = `🏁 ${laps} / 4`;
 }
 
 
 export function createLapsCount() {
    const lapDiv = document.createElement('div');
    lapDiv.style.position = 'absolute';
-   lapDiv.style.top = '80px';
+   lapDiv.style.top = '10px';
    lapDiv.style.right = '10px';
    lapDiv.style.color = '#44ff44';
    lapDiv.style.fontFamily = 'Arial, sans-serif';
@@ -141,6 +141,34 @@ export function createLapsCount() {
    document.body.appendChild(lapDiv);
    
    return lapDiv;
+}
+
+export function updateCheckPointDisplay(checkpoint_Count, checkPointDisplay) {
+    const checkpoints = checkpoint_Count;
+    checkPointDisplay.textContent = `🚩 ${checkpoints} / 4`;
+}
+
+// ⚠️ Esse emojie também é interessante para ali em cima
+
+
+export function createCheckPointCount() {
+   const checkpointDiv = document.createElement('div');
+   checkpointDiv.style.position = 'absolute';
+   checkpointDiv.style.top = '80px';
+   checkpointDiv.style.right = '10px';
+   checkpointDiv.style.color = '#44ff44';
+   checkpointDiv.style.fontFamily = 'Arial, sans-serif';
+   checkpointDiv.style.fontSize = '24px';
+   checkpointDiv.style.fontWeight = 'bold';
+   checkpointDiv.style.backgroundColor = 'rgba(0,0,0,0.7)';
+   checkpointDiv.style.padding = '15px';
+   checkpointDiv.style.borderRadius = '10px';
+   checkpointDiv.style.border = '2px solid #333';
+   checkpointDiv.style.textShadow = '2px 2px 4px rgba(0,0,0,0.5)';
+   checkpointDiv.id = 'checkPointDisplay';
+   document.body.appendChild(checkpointDiv);
+   
+   return checkpointDiv;
 }
 
 // Método para criar a tela de finalização

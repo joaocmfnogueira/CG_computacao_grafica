@@ -57,9 +57,11 @@ export function createTrack1(scene) {
     createSky(scene);
 
     for (let index = 0; index < 8; index++) {
-        let block
-        if(index == 2)
+        let block;
+        if(index == 0)
             block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(255,30,30)");
+        else if(index == 2)
+            block = createBlock(1, "rgba(108, 20, 20, 1)", "rgb(255,30,30)");
         else
             block = createBlock(1, "rgb(100,100,100)", "rgb(255,30,30)");
         block.rotateZ(THREE.MathUtils.degToRad(90));
@@ -80,7 +82,11 @@ export function createTrack1(scene) {
 
 
     for (let index = 0; index < 8; index++) {
-        let block = createBlock(1, "rgb(100,100,100)", "rgb(255,30,30)");
+        let block;
+        if(index == 0)
+            block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(255,30,30)");
+        else
+            block = createBlock(1, "rgb(100,100,100)", "rgb(255,30,30)");
         block.rotateZ(THREE.MathUtils.degToRad(180));
         block.position.set(-180, 0, -30 - 30 * index);
         block.name = "block_vertical1_" + index;
@@ -100,7 +106,11 @@ export function createTrack1(scene) {
 
 
     for (let index = 0; index < 8; index++) {
-        let block = createBlock(1, "rgb(100,100,100)", "rgb(255,30,30)");
+        let block;
+        if(index == 0)
+            block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(255,30,30)");
+        else
+            block = createBlock(1, "rgb(100,100,100)", "rgb(255,30,30)");
         block.rotateZ(THREE.MathUtils.degToRad(270));
         block.position.set(-150 + 30 * index, 0, -270);
         block.name = "block_horizontal2_" + index;
@@ -120,7 +130,11 @@ export function createTrack1(scene) {
 
 
     for (let index = 0; index < 8; index++) {
-        let block = createBlock(1, "rgb(100,100,100)", "rgb(255,30,30)");
+        let block;
+        if(index == 0)
+            block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(255,30,30)");
+        else
+            block = createBlock(1, "rgb(100,100,100)", "rgb(255,30,30)");
         block.position.set(90, 0, -240 + 30 * index);
         block.name = "block_vertical2_" + index;
         scene.add(block);
@@ -419,11 +433,6 @@ export function createTrack3(scene) {
     scene.add(blockConer6);
     registerWallsForCollision(blockConer6);
     debugShowBoundingBoxes(blockConer6, scene);
-
-
-
-
-
 }
 
 // Cria os três tipos de blocos (piso + mureta):
@@ -606,8 +615,6 @@ function registerWallsForCollision(block) {
   });
 }
 
-
-
 // Visualizador de boudingbox
 function debugShowBoundingBoxes(block, scene) {
 // // helper from box3
@@ -632,7 +639,6 @@ function debugShowBoundingBoxes(block, scene) {
   });
   
 }
-
 
 export function addWallNormalHelper(wallMesh, scene, length = 2, color = 0xff0000) {
     // Normal of a plane in local space (pointing +Z in this case)

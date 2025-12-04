@@ -6,7 +6,7 @@ import Stats from '../build/jsm/libs/stats.module.js';
 import KeyboardState from '../libs/util/KeyboardState.js';
 import { createTrack2, createTrack1, createTrack0} from "./models/map.js"
 import { createHavac } from './models/vehicle.js';
-import {createSpeedDisplay, updateSpeedDisplay, createLapsCount, updateLapDisplay, showFinishScreen, initLight, initRenderer} from './utils.js';
+import {createSpeedDisplay, updateSpeedDisplay, createLapsCount, updateLapDisplay, showFinishScreen, initLight, initRenderer, createCheckPointCount, updateCheckPointDisplay} from './utils.js';
 import {keyboardUpdate, updateVehicleMovement, updateCamera, resetVehicle} from './control/control.js';
 import { collisionSystem } from './models/map.js';
 
@@ -37,6 +37,7 @@ createTrack1(scene);
 let velocity = 0;
 let aceleration = 0;
 let laps_count = 0;
+let checkpoints_count = 0;
 let canCompleteLap = false;
 
 // Variavel para pausar o jogo quando acontece troca de telas e outros eventos similares
@@ -46,15 +47,16 @@ let isPaused = false;
 let clock = new THREE.Clock();
 
 // Informações básicas do jogo
-let controls = new InfoBox();
-controls.add("Basic Controls");
-controls.addParagraph();
-controls.add("Keyboard commands:");
-controls.add("* 1 to change to track1");
-controls.add("* 2 to change to track2");
-controls.add("* R to reset vehicle");
-controls.add("* Arrow keys to drive");
-controls.show();
+// let controls = new InfoBox();
+// controls.add("Basic Controls");
+// controls.addParagraph();
+// controls.add("Keyboard commands:");
+// controls.add("* 1 to change to track1");
+// controls.add("* 2 to change to track2");
+// controls.add("* 3 to change to track3");
+// controls.add("* R to reset vehicle");
+// controls.add("* Arrow keys to drive");
+// controls.show();
 
 createHavac(scene);
 
@@ -64,8 +66,8 @@ const speedDisplay = createSpeedDisplay();
 // Constante para exibir a quantidade de voltas que o veiculo fez
 const lapsDisplay = createLapsCount();
 
-// Variaveis que definem se houve colisão e em qual angulo
-
+// Constante pare exibir a quantidade de checkpoints que o veiculo fez
+const checkPointDisplay = createCheckPointCount();
 
 render();
 
@@ -107,6 +109,7 @@ function render() {
       checkLapCompletion(carPosition);
    }
    updateLapDisplay(laps_count, lapsDisplay);
+   updateCheckPointDisplay(checkpoints_count, checkPointDisplay);
 
    if(laps_count == 4){
     showFinishScreen(scene);
