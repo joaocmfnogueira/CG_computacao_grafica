@@ -8,7 +8,8 @@ import {initRenderer,
         onWindowResize,
         createGroundPlaneXZ} from "../libs/util/util.js";
 
-import {createHavac} from "./models/vehicle.js"
+import {createHavac} from "./models/vehicle.js";
+import{createTrack3} from "./models/map.js";
 
 let scene, renderer, camera, material, light, orbit; // Initial variables
 scene = new THREE.Scene();    // Create main scene
@@ -27,10 +28,11 @@ let axesHelper = new THREE.AxesHelper( 12 );
 scene.add( axesHelper );
 
 // create the ground plane
-let plane = createGroundPlaneXZ(20, 20)
-scene.add(plane);
+// let plane = createGroundPlaneXZ(20, 20)
+// scene.add(plane);
+createTrack3(scene);
+// createHavac(scene);
 
-createHavac(scene);
 
 // Use this to show information onscreen
 let controls = new InfoBox();

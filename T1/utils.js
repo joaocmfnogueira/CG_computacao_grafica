@@ -220,7 +220,7 @@ export function closeFinishScreen() {
 }
 
 // Método que cria um helper para o OBB
-export function createOBBHelper(obb, color = "rgb(255, 255, 255)") {
+export function createOBBHelper(obb, color = "rgba(155, 155, 155, 1)") {
     const geometry = new THREE.BufferGeometry();
 
     // 8 corner points of the OBB

@@ -4,7 +4,7 @@ import {
    InfoBox,
    onWindowResize
 } from "../../libs/util/util.js";
-import { createTrack1, createTrack2 } from "../models/map.js"
+import { createTrack1, createTrack2, createTrack3 } from "../models/map.js"
 import { createHavac } from '../models/vehicle.js';
 import { clearScene } from '../utils.js';
 import { initLight} from '../utils.js';
@@ -107,6 +107,12 @@ export function keyboardUpdate(keyboard, velocity, aceleration, dt, scene, camer
    } 
    if (keyboard.down("2")){
       switchTrack(2, scene, cameraHolder);
+      velocity = 0;
+      aceleration = 0;
+      laps_count = 0;
+   } 
+   if (keyboard.down("3")){
+      switchTrack(3, scene, cameraHolder);
       velocity = 0;
       aceleration = 0;
       laps_count = 0;
@@ -248,6 +254,7 @@ function switchTrack(trackNumber, scene, cameraHolder) {
 
    if (trackNumber === 1) createTrack1(scene);
    else if (trackNumber === 2) createTrack2(scene);
+   else if (trackNumber === 3) createTrack3(scene);
 
    initLight(scene);
    createHavac(scene);
