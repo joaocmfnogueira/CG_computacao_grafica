@@ -39,7 +39,7 @@ let currentLookAhead = 0;
 let turnProgressLeft = 0;
 let turnProgressRight = 0;
 
-export function keyboardUpdate(keyboard, velocity, aceleration, dt, scene, cameraHolder, laps_count) {
+export function keyboardUpdate(keyboard, velocity, aceleration, dt, scene, cameraHolder, laps_count, checkpoints_count, trackNumber) {
    keyboard.update();
 
    /* 
@@ -98,27 +98,35 @@ export function keyboardUpdate(keyboard, velocity, aceleration, dt, scene, camer
       velocity = 0;
       aceleration = 0;
       laps_count = 0;
+      checkpoints_count = 0;
+      // trackNumber = 0;
    } 
    if (keyboard.down("1")){
       switchTrack(1, scene, cameraHolder);
       velocity = 0;
       aceleration = 0;
       laps_count = 0;
+      checkpoints_count = 0;
+      trackNumber = "Primeiro";
    } 
    if (keyboard.down("2")){
       switchTrack(2, scene, cameraHolder);
       velocity = 0;
       aceleration = 0;
       laps_count = 0;
+      checkpoints_count = 0;
+      trackNumber = "Segundo";
    } 
    if (keyboard.down("3")){
       switchTrack(3, scene, cameraHolder);
       velocity = 0;
       aceleration = 0;
       laps_count = 0;
+      checkpoints_count = 0;
+      trackNumber = "Terceiro";
    } 
 
-   return { velocity, aceleration, laps_count };
+   return { velocity, aceleration, laps_count, checkpoints_count, trackNumber};
 }
 
 export function updateVehicleMovement(dt, scene, velocity, keyboard, light) {

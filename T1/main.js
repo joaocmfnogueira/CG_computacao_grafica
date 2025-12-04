@@ -7,7 +7,7 @@ import KeyboardState from '../libs/util/KeyboardState.js';
 import { createTrack2, createTrack1, createTrack0} from "./models/map.js"
 import { createHavac } from './models/vehicle.js';
 import {createSpeedDisplay, updateSpeedDisplay, createLapsCount, updateLapDisplay, showFinishScreen, initLight, initRenderer, createCheckPointCount, updateCheckPointDisplay} from './utils.js';
-import {keyboardUpdate, updateVehicleMovement, updateCamera, resetVehicle} from './control/control.js';
+import {keyboardUpdate, updateVehicleMovement, updateCamera} from './control/control.js';
 import { collisionSystem } from './models/map.js';
 
 
@@ -39,6 +39,12 @@ let aceleration = 0;
 let laps_count = 0;
 let checkpoints_count = 0;
 let canCompleteLap = false;
+let trackNumber = "Primeiro";
+let trackPoints = {
+  "Primeiro" : [[-180, 0, -30], [-150, 0, -270], [90, 0, -240], [60, 0, 0]],
+  "Segundo" : [[-180, 0, -30], [-150, 0, -270], [-30, 0, -240], [90, 0, -90]],
+  "Terceiro" : [[-90, 0, -30], [-120, 0, -270], [-180, 0, -150], [30, 0, -120]]
+}
 
 // Variavel para pausar o jogo quando acontece troca de telas e outros eventos similares
 let isPaused = false;
@@ -80,20 +86,22 @@ function render() {
    if (isPaused) return
 
    const dt = clock.getDelta();
-   const result = keyboardUpdate(keyboard, velocity, aceleration, dt, scene, cameraHolder, laps_count);
+   const result = keyboardUpdate(keyboard, velocity, aceleration, dt, scene, cameraHolder, laps_count, checkpoints_count, trackNumber);
    velocity = result.velocity;
    aceleration = result.aceleration;
-   laps_count = result.laps_count
+   laps_count = result.laps_count;
+   checkpoints_count = result.checkpoints_count;
+   trackNumber = result.trackNumber;
 
    updateVehicleMovement(dt, scene, velocity, keyboard, scene.getObjectByName("light"));
    
-  // Avalia a colisão
-  const [isColided, angle, normal, wall] = checkCarCollision(scene.getObjectByName("veiculo_principal"), scene.getObjectByName("veiculo_principal").userData.obb);
+    // Avalia a colisão
+    const [isColided, angle, normal, wall] = checkCarCollision(scene.getObjectByName("veiculo_principal"), scene.getObjectByName("veiculo_principal").userData.obb);
 
-  if (isColided){
-    const car = scene.getObjectByName("veiculo_principal");
-    [velocity, aceleration] = applyCollisionResponse(car, angle, normal, wall, dt, velocity, aceleration);
-  }
+    if (isColided){
+      const car = scene.getObjectByName("veiculo_principal");
+      [velocity, aceleration] = applyCollisionResponse(car, angle, normal, wall, dt, velocity, aceleration);
+    }
   
   
 
@@ -107,6 +115,7 @@ function render() {
       // console.log(carPosition)
       
       checkLapCompletion(carPosition);
+      checkCheckPointCompletion(carPosition, trackNumber);
    }
    updateLapDisplay(laps_count, lapsDisplay);
    updateCheckPointDisplay(checkpoints_count, checkPointDisplay);
@@ -178,13 +187,32 @@ function checkLapCompletion(carPos) {
    }
    
    // If car leaves finish zone after entering, complete the lap
-   if (!isInFinishZone && canCompleteLap) {
+   if (!isInFinishZone && canCompleteLap && checkpoints_count == 4) {
       laps_count++;
       canCompleteLap = false;
+      checkpoints_count = 0;
       console.log(`Lap ${laps_count} completed!`);
    }
 }
 
+// lembrar de passar a pista como paramêtro ao invez de verificar todos;
+function checkCheckPointCompletion(carPos, trackNumber) {
+  const R = 12.5;
+  let points = trackPoints[trackNumber];
+    // console.log(points.length)
+    if (checkpoints_count >= points.length) return;
+
+    const checkpoint = points[checkpoints_count];
+    const [x, y, z] = checkpoint;
+
+    const dentro =
+      carPos.x >= x - R && carPos.x <= x + R &&
+      carPos.z >= z - R && carPos.z <= z + R;
+
+    if (dentro) {
+      checkpoints_count++;
+    }
+}
 
 function applyCollisionResponse(car, angle, normal, wall, dt, velocity, acceleration) {
 
