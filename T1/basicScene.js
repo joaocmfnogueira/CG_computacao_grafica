@@ -16,7 +16,7 @@ scene = new THREE.Scene();    // Create main scene
 renderer = initRenderer();    // Init a basic renderer
 material = setDefaultMaterial(); // create a basic material
 light = initDefaultBasicLight(scene); // Create a basic light to illuminate the scene
-camera = initCamera(new THREE.Vector3(0, 15, 30)); // Init camera in this position
+camera = initCamera(new THREE.Vector3(100, 350, 490)); // Init camera in this position
 scene.add(camera); // Add camera to the scene
 orbit = new OrbitControls( camera, renderer.domElement ); // Enable mouse rotation, pan, zoom etc.
 
@@ -30,7 +30,7 @@ scene.add( axesHelper );
 // create the ground plane
 // let plane = createGroundPlaneXZ(20, 20)
 // scene.add(plane);
-createTrack1(scene);
+createTrack3(scene);
 // createHavac(scene);
 
 

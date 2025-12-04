@@ -163,7 +163,7 @@ export function createTrack2(scene) {
     for (let index = 0; index < 8; index++) {
         let block;
         if(index == 2)
-            block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(255,165,0)");
+            block = createBlock(1, "rgba(108, 20, 20, 1)", "rgb(255,165,0)");
         else
             block = createBlock(1, "rgb(190,190,190)", "rgb(255,165,0)");
         block.rotateZ(THREE.MathUtils.degToRad(90));
@@ -185,7 +185,11 @@ export function createTrack2(scene) {
 
 
     for (let index = 0; index < 8; index++) {
-        let block = createBlock(1, "rgb(190,190,190)", "rgb(255,165,0)");
+        let block;
+        if(index == 0)
+            block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(255,165,0)");
+        else
+            block = createBlock(1, "rgb(190,190,190)", "rgb(255,165,0)");
         block.rotateZ(THREE.MathUtils.degToRad(180));
         block.position.set(-180, 0, -30 - 30 * index);
         block.name = "block_vertical1_" + index;
@@ -205,7 +209,11 @@ export function createTrack2(scene) {
 
 
     for (let index = 0; index < 4; index++) {
-        let block = createBlock(1, "rgb(190,190,190)", "rgb(255,165,0)");
+        let block;
+        if(index == 0)
+            block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(255,165,0)");
+        else
+            block = createBlock(1, "rgb(190,190,190)", "rgb(255,165,0)");
         block.rotateZ(THREE.MathUtils.degToRad(270));
         block.position.set(-150 + 30 * index, 0, -270);
         block.name = "block_horizontal2_" + index;
@@ -224,7 +232,11 @@ export function createTrack2(scene) {
 
 
     for (let index = 0; index < 4; index++) {
-        let block = createBlock(1, "rgb(190,190,190)", "rgb(255,165,0)");
+        let block;
+        if(index == 0)
+            block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(255,165,0)");
+        else
+            block = createBlock(1, "rgb(190,190,190)", "rgb(255,165,0)");
         block.position.set(-30, 0, -240 + 30 * index);
         block.name = "block_vertical2_" + index;
         scene.add(block);
@@ -262,7 +274,11 @@ export function createTrack2(scene) {
 
 
     for (let index = 0; index < 3; index++) {
-        let block = createBlock(1, "rgb(190,190,190)", "rgb(255,165,0)");
+        let block;
+        if(index == 0)
+            block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(255,165,0)");
+        else
+            block = createBlock(1, "rgb(190,190,190)", "rgb(255,165,0)");
         // block.rotateZ(THREE.MathUtils.degToRad(-90))
         block.position.set(90, 0, -90 + 30 * index);
         block.name = "block_vertical3_" + index;
@@ -292,7 +308,7 @@ export function createTrack3(scene) {
     for (let index = 0; index < 3; index++) {
         let block
         if(index == 0)
-            block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(100,30,255)");
+            block = createBlock(1, "rgba(108, 20, 20, 1)", "rgb(100,30,255)");
         else
             block = createBlock(1, "rgb(200,100,100)", "rgb(100,30,255)");
         block.rotateZ(THREE.MathUtils.degToRad(90));
@@ -322,7 +338,11 @@ export function createTrack3(scene) {
            debugShowBoundingBoxes(block, scene);
         }
         else{
-            let block = createBlock(1, "rgb(200,100,100)", "rgb(100,30,255)");
+            let block;
+            if(index == 0)
+                block = createBlock(1, "rgba(187, 173, 173, 1)", "rgb(100,30,255)");
+            else
+                block = createBlock(1, "rgb(200,100,100)", "rgb(100,30,255)");
             block.rotateZ(THREE.MathUtils.degToRad(180));
             block.position.set(-90, 0, -30 - 30 * index);
             block.name = "block_vertical1_" + index;
@@ -352,7 +372,11 @@ export function createTrack3(scene) {
 
 
     for (let index = 0; index < 3; index++) {
-        let block = createBlock(1, "rgb(200,100,100)", "rgb(100,30,255)");
+        let block;
+            if(index == 0)
+                block = createBlock(1, "rgba(187, 173, 173, 1)", "rgb(100,30,255)");
+            else
+                block = createBlock(1, "rgb(200,100,100)", "rgb(100,30,255)");
         block.rotateZ(THREE.MathUtils.degToRad(270));
         block.position.set(-120 - 30 * index, 0, -270);
         block.name = "block_horizontal2_" + index;
@@ -390,7 +414,11 @@ export function createTrack3(scene) {
     debugShowBoundingBoxes(blockConer4, scene);
 
     for (let index = 0; index < 3; index++) {
-        let block = createBlock(1, "rgb(200,100,100)", "rgb(100,30,255)");
+        let block;
+            if(index == 0)
+                block = createBlock(1, "rgba(187, 173, 173, 1)", "rgb(100,30,255)");
+            else
+                block = createBlock(1, "rgb(200,100,100)", "rgb(100,30,255)");
         block.rotateZ(THREE.MathUtils.degToRad(90));
         block.position.set(-180 + 30 * index, 0, -150);
         block.name = "block_vertical2_" + index;
@@ -418,7 +446,11 @@ export function createTrack3(scene) {
     debugShowBoundingBoxes(blockConer5, scene);
 
     for (let index = 0; index < 4; index++) {
-        let block = createBlock(1, "rgb(200,100,100)", "rgb(100,30,255)", 1);
+        let block;
+            if(index == 0)
+                block = createBlock(1, "rgba(187, 173, 173, 1)", "rgb(100,30,255)");
+            else
+                block = createBlock(1, "rgb(200,100,100)", "rgb(100,30,255)");
         block.position.set(30, 0, -120 + 30 * index);
         block.name = "block_vertical2_" + index;
         scene.add(block);
