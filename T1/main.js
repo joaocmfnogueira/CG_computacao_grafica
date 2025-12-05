@@ -179,15 +179,17 @@ function resetKeyboardState() {
 function checkLapCompletion(carPos) {
    // Check if car is within the finish line area
    const isInFinishZone = 
-      (carPos.x <= 5 && carPos.x >= 2) && (carPos.z <= 7.5 && carPos.z >= -6) ;
+   (carPos.x <= 12 && carPos.x >= -12) && (carPos.z <= 6 && carPos.z >= -6) ;
+  //  console.log(isInFinishZone);
+  //  console.log(carPos);
    
-   if (isInFinishZone && !canCompleteLap) {
-      // Car entered finish zone
-      canCompleteLap = true;
-   }
+  //  if (isInFinishZone && !canCompleteLap) {
+  //     // Car entered finish zone
+  //     canCompleteLap = true;
+  //  }
    
    // If car leaves finish zone after entering, complete the lap
-   if (!isInFinishZone && canCompleteLap && checkpoints_count == 4) {
+   if (isInFinishZone && checkpoints_count == 4) {
       laps_count++;
       canCompleteLap = false;
       checkpoints_count = 0;

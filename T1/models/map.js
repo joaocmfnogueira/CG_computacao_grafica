@@ -114,8 +114,36 @@ export function createTrack1(scene) {
         scene.add(block);
         registerWallsForCollision(block);
         debugShowBoundingBoxes(block, scene);
-        createTree1(scene,60 - 30 * index, 2.5, 25);
-        createTree2(scene,60 - 30 * index, 2.5, -25);
+        
+        // posição base em X
+        const baseX = 60 - 30 * index;
+
+        // sorteia qual tipo vai usar +25 ou -25
+        const types = [createTree1, createTree2];
+        const shuffled = types.sort(() => Math.random() - 0.5);
+
+        // gera offset de -5 a +5
+        const randOffset = () => (Math.random() * 10 - 5);
+
+        // posição base do Z (pode ser +25 ou -25 conforme sorte)
+        const baseZ1 = 25;
+        const baseZ2 = -25;
+
+        // --- ÁRVORE 1 ---
+        shuffled[0](
+            scene,
+            baseX + randOffset(),
+            2.5,
+            baseZ1 + randOffset()
+        );
+
+        // --- ÁRVORE 2 ---
+        shuffled[1](
+            scene,
+            baseX + randOffset(),
+            2.5,
+            baseZ2 + randOffset()
+        );
     }
 
     let blockConer = createBlock(2, "rgb(100,100,100)", "rgb(255,30,30)");
@@ -140,6 +168,38 @@ export function createTrack1(scene) {
         registerWallsForCollision(block);
         debugShowBoundingBoxes(block, scene);
 
+        // posição base em X
+        // if(index != 0){
+        //     const baseX1 = -215;
+        // const baseX2 = -155;
+
+        // // sorteia qual tipo vai usar +25 ou -25
+        // const types = [createTree1, createTree2];
+        // const shuffled = types.sort(() => Math.random() - 0.5);
+
+        // // gera offset de -5 a +5
+        // const randOffset = () => (Math.random() * 10 - 5);
+
+        // // posição base do Z (pode ser +25 ou -25 conforme sorte)
+        // const baseZ = -30 - 30 * index;
+        
+        // // --- ÁRVORE 1 ---
+        // shuffled[0](
+        //     scene,
+        //     baseX1 + randOffset(),
+        //     2.5,
+        //     baseZ + randOffset()
+            
+        // );
+        // // --- ÁRVORE 2 ---
+        // shuffled[1](
+        //     scene,
+        //     baseX2 + randOffset(),
+        //     2.5,
+        //     baseZ + randOffset()
+            
+        // );
+        // }
     }
 
     let blockConer2 = createBlock(2, "rgb(100,100,100)", "rgb(255,30,30)", 2, "rgb(255,30,30)");
@@ -164,6 +224,38 @@ export function createTrack1(scene) {
         registerWallsForCollision(block);
         debugShowBoundingBoxes(block, scene);
 
+        // posição base em X
+        if(index != 0){
+            const baseX = -150 + 30 * index;
+            
+
+            // sorteia qual tipo vai usar +25 ou -25
+            const types = [createTree1, createTree2];
+            const shuffled = types.sort(() => Math.random() - 0.5);
+
+            // gera offset de -5 a +5
+            const randOffset = () => (Math.random() * 10 - 5);
+
+            // posição base do Z (pode ser +25 ou -25 conforme sorte)
+            const baseZ1 = -295;
+            const baseZ2 = -245;
+            
+            // --- ÁRVORE 1 ---
+            shuffled[0](
+                scene,
+                baseX + randOffset(),
+                2.5,
+                baseZ1 + randOffset()
+                
+            );
+            // --- ÁRVORE 2 ---
+            shuffled[1](
+                scene,
+                baseX + randOffset(),
+                2.5,
+                baseZ2 + randOffset()
+            );
+        }
     }
 
     let blockConer3 = createBlock(2, "rgb(100,100,100)", "rgb(255,30,30)");
@@ -186,6 +278,38 @@ export function createTrack1(scene) {
         scene.add(block);
         registerWallsForCollision(block);
         debugShowBoundingBoxes(block, scene);
+
+        if(index != 0 && index != 7){
+            const baseX1 = 115;
+            const baseX2 = 65;
+            
+
+            // sorteia qual tipo vai usar +25 ou -25
+            const types = [createTree1, createTree2];
+            const shuffled = types.sort(() => Math.random() - 0.5);
+
+            // gera offset de -5 a +5
+            const randOffset = () => (Math.random() * 10 - 5);
+
+            // posição base do Z (pode ser +25 ou -25 conforme sorte)
+            const baseZ = -240 + 30 * index;
+            
+            // --- ÁRVORE 1 ---
+            shuffled[0](
+                scene,
+                baseX1 + randOffset(),
+                2.5,
+                baseZ + randOffset()
+                
+            );
+            // --- ÁRVORE 2 ---
+            shuffled[1](
+                scene,
+                baseX2 + randOffset(),
+                2.5,
+                baseZ + randOffset()
+            );
+        }
 
     }
 
@@ -219,6 +343,38 @@ export function createTrack2(scene) {
         registerWallsForCollision(block);
         debugShowBoundingBoxes(block, scene);
 
+        // posição base em X
+        const baseX = 60 - 30 * index;
+
+        // sorteia qual tipo vai usar +25 ou -25
+        const types = [createTree1, createTree2];
+        const shuffled = types.sort(() => Math.random() - 0.5);
+
+        // gera offset de -5 a +5
+        const randOffset = () => (Math.random() * 10 - 5);
+
+        // posição base do Z (pode ser +25 ou -25 conforme sorte)
+        const baseZ1 = 25;
+        const baseZ2 = -25;
+
+        // --- ÁRVORE 1 ---
+        shuffled[0](
+            scene,
+            baseX + randOffset(),
+            2.5,
+            baseZ1 + randOffset()
+        );
+
+        // --- ÁRVORE 2 ---
+        shuffled[1](
+            scene,
+            baseX + randOffset(),
+            2.5,
+            baseZ2 + randOffset()
+        );
+
+        
+
     }
 
     let blockConer = createBlock(2, "rgb(190,190,190)", "rgb(255,165,0)");
@@ -243,6 +399,37 @@ export function createTrack2(scene) {
         registerWallsForCollision(block);
         debugShowBoundingBoxes(block, scene);
 
+        if(index != 0){
+            const baseX1 = -215;
+            const baseX2 = -155;
+
+            // sorteia qual tipo vai usar +25 ou -25
+            const types = [createTree1, createTree2];
+            const shuffled = types.sort(() => Math.random() - 0.5);
+
+            // gera offset de -5 a +5
+            const randOffset = () => (Math.random() * 10 - 5);
+
+            // posição base do Z (pode ser +25 ou -25 conforme sorte)
+            const baseZ = -30 - 30 * index;
+            
+            // --- ÁRVORE 1 ---
+            shuffled[0](
+                scene,
+                baseX1 + randOffset(),
+                2.5,
+                baseZ + randOffset()
+                
+            );
+            // --- ÁRVORE 2 ---
+            shuffled[1](
+                scene,
+                baseX2 + randOffset(),
+                2.5,
+                baseZ + randOffset()
+                
+            );
+        }
     }
 
     let blockConer2 = createBlock(2, "rgb(190,190,190)", "rgb(255,165,0)", 2, "rgb(255,165,0)");
@@ -266,6 +453,38 @@ export function createTrack2(scene) {
         scene.add(block);
         registerWallsForCollision(block);
         debugShowBoundingBoxes(block, scene);
+
+        if(index != 0 && index != 3){
+            // posição base em X
+            const baseX = -150 + 30 * index;
+
+            // sorteia qual tipo vai usar +25 ou -25
+            const types = [createTree1, createTree2];
+            const shuffled = types.sort(() => Math.random() - 0.5);
+
+            // gera offset de -5 a +5
+            const randOffset = () => (Math.random() * 10 - 5);
+
+            // posição base do Z (pode ser +25 ou -25 conforme sorte)
+            const baseZ1 = -245;
+            const baseZ2 = -295;
+
+            // --- ÁRVORE 1 ---
+            shuffled[0](
+                scene,
+                baseX + randOffset(),
+                2.5,
+                baseZ1 + randOffset()
+            );
+
+            // --- ÁRVORE 2 ---
+            shuffled[1](
+                scene,
+                baseX + randOffset(),
+                2.5,
+                baseZ2 + randOffset()
+            );
+        }
 
     }
 
@@ -363,6 +582,36 @@ export function createTrack3(scene) {
         scene.add(block);
         registerWallsForCollision(block);
         debugShowBoundingBoxes(block, scene);
+        
+        const baseX = -30 * index;
+
+        // sorteia qual tipo vai usar +25 ou -25
+        const types = [createTree1, createTree2];
+        const shuffled = types.sort(() => Math.random() - 0.5);
+
+        // gera offset de -5 a +5
+        const randOffset = () => (Math.random() * 10 - 5);
+
+        // posição base do Z (pode ser +25 ou -25 conforme sorte)
+        const baseZ1 = -25
+        const baseZ2 = 25;
+        
+        // --- ÁRVORE 1 ---
+        shuffled[0](
+            scene,
+            baseX + randOffset(),
+            2.5,
+            baseZ1 + randOffset()
+            
+        );
+        // --- ÁRVORE 2 ---
+        shuffled[1](
+            scene,
+            baseX + randOffset(),
+            2.5,
+            baseZ2 + randOffset()
+            
+        );
     }
 
     let blockConer = createBlock(2, "rgb(200,100,100)", "rgb(100,30,255)");
@@ -395,6 +644,37 @@ export function createTrack3(scene) {
             scene.add(block);
             registerWallsForCollision(block);
             debugShowBoundingBoxes(block, scene);
+            if(index != 0){
+                const baseX1 = -115;
+                const baseX2 = -65;
+
+                // sorteia qual tipo vai usar +25 ou -25
+                const types = [createTree1, createTree2];
+                const shuffled = types.sort(() => Math.random() - 0.5);
+
+                // gera offset de -5 a +5
+                const randOffset = () => (Math.random() * 10 - 5);
+
+                // posição base do Z (pode ser +25 ou -25 conforme sorte)
+                const baseZ = -30 - 30 * index;
+                
+                // --- ÁRVORE 1 ---
+                shuffled[0](
+                    scene,
+                    baseX1 + randOffset(),
+                    2.5,
+                    baseZ + randOffset()
+                    
+                );
+                // --- ÁRVORE 2 ---
+                shuffled[1](
+                    scene,
+                    baseX2 + randOffset(),
+                    2.5,
+                    baseZ + randOffset()
+                    
+                );
+            }
         }
     }
 
@@ -406,6 +686,39 @@ export function createTrack3(scene) {
             scene.add(block);
             registerWallsForCollision(block);
             debugShowBoundingBoxes(block, scene);
+
+            
+            const baseX1 = -115;
+            const baseX2 = -65;
+
+            // sorteia qual tipo vai usar +25 ou -25
+            const types = [createTree1, createTree2];
+            const shuffled = types.sort(() => Math.random() - 0.5);
+
+            // gera offset de -5 a +5
+            const randOffset = () => (Math.random() * 10 - 5);
+
+            // posição base do Z (pode ser +25 ou -25 conforme sorte)
+            const baseZ = -180 - 30 * index;
+            
+            // --- ÁRVORE 1 ---
+            shuffled[0](
+                scene,
+                baseX1 + randOffset(),
+                2.5,
+                baseZ + randOffset()
+                
+            );
+            // --- ÁRVORE 2 ---
+            shuffled[1](
+                scene,
+                baseX2 + randOffset(),
+                2.5,
+                baseZ + randOffset()
+                
+            );
+            
+
     }
 
     let blockConer2 = createBlock(2, "rgb(200,100,100)", "rgb(100,30,255)", 1, "rgb(255,255,255)");
@@ -481,7 +794,41 @@ export function createTrack3(scene) {
         scene.add(block);
         registerWallsForCollision(block);
         debugShowBoundingBoxes(block, scene);
+
+        if(index != 0){
+            const baseX = -60 + 30 * index;
+
+            // sorteia qual tipo vai usar +25 ou -25
+            const types = [createTree1, createTree2];
+            const shuffled = types.sort(() => Math.random() - 0.5);
+
+            // gera offset de -5 a +5
+            const randOffset = () => (Math.random() * 10 - 5);
+
+            // posição base do Z (pode ser +25 ou -25 conforme sorte)
+            const baseZ1 = -125;
+            const baseZ2 = -175;
+
+            // --- ÁRVORE 1 ---
+            shuffled[0](
+                scene,
+                baseX + randOffset(),
+                2.5,
+                baseZ1 + randOffset()
+            );
+
+            // --- ÁRVORE 2 ---
+            shuffled[1](
+                scene,
+                baseX + randOffset(),
+                2.5,
+                baseZ2 + randOffset()
+            );
+
+        }
+        
     }
+    
 
     let blockConer5 = createBlock(2, "rgb(200,100,100)", "rgb(100,30,255)", 1, "rgb(255,255,255)");
     blockConer5.rotateZ(THREE.MathUtils.degToRad(0));
@@ -502,6 +849,40 @@ export function createTrack3(scene) {
         scene.add(block);
         registerWallsForCollision(block);
         debugShowBoundingBoxes(block, scene);
+
+        if(index != 0 && index != 3){
+            const baseX1 = 5;
+            const baseX2 = 55;
+
+
+            // sorteia qual tipo vai usar +25 ou -25
+            const types = [createTree1, createTree2];
+            const shuffled = types.sort(() => Math.random() - 0.5);
+
+            // gera offset de -5 a +5
+            const randOffset = () => (Math.random() * 10 - 5);
+
+            // posição base do Z (pode ser +25 ou -25 conforme sorte)
+            const baseZ = -120 + 30 * index;
+
+            // --- ÁRVORE 1 ---
+            shuffled[0](
+                scene,
+                baseX1 + randOffset(),
+                2.5,
+                baseZ + randOffset()
+            );
+
+            // --- ÁRVORE 2 ---
+            shuffled[1](
+                scene,
+                baseX2 + randOffset(),
+                2.5,
+                baseZ + randOffset()
+            );
+
+        }
+        
     }
 
     let blockConer6 = createBlock(2, "rgb(200,100,100)", "rgb(100,30,255)", 2, "rgb(100,30,255)");
@@ -511,6 +892,8 @@ export function createTrack3(scene) {
     scene.add(blockConer6);
     registerWallsForCollision(blockConer6);
     debugShowBoundingBoxes(blockConer6, scene);
+
+    
 }
 
 // Cria os três tipos de blocos (piso + mureta):
