@@ -8,7 +8,7 @@ import {createOBBHelper} from "../utils.js";
 
 export const collisionSystem = new CollisionSystem();
 
-export function createGround(scene) {
+function createGround(scene) {
 
     const groundGeometry = new THREE.PlaneGeometry(3000, 3000);
     const groundMaterial = setDefaultMaterial("rgba(87, 215, 138, 1)"); 
@@ -22,8 +22,55 @@ export function createGround(scene) {
     scene.add(ground);
 }
 
-export function createSky(scene) {
+function createSky(scene) {
     scene.background = new THREE.Color(0x87CEEB); 
+}
+
+export function createTree1(scene, x, y, z){
+    const troncoGeometry = new THREE.CylinderGeometry(0.3, 0.5, 6, 18, 18);
+    const troncoMaterial = setDefaultMaterial("rgba(139, 69, 19, 1)");
+
+    const tronco = new THREE.Mesh(troncoGeometry, troncoMaterial);
+
+    const copaGeometry = new THREE.IcosahedronGeometry(4);
+    const copaMaterial = setDefaultMaterial("rgba(70, 214, 77, 1)");
+
+    const copa = new THREE.Mesh(copaGeometry, copaMaterial);
+    // tronco.rotation.x = THREE.MathUtils.degToRad(-90);
+
+    tronco.add(copa);
+    copa.translateY(5);
+
+    copa.receiveShadow = true;
+    copa.castShadow = true;
+    tronco.receiveShadow = true;
+    tronco.castShadow = true;
+    
+    scene.add(tronco);
+    tronco.position.set(x, y, z);
+}
+
+export function createTree2(scene, x, y, z){
+    const troncoGeometry = new THREE.CylinderGeometry(0.3, 0.5, 6, 18, 18);
+    const troncoMaterial = setDefaultMaterial("rgba(139, 69, 19, 1)");
+
+    const tronco = new THREE.Mesh(troncoGeometry, troncoMaterial);
+
+    const copaGeometry = new THREE.ConeGeometry(3, 8, 8);
+    const copaMaterial = setDefaultMaterial("rgba(4, 104, 9, 1)");
+
+    const copa = new THREE.Mesh(copaGeometry, copaMaterial);
+    // tronco.rotation.x = THREE.MathUtils.degToRad(-90);
+
+    tronco.add(copa);
+    copa.translateY(5);
+    copa.receiveShadow = true;
+    copa.castShadow = true;
+    tronco.receiveShadow = true;
+    tronco.castShadow = true;
+    
+    scene.add(tronco);
+    tronco.position.set(x, y, z);
 }
 
 // Pista de teste
@@ -33,7 +80,6 @@ export function createTrack0(scene) {
     
     createSky(scene);
     
-
     let blockConer = createBlock(2, "rgb(190,190,190)", "rgb(255,165,0)");
     blockConer.rotateZ(THREE.MathUtils.degToRad(180));
     blockConer.position.set(-180, 0, 0);
@@ -43,10 +89,8 @@ export function createTrack0(scene) {
     debugShowBoundingBoxes(blockConer, scene);
 
 
-    
-
-    
-
+    createTree1(scene, 2, 3, 2);
+    createTree2(scene, 10, 3, 10);
 }
 
 // Criar a primeira pista
@@ -70,6 +114,8 @@ export function createTrack1(scene) {
         scene.add(block);
         registerWallsForCollision(block);
         debugShowBoundingBoxes(block, scene);
+        createTree1(scene,60 - 30 * index, 2.5, 25);
+        createTree2(scene,60 - 30 * index, 2.5, -25);
     }
 
     let blockConer = createBlock(2, "rgb(100,100,100)", "rgb(255,30,30)");
@@ -717,9 +763,3 @@ function getWallNormalsFromOBB(obb) {
     // console.log(normals);
     return normals;
 }
-
-
-
-
-
-
