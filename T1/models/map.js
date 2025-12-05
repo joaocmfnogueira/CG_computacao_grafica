@@ -5,8 +5,67 @@ import {
 import { CollisionSystem } from './CollisionSystem.js';
 import {OBB} from "./OBB.js";
 import {createOBBHelper} from "../utils.js";
+import { CSG } from "../../libs/other/CSGMesh.js";
+
 
 export const collisionSystem = new CollisionSystem();
+
+
+export function createTunnelWithHoles(scene, x, y, z) {
+
+    // 1 — Tunnel
+    const tunnelGeom = new THREE.CylinderGeometry(10, 10, 100, 64, 1, true);
+    const tunnelMat  = new THREE.MeshStandardMaterial({
+        color: 0x777777,
+        side: THREE.DoubleSide
+    });
+
+    const tunnel = new THREE.Mesh(tunnelGeom, tunnelMat);
+    tunnel.rotation.z = Math.PI / 2; 
+    tunnel.updateMatrix(); // IMPORTANT
+
+    // 2 — Hole Cutters in local space of the tunnel
+    // const holeCutters = [];
+
+    // for (let i = 0; i < 10; i++) {
+    //     const cutter = new THREE.Mesh(
+    //         new THREE.CylinderGeometry(0.8, 0.8, 20, 32)
+    //     );
+
+    //     cutter.rotation.x = Math.PI / 2;
+
+    //     const offset = THREE.MathUtils.randFloatSpread(0.5);
+    //     const radius = 9;
+
+    //     cutter.position.set(
+    //         Math.cos(offset) * radius,
+    //         Math.abs(Math.sin(offset) * radius), // ceiling only
+    //         -40 + i * 8
+    //     );
+
+    //     cutter.updateMatrix(); // IMPORTANT
+    //     holeCutters.push(cutter);
+    // }
+
+    // // 3 — CSG subtraction
+    // let csg = CSG.fromMesh(tunnel);
+
+    // for (const cutter of holeCutters) {
+    //     const cutterCSG = CSG.fromMesh(cutter);
+    //     csg = csg.subtract(cutterCSG);
+    // }
+
+    // const finalMesh = CSG.toMesh(csg, new THREE.Matrix4());
+    // finalMesh.material = tunnelMat;
+
+    // // FINAL placement in the world
+    // finalMesh.position.set(x, y, z);
+    // finalMesh.rotation.copy(tunnel.rotation);
+    // finalMesh.updateMatrix();
+
+    scene.add(tunnel);
+    return tunnel;
+}
 
 function createGround(scene) {
 
@@ -88,9 +147,11 @@ export function createTrack0(scene) {
     registerWallsForCollision(blockConer);
     debugShowBoundingBoxes(blockConer, scene);
 
+    createTunnelWithHoles(scene, 1, 0, 1);
 
-    createTree1(scene, 2, 3, 2);
-    createTree2(scene, 10, 3, 10);
+
+    // createTree1(scene, 2, 3, 2);
+    // createTree2(scene, 10, 3, 10);
 }
 
 // Criar a primeira pista
