@@ -10,62 +10,65 @@ import { CSG } from "../../libs/other/CSGMesh.js";
 
 export const collisionSystem = new CollisionSystem();
 
-
 export function createTunnelWithHoles(scene, x, y, z) {
 
-    // 1 — Tunnel
-    const tunnelGeom = new THREE.CylinderGeometry(10, 10, 100, 64, 1, true);
-    const tunnelMat  = new THREE.MeshStandardMaterial({
+    const tunnelGeom = new THREE.CylinderGeometry(20, 20, 90, 16, 1);
+    const tunnelMat = new THREE.MeshStandardMaterial({
         color: 0x777777,
         side: THREE.DoubleSide
     });
 
     const tunnel = new THREE.Mesh(tunnelGeom, tunnelMat);
-    tunnel.rotation.z = Math.PI / 2; 
-    tunnel.updateMatrix(); // IMPORTANT
+    tunnel.rotation.z = Math.PI / 2;
+    tunnel.updateMatrixWorld(true);
 
-    // 2 — Hole Cutters in local space of the tunnel
-    // const holeCutters = [];
+    const tunnelGeom2 = new THREE.CylinderGeometry(19.5, 19.5, 90, 16, 1);
+    const tunnelMat2 = new THREE.MeshStandardMaterial({
+        color: 0x777777,
+        side: THREE.DoubleSide
+    });
 
-    // for (let i = 0; i < 10; i++) {
-    //     const cutter = new THREE.Mesh(
-    //         new THREE.CylinderGeometry(0.8, 0.8, 20, 32)
-    //     );
+    const tunnel2 = new THREE.Mesh(tunnelGeom2, tunnelMat2);
+    tunnel2.rotation.z = Math.PI / 2;
+    tunnel2.updateMatrixWorld(true);
 
-    //     cutter.rotation.x = Math.PI / 2;
 
-    //     const offset = THREE.MathUtils.randFloatSpread(0.5);
-    //     const radius = 9;
+    const holeCutters = [];
+        for (let i = 0; i < 4; i++) {
+            const cutter = new THREE.Mesh(
+                new THREE.CylinderGeometry(6, 6, 40, 32)
+            );
 
-    //     cutter.position.set(
-    //         Math.cos(offset) * radius,
-    //         Math.abs(Math.sin(offset) * radius), // ceiling only
-    //         -40 + i * 8
-    //     );
+            cutter.position.set(
+                -37.5 + i * 25,
+                0,
+                0
+            );
 
-    //     cutter.updateMatrix(); // IMPORTANT
-    //     holeCutters.push(cutter);
-    // }
+            // IMPORTANT — do not add to scene!
+            cutter.updateMatrixWorld(true);
+            holeCutters.push(cutter);
+        }
 
-    // // 3 — CSG subtraction
-    // let csg = CSG.fromMesh(tunnel);
+    let csg = CSG.fromMesh(tunnel);
+    let temp = CSG.fromMesh(tunnel2);
+    
+    for (const cutter of holeCutters) {
+        csg = csg.subtract(CSG.fromMesh(cutter));
+    }
+    csg = csg.subtract(temp);
 
-    // for (const cutter of holeCutters) {
-    //     const cutterCSG = CSG.fromMesh(cutter);
-    //     csg = csg.subtract(cutterCSG);
-    // }
+    const finalMesh = CSG.toMesh(csg, new THREE.Matrix4());
+    finalMesh.material = tunnelMat;
 
-    // const finalMesh = CSG.toMesh(csg, new THREE.Matrix4());
-    // finalMesh.material = tunnelMat;
+    finalMesh.position.set(x, y, z);
+    finalMesh.updateMatrixWorld(true);
+    finalMesh.castShadow = true;
 
-    // // FINAL placement in the world
-    // finalMesh.position.set(x, y, z);
-    // finalMesh.rotation.copy(tunnel.rotation);
-    // finalMesh.updateMatrix();
-
-    scene.add(tunnel);
-    return tunnel;
+    scene.add(finalMesh);
+    return finalMesh;
 }
+
 
 function createGround(scene) {
 
@@ -191,7 +194,8 @@ export function createTrack1(scene) {
         const baseZ2 = -25;
 
         // --- ÁRVORE 1 ---
-        shuffled[0](
+        if(index%2 == 0){
+            shuffled[0](
             scene,
             baseX + randOffset(),
             2.5,
@@ -205,6 +209,9 @@ export function createTrack1(scene) {
             2.5,
             baseZ2 + randOffset()
         );
+
+        }
+        
     }
 
     let blockConer = createBlock(2, "rgb(100,100,100)", "rgb(255,30,30)");
@@ -229,38 +236,10 @@ export function createTrack1(scene) {
         registerWallsForCollision(block);
         debugShowBoundingBoxes(block, scene);
 
-        // posição base em X
-        // if(index != 0){
-        //     const baseX1 = -215;
-        // const baseX2 = -155;
-
-        // // sorteia qual tipo vai usar +25 ou -25
-        // const types = [createTree1, createTree2];
-        // const shuffled = types.sort(() => Math.random() - 0.5);
-
-        // // gera offset de -5 a +5
-        // const randOffset = () => (Math.random() * 10 - 5);
-
-        // // posição base do Z (pode ser +25 ou -25 conforme sorte)
-        // const baseZ = -30 - 30 * index;
-        
-        // // --- ÁRVORE 1 ---
-        // shuffled[0](
-        //     scene,
-        //     baseX1 + randOffset(),
-        //     2.5,
-        //     baseZ + randOffset()
-            
-        // );
-        // // --- ÁRVORE 2 ---
-        // shuffled[1](
-        //     scene,
-        //     baseX2 + randOffset(),
-        //     2.5,
-        //     baseZ + randOffset()
-            
-        // );
-        // }
+        if(index == 3){
+            let tunnel = createTunnelWithHoles(scene, -180, 0, -120);
+            tunnel.rotation.y = THREE.MathUtils.degToRad(90);
+        }
     }
 
     let blockConer2 = createBlock(2, "rgb(100,100,100)", "rgb(255,30,30)", 2, "rgb(255,30,30)");
@@ -286,7 +265,7 @@ export function createTrack1(scene) {
         debugShowBoundingBoxes(block, scene);
 
         // posição base em X
-        if(index != 0){
+        
             const baseX = -150 + 30 * index;
             
 
@@ -301,7 +280,8 @@ export function createTrack1(scene) {
             const baseZ1 = -295;
             const baseZ2 = -245;
             
-            // --- ÁRVORE 1 ---
+            if(index%2 == 0 || index == 1){
+                // --- ÁRVORE 1 ---
             shuffled[0](
                 scene,
                 baseX + randOffset(),
@@ -316,6 +296,9 @@ export function createTrack1(scene) {
                 2.5,
                 baseZ2 + randOffset()
             );
+
+            
+            
         }
     }
 
@@ -515,37 +498,37 @@ export function createTrack2(scene) {
         registerWallsForCollision(block);
         debugShowBoundingBoxes(block, scene);
 
-        if(index != 0 && index != 3){
-            // posição base em X
-            const baseX = -150 + 30 * index;
+        // if(index != 0 && index != 3){
+        //     // posição base em X
+        //     const baseX = -150 + 30 * index;
 
-            // sorteia qual tipo vai usar +25 ou -25
-            const types = [createTree1, createTree2];
-            const shuffled = types.sort(() => Math.random() - 0.5);
+        //     // sorteia qual tipo vai usar +25 ou -25
+        //     const types = [createTree1, createTree2];
+        //     const shuffled = types.sort(() => Math.random() - 0.5);
 
-            // gera offset de -5 a +5
-            const randOffset = () => (Math.random() * 10 - 5);
+        //     // gera offset de -5 a +5
+        //     const randOffset = () => (Math.random() * 10 - 5);
 
-            // posição base do Z (pode ser +25 ou -25 conforme sorte)
-            const baseZ1 = -245;
-            const baseZ2 = -295;
+        //     // posição base do Z (pode ser +25 ou -25 conforme sorte)
+        //     const baseZ1 = -245;
+        //     const baseZ2 = -295;
 
-            // --- ÁRVORE 1 ---
-            shuffled[0](
-                scene,
-                baseX + randOffset(),
-                2.5,
-                baseZ1 + randOffset()
-            );
+        //     // --- ÁRVORE 1 ---
+        //     shuffled[0](
+        //         scene,
+        //         baseX + randOffset(),
+        //         2.5,
+        //         baseZ1 + randOffset()
+        //     );
 
-            // --- ÁRVORE 2 ---
-            shuffled[1](
-                scene,
-                baseX + randOffset(),
-                2.5,
-                baseZ2 + randOffset()
-            );
-        }
+        //     // --- ÁRVORE 2 ---
+        //     shuffled[1](
+        //         scene,
+        //         baseX + randOffset(),
+        //         2.5,
+        //         baseZ2 + randOffset()
+        //     );
+        // }
 
     }
 
@@ -568,6 +551,10 @@ export function createTrack2(scene) {
         scene.add(block);
         registerWallsForCollision(block);
         debugShowBoundingBoxes(block, scene);
+        if(index == 1){
+            let tunnel = createTunnelWithHoles(scene, -30, 0, -240 + 30 * index + 15);
+            tunnel.rotation.y = THREE.MathUtils.degToRad(90);
+        }
 
     }
 
@@ -804,6 +791,39 @@ export function createTrack3(scene) {
         registerWallsForCollision(block);
         debugShowBoundingBoxes(block, scene);
 
+        if(index == 1){
+            const baseX = -120 - 30 * index;
+
+            // sorteia qual tipo vai usar +25 ou -25
+            const types = [createTree1, createTree2];
+            const shuffled = types.sort(() => Math.random() - 0.5);
+
+            // gera offset de -5 a +5
+            const randOffset = () => (Math.random() * 10 - 5);
+
+            // posição base do Z (pode ser +25 ou -25 conforme sorte)
+            const baseZ1 = -295;
+            const baseZ2 = -245;
+
+            
+            // --- ÁRVORE 1 ---
+            shuffled[0](
+                scene,
+                baseX + randOffset(),
+                2.5,
+                baseZ1 + randOffset()
+                
+            );
+            // --- ÁRVORE 2 ---
+            shuffled[1](
+                scene,
+                baseX + randOffset(),
+                2.5,
+                baseZ2 + randOffset()
+                
+            );
+        }
+
     }
 
     let blockConer3 = createBlock(2, "rgb(200,100,100)", "rgb(100,30,255)", 2, "rgb(100,30,255)");
@@ -823,6 +843,11 @@ export function createTrack3(scene) {
         scene.add(block);
         registerWallsForCollision(block);
         debugShowBoundingBoxes(block, scene);
+
+        if(index == 1) {
+            let tunnel = createTunnelWithHoles(scene, -210, 0, -240 + 30 * index);
+            tunnel.rotation.y = THREE.MathUtils.degToRad(90);
+        }
     }
 
     let blockConer4 = createBlock(2, "rgb(200,100,100)", "rgb(100,30,255)", 1);
@@ -845,6 +870,39 @@ export function createTrack3(scene) {
         scene.add(block);
         registerWallsForCollision(block);
         debugShowBoundingBoxes(block, scene);
+
+        if(index == 1){
+            const baseX = -180 + 30 * index;
+
+            // sorteia qual tipo vai usar +25 ou -25
+            const types = [createTree1, createTree2];
+            const shuffled = types.sort(() => Math.random() - 0.5);
+
+            // gera offset de -5 a +5
+            const randOffset = () => (Math.random() * 10 - 5);
+
+            // posição base do Z (pode ser +25 ou -25 conforme sorte)
+            const baseZ1 = -175;
+            const baseZ2 = -125;
+
+            
+            // --- ÁRVORE 1 ---
+            shuffled[0](
+                scene,
+                baseX + randOffset(),
+                2.5,
+                baseZ1 + randOffset()
+                
+            );
+            // --- ÁRVORE 2 ---
+            shuffled[1](
+                scene,
+                baseX + randOffset(),
+                2.5,
+                baseZ2 + randOffset()
+                
+            );
+        }
     }
 
     for (let index = 0; index < 3; index++) {

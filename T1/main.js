@@ -219,13 +219,16 @@ function checkCheckPointCompletion(carPos, trackNumber) {
 function applyCollisionResponse(car, angle, normal, wall, dt, velocity, acceleration) {
 
     // segurança absoluta – evitar quaternions degenerados
+    const DT = dt * 50;
+    console.log(dt);
+    console.log(DT);
     car.quaternion.normalize();
     console.log(velocity)
     if (angle < 40 && velocity > 0) {
 
         const bump = velocity > 2
-            ? 0.5 + Math.log(velocity * 20)
-            : 0.5;
+            ? 0.5 * DT + Math.log(velocity * 20) * DT
+            : 0.5 * DT;
         console.log(bump);
         car.translateX(bump);
         velocity = -velocity / 2;
@@ -234,8 +237,8 @@ function applyCollisionResponse(car, angle, normal, wall, dt, velocity, accelera
     else if (angle < 40 && velocity < 0) {
 
         const bump = velocity < -2
-            ? -0.5 - Math.log(-velocity * 20)
-            : -0.5;
+            ? -0.5 * DT - Math.log(-velocity * 20) * DT
+            : -0.5 * DT;
 
         car.translateX(bump);
         velocity = -velocity / 2;
@@ -263,11 +266,11 @@ function applyCollisionResponse(car, angle, normal, wall, dt, velocity, accelera
         //     rotationSign *= -1;
         console.log(wall.mesh.name);
         // smooth rotation away from the wall
-        const maxRot = THREE.MathUtils.degToRad(0.5);
+        const maxRot = THREE.MathUtils.degToRad(0.5 * DT);
         car.rotateY(rotationSign * maxRot);
 
         // push the car slightly away
-        car.position.addScaledVector(wallNormal, 0.1);
+        car.position.addScaledVector(wallNormal, 0.2 * DT);
 
         // slow down
         const smooth = 0.01;

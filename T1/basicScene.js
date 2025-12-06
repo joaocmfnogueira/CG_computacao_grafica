@@ -30,7 +30,7 @@ scene.add( axesHelper );
 // create the ground plane
 // let plane = createGroundPlaneXZ(20, 20)
 // scene.add(plane);
-createTrack0(scene);
+createTrack3(scene);
 // createHavac(scene);
 
 
