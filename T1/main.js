@@ -267,11 +267,12 @@ function applyCollisionResponse(car, angle, normal, wall, dt, velocity, accelera
         //     rotationSign *= -1;
         // console.log(wall.mesh.name);
         // smooth rotation away from the wall
-        const maxRot = angle >= 40 && angle <= 70 ? THREE.MathUtils.degToRad(0.5 * DT * velocity * 4) : THREE.MathUtils.degToRad(0.5 * DT);
+        const maxRot = angle >= 40 && angle <= 70 ? THREE.MathUtils.degToRad(0.5 * DT * velocity * 4) : THREE.MathUtils.degToRad(0.25 * DT);
         car.rotateY(rotationSign * maxRot);
 
         // push the car slightly away
-        car.position.addScaledVector(wallNormal, 0.2 * DT);
+        const bump = angle >= 40 && angle <= 70 ? 0.4 * DT : 0.2 * DT;
+        car.position.addScaledVector(wallNormal, bump);
 
         // slow down
         const smooth = 0.01;
