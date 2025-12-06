@@ -319,8 +319,8 @@ export function initLight(scene, castShadow = true, position = new THREE.Vector3
    // and its left, right, bottom, top, near and far parameters are, respectively,
    // (-5, 5, -5, 5, 0.5, 500).    
    const shadow = mainLight.shadow;
-   shadow.mapSize.width = 512;
-   shadow.mapSize.height = 512;
+   shadow.mapSize.width = 2048;
+   shadow.mapSize.height = 2048;
    shadow.camera.left = -100;
    shadow.camera.right = 100;
    shadow.camera.top = 100;

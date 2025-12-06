@@ -179,7 +179,7 @@ function resetKeyboardState() {
 function checkLapCompletion(carPos) {
    // Check if car is within the finish line area
    const isInFinishZone = 
-   (carPos.x <= 12 && carPos.x >= -12) && (carPos.z <= 6 && carPos.z >= -6) ;
+   (carPos.x <= 12.5 && carPos.x >= -12.5) && (carPos.z <= 12.5 && carPos.z >= -12.5) ;
   //  console.log(isInFinishZone);
   //  console.log(carPos);
    
@@ -220,16 +220,16 @@ function applyCollisionResponse(car, angle, normal, wall, dt, velocity, accelera
 
     // segurança absoluta – evitar quaternions degenerados
     const DT = dt * 50;
-    console.log(dt);
-    console.log(DT);
+    // console.log(dt);
+    // console.log(DT);
     car.quaternion.normalize();
-    console.log(velocity)
+    // console.log(velocity)
     if (angle < 40 && velocity > 0) {
 
         const bump = velocity > 2
             ? 0.5 * DT + Math.log(velocity * 20) * DT
             : 0.5 * DT;
-        console.log(bump);
+        // console.log(bump);
         car.translateX(bump);
         velocity = -velocity / 2;
         acceleration = -acceleration;
@@ -258,15 +258,16 @@ function applyCollisionResponse(car, angle, normal, wall, dt, velocity, accelera
 
         // use wall normal, not wall.position
         const wallNormal = normal.clone().normalize();
+        // console.log(velocity * 20);
 
         // rotation sign: should we rotate left or right to escape the wall?
         const cross = new THREE.Vector3().crossVectors(forward, wallNormal);
         let rotationSign = Math.sign(cross.y);
         // if(wall.mesh.name.includes("rightWall"))
         //     rotationSign *= -1;
-        console.log(wall.mesh.name);
+        // console.log(wall.mesh.name);
         // smooth rotation away from the wall
-        const maxRot = THREE.MathUtils.degToRad(0.5 * DT);
+        const maxRot = angle >= 40 && angle <= 70 ? THREE.MathUtils.degToRad(0.5 * DT * velocity * 4) : THREE.MathUtils.degToRad(0.5 * DT);
         car.rotateY(rotationSign * maxRot);
 
         // push the car slightly away
@@ -287,61 +288,6 @@ function applyCollisionResponse(car, angle, normal, wall, dt, velocity, accelera
     car.quaternion.normalize();
     return [velocity, acceleration];
 }
-
-
-// Função que pretendia resolver o problema do angulo 40, não resolveu de fato
-// function applyCollisionResponse(car, angle, normal, wall, dt, velocity, acceleration) {
-
-//     car.quaternion.normalize();
-
-//     // --- transition factor for smooth physics ---------------------
-//     const t = THREE.MathUtils.clamp((angle - 35) / 10, 0, 1);
-
-//     // forward direction of car
-//     const forward = new THREE.Vector3(-1, 0, 0)
-//         .applyQuaternion(car.quaternion)
-//         .normalize();
-
-//     const wallNormal = normal.clone().normalize();
-//     const cross = new THREE.Vector3().crossVectors(forward, wallNormal);
-
-//     const rotationSign = Math.sign(cross.y);
-//     const maxRot = THREE.MathUtils.degToRad(0.5);
-
-//     // --- bump displacement ----------------------------------------
-//     let bump = 0;
-//     if (velocity > 0) {
-//         bump = velocity > 2 ? 0.5 + Math.log(velocity * 20) : 0.5;
-//     } else if (velocity < 0) {
-//         bump = velocity < -2 ? -0.5 - Math.log(-velocity * 20) : -0.5;
-//     }
-
-//     // blended bump: strong at angle <35, weak at angle>45
-//     const blendedBump = bump * (1 - t);
-//     car.translateX(blendedBump);
-
-//     // blended slide: weak at angle <35, strong at angle>45
-//     const slideAmount = 0.1 * t;
-//     car.position.addScaledVector(wallNormal, slideAmount);
-
-//     // blended rotation
-//     car.rotateY(rotationSign * maxRot * t);
-
-//     // blended velocity response
-//     if (t === 0) {
-//         // pure bump
-//         velocity = -velocity / 2;
-//         acceleration = -acceleration;
-//     } else {
-//         // slide mode dampening
-//         const smooth = 0.01;
-//         velocity = velocity / (1 + (90 - angle) * smooth);
-//     }
-
-//     car.quaternion.normalize();
-
-//     return [velocity, acceleration];
-// }
 
 
 
