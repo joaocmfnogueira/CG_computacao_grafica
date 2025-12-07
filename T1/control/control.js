@@ -160,6 +160,9 @@ export function keyboardUpdate(keyboard, velocity, aceleration, dt, scene, camer
       aceleration = 0;
       laps_count = 0;
       checkpoints_count = 0;
+      nBullets = 4;
+      bulletsInGame = [];
+
       // trackNumber = 0;
    } 
    if (keyboard.down("1")){
@@ -169,6 +172,8 @@ export function keyboardUpdate(keyboard, velocity, aceleration, dt, scene, camer
       laps_count = 0;
       checkpoints_count = 0;
       trackNumber = "Primeiro";
+      nBullets = 4;
+      bulletsInGame = [];
    } 
    if (keyboard.down("2")){
       switchTrack(2, scene, cameraHolder);
@@ -177,6 +182,8 @@ export function keyboardUpdate(keyboard, velocity, aceleration, dt, scene, camer
       laps_count = 0;
       checkpoints_count = 0;
       trackNumber = "Segundo";
+      nBullets = 4;
+      bulletsInGame = [];
    } 
    if (keyboard.down("3")){
       switchTrack(3, scene, cameraHolder);
@@ -185,6 +192,8 @@ export function keyboardUpdate(keyboard, velocity, aceleration, dt, scene, camer
       laps_count = 0;
       checkpoints_count = 0;
       trackNumber = "Terceiro";
+      nBullets = 4;
+      bulletsInGame = [];
    } 
 
    return { velocity, aceleration, laps_count, checkpoints_count, trackNumber, nBullets, bulletsInGame};

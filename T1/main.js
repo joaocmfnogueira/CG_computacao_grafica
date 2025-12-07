@@ -6,7 +6,7 @@ import Stats from '../build/jsm/libs/stats.module.js';
 import KeyboardState from '../libs/util/KeyboardState.js';
 import { createTrack2, createTrack1, createTrack0} from "./models/map.js"
 import { createHavac } from './models/vehicle.js';
-import {createSpeedDisplay, updateSpeedDisplay, createLapsCount, updateLapDisplay, showFinishScreen, initLight, initRenderer, createCheckPointCount, updateCheckPointDisplay, createBulletCount, updateBulletDisplay} from './utils.js';
+import {createSpeedDisplay, updateSpeedDisplay, createLapsCount, updateLapDisplay, showFinishScreen, initLight, initRenderer, createCheckPointCount, updateCheckPointDisplay, createBulletCount, updateBulletDisplay, removeAndDispose} from './utils.js';
 import {keyboardUpdate, updateVehicleMovement, updateCamera} from './control/control.js';
 import { collisionSystem } from './models/map.js';
 
@@ -67,7 +67,7 @@ const lapsDisplay = createLapsCount();
 // Constante pare exibir a quantidade de checkpoints que o veiculo fez
 const checkPointDisplay = createCheckPointCount();
 
-// Constante para exibir a quantidade de tiros que aidna resta do jogador
+// Constante para exibir a quantidade de tiros que ainda resta do jogador
 const bulletDisplay = createBulletCount();
 
 
@@ -80,7 +80,7 @@ function render() {
 
    // Avalia se algum evento de troca de tela ou perca de foco aconteceu, se acontecer, congela as atualizações 
    if (isPaused) return
-
+    // console.log(bulletsInGame);
    const dt = clock.getDelta();
    const result = keyboardUpdate(keyboard, velocity, aceleration, dt, scene, cameraHolder, laps_count, checkpoints_count, trackNumber, nBullets, bulletsInGame);
    velocity = result.velocity;
@@ -91,12 +91,22 @@ function render() {
    nBullets = result.nBullets;
    bulletsInGame = result.bulletsInGame;
 
-  //  console.log(bulletsInGame);
-   bulletsInGame.forEach(element => {
-         element.translateX(-200 * dt);
-         element.userData.updateOBB();
-        //  if()
-   });
+  for (let i = bulletsInGame.length - 1; i >= 0; i--) {
+    const bullet = bulletsInGame[i];
+
+    bullet.translateX(-200 * dt);
+    bullet.userData.updateOBB();
+
+    if (collisionSystem.checkbulletcolision(bullet.userData.obb)) {
+
+        // remove from scene
+        removeAndDispose(bullet);
+        scene.remove(bullet);
+
+        // remove from array
+        bulletsInGame.splice(i, 1);
+    }
+}
 
    updateVehicleMovement(dt, scene, velocity, keyboard, scene.getObjectByName("light"));
    
@@ -127,7 +137,7 @@ function render() {
    updateBulletDisplay(nBullets, bulletDisplay);
 
    if(laps_count == 4){
-    showFinishScreen(scene);
+    showFinishScreen();
    }
 
 

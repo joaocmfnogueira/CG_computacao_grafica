@@ -1,8 +1,6 @@
 import { collisionSystem } from './models/map.js';
 import * as THREE from 'three';
 
-
-
 let finishScreen = null;
 let gameCompleted = false;
 
@@ -43,8 +41,12 @@ export function clearScene(scene, options = {}, renderer) {
     console.log(scene);
 }
 
-function removeAndDispose(object, ignoreSet) {
-    if (!object || ignoreSet.has(object)) return;
+export function removeAndDispose(object, ignoreSet = null) {
+    if(ignoreSet != null)
+        if(ignoreSet.has(object))
+            return
+        
+    if (!object) return;
 
     // Process children from a static snapshot
     const children = [...object.children];
@@ -196,7 +198,7 @@ export function updateBulletDisplay(bullet_Count, bulletDisplay) {
 
 
 // Método para criar a tela de finalização
-export function showFinishScreen(scene) {
+export function showFinishScreen(result = "YOU WON THE RACE!!!!") {
    if (finishScreen) {
       return;
    }
@@ -224,7 +226,7 @@ export function showFinishScreen(scene) {
    title.style.textShadow = '0 0 10px #44ff44';
    
    const message = document.createElement('h2');
-   message.textContent = `You completed 4 laps!`;
+   message.textContent = result;
    message.style.fontSize = '2.5em';
    message.style.marginBottom = '40px';
    message.style.color = '#ffffff';
