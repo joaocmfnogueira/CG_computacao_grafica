@@ -79,7 +79,7 @@ export function createHavac(scene) {
 
 
 // criar carro dos inimigos
-function createHavacEnemy(colorBase, colorBody, colorAntenna, id){
+export function createHavacEnemy(scene, colorBase, colorBody, colorAntenna, id){
 
     const materialBase = setDefaultMaterial(colorBase); 
     const materialBody = new THREE.MeshPhongMaterial(({ 
@@ -105,6 +105,25 @@ function createHavacEnemy(colorBase, colorBody, colorAntenna, id){
     base.castShadow = true;
     base.receiveShadow = true;
     scene.add(base);
+    if(id == 0){
+        base.position.x = 7.8;
+        base.position.z = -7.8;
+    }
+    if(id == 1){
+        base.position.x = 3.9;
+        base.position.z = -3.9;
+    }
+    if(id == 2){
+        base.position.x =  -3.9;
+        base.position.z =  3.9;
+    }
+        
+    if(id == 3){
+        base.position.x =  -7.8;
+        base.position.z =  7.8;
+    }
+        
+
 
     base.userData.boundingBox = new THREE.Box3().setFromObject(base);
     const obb = new OBB().fromBox3(base.userData.boundingBox);

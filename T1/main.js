@@ -5,7 +5,7 @@ import {
 import Stats from '../build/jsm/libs/stats.module.js';
 import KeyboardState from '../libs/util/KeyboardState.js';
 import { createTrack2, createTrack1, createTrack0} from "./models/map.js"
-import { createHavac } from './models/vehicle.js';
+import { createHavac, createHavacEnemy } from './models/vehicle.js';
 import {createSpeedDisplay, updateSpeedDisplay, createLapsCount, updateLapDisplay, showFinishScreen, initLight, initRenderer, createCheckPointCount, updateCheckPointDisplay, createBulletCount, updateBulletDisplay, removeAndDispose} from './utils.js';
 import {keyboardUpdate, updateVehicleMovement, updateCamera} from './control/control.js';
 import { collisionSystem } from './models/map.js';
@@ -57,6 +57,11 @@ let clock = new THREE.Clock();
 
 
 createHavac(scene);
+
+createHavacEnemy(scene, "rgba(126, 235, 126, 1)", "rgba(12, 15, 188, 1)", "rgba(235, 151, 126, 1)", 0);
+createHavacEnemy(scene, "rgba(204, 153, 13, 1)", "rgba(255, 0, 0, 1)", "rgba(75, 12, 12, 1)", 1);
+createHavacEnemy(scene, "rgba(0, 238, 16, 1)", "rgba(0, 118, 14, 1)", "rgba(112, 0, 87, 1)", 2);
+createHavacEnemy(scene, "rgba(163, 205, 220, 1)", "rgba(0, 225, 255, 1)", "rgba(0, 0, 0, 1)", 3);
 
 // Constante para exibir o a velocidade do veiculo
 const speedDisplay = createSpeedDisplay();
