@@ -110,19 +110,13 @@ export function createSpeedDisplay() {
    return speedDiv;
 }
 
-
 export function updateSpeedDisplay(velocity, speedDisplay) {
     const speed = Math.abs(velocity * 20);
     speedDisplay.textContent = `Speed: ${speed.toFixed(2)} km/h`;
 }
 
+
 // Métodos para criar e atualizar a tela de contador de voltas
-export function updateLapDisplay(lap_count, lapDisplay) {
-    const laps = lap_count;
-    lapDisplay.textContent = `🏁 ${laps} / 4`;
-}
-
-
 export function createLapsCount() {
    const lapDiv = document.createElement('div');
    lapDiv.style.position = 'absolute';
@@ -143,14 +137,12 @@ export function createLapsCount() {
    return lapDiv;
 }
 
-export function updateCheckPointDisplay(checkpoint_Count, checkPointDisplay) {
-    const checkpoints = checkpoint_Count;
-    checkPointDisplay.textContent = `🚩 ${checkpoints} / 4`;
+export function updateLapDisplay(lap_count, lapDisplay) {
+    const laps = lap_count;
+    lapDisplay.textContent = `🏁 ${laps} / 4`;
 }
 
-// ⚠️ Esse emojie também é interessante para ali em cima
-
-
+// Métodos para criar e atualizar a tela de contador de checkpoints
 export function createCheckPointCount() {
    const checkpointDiv = document.createElement('div');
    checkpointDiv.style.position = 'absolute';
@@ -170,6 +162,38 @@ export function createCheckPointCount() {
    
    return checkpointDiv;
 }
+
+export function updateCheckPointDisplay(checkpoint_Count, checkPointDisplay) {
+    const checkpoints = checkpoint_Count;
+    checkPointDisplay.textContent = `🚩 ${checkpoints} / 4`;
+}
+
+// Métodos para criar e atualizar a tela de contador de balas
+export function createBulletCount() {
+   const bulletDiv = document.createElement('div');
+   bulletDiv.style.position = 'absolute';
+   bulletDiv.style.top = '150px';
+   bulletDiv.style.right = '10px';
+   bulletDiv.style.color = '#44ff44';
+   bulletDiv.style.fontFamily = 'Arial, sans-serif';
+   bulletDiv.style.fontSize = '24px';
+   bulletDiv.style.fontWeight = 'bold';
+   bulletDiv.style.backgroundColor = 'rgba(0,0,0,0.7)';
+   bulletDiv.style.padding = '15px';
+   bulletDiv.style.borderRadius = '10px';
+   bulletDiv.style.border = '2px solid #333';
+   bulletDiv.style.textShadow = '2px 2px 4px rgba(0,0,0,0.5)';
+   bulletDiv.id = 'bulletDisplay';
+   document.body.appendChild(bulletDiv);
+   
+   return bulletDiv;
+}
+
+export function updateBulletDisplay(bullet_Count, bulletDisplay) {
+    const bullets = bullet_Count;
+    bulletDisplay.textContent = `🔥 ${bullets} / 4`;
+}
+
 
 // Método para criar a tela de finalização
 export function showFinishScreen(scene) {
@@ -351,4 +375,58 @@ export function initRenderer(color = "rgb(0, 0, 0)", shadowMapType = THREE.PCFSo
    document.getElementById("webgl-output").appendChild(renderer.domElement);
 
    return renderer;
+}
+
+
+export function createBBHelper(bb, color = "rgb(255, 255, 255)")
+{
+   let helper = new THREE.Box3Helper( bb, color );
+   scene.add( helper );
+   return helper;
+}
+
+
+export function updateOBBHelper(obb, helper) {
+    const pos = helper.geometry.attributes.position;
+    const vertices = pos.array;
+
+    const half = obb.halfSize;
+    const signs = [
+        [+1, +1, +1],
+        [+1, +1, -1],
+        [+1, -1, +1],
+        [+1, -1, -1],
+        [-1, +1, +1],
+        [-1, +1, -1],
+        [-1, -1, +1],
+        [-1, -1, -1],
+    ];
+
+    const corners = [];
+    for (const s of signs) {
+        const p = new THREE.Vector3(
+            s[0] * half.x,
+            s[1] * half.y,
+            s[2] * half.z
+        );
+        p.applyMatrix3(obb.rotation).add(obb.center);
+        corners.push(p);
+    }
+
+    const idx = [
+        0,1, 0,2, 0,4,
+        7,6, 7,5, 7,3,
+        1,3, 1,5,
+        2,3, 2,6,
+        4,5, 4,6
+    ];
+
+    for (let i = 0; i < idx.length; i++) {
+        const p = corners[idx[i]];
+        vertices[i * 3] = p.x;
+        vertices[i * 3 + 1] = p.y;
+        vertices[i * 3 + 2] = p.z;
+    }
+
+    pos.needsUpdate = true;
 }

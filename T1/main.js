@@ -6,7 +6,7 @@ import Stats from '../build/jsm/libs/stats.module.js';
 import KeyboardState from '../libs/util/KeyboardState.js';
 import { createTrack2, createTrack1, createTrack0} from "./models/map.js"
 import { createHavac } from './models/vehicle.js';
-import {createSpeedDisplay, updateSpeedDisplay, createLapsCount, updateLapDisplay, showFinishScreen, initLight, initRenderer, createCheckPointCount, updateCheckPointDisplay} from './utils.js';
+import {createSpeedDisplay, updateSpeedDisplay, createLapsCount, updateLapDisplay, showFinishScreen, initLight, initRenderer, createCheckPointCount, updateCheckPointDisplay, createBulletCount, updateBulletDisplay} from './utils.js';
 import {keyboardUpdate, updateVehicleMovement, updateCamera} from './control/control.js';
 import { collisionSystem } from './models/map.js';
 
@@ -34,11 +34,14 @@ let keyboard = new KeyboardState();
 // Criando a pista inicial
 createTrack1(scene);
 
+let nBullets = 4;
+let bulletsInGame = [];
+
+
 let velocity = 0;
 let aceleration = 0;
 let laps_count = 0;
 let checkpoints_count = 0;
-let canCompleteLap = false;
 let trackNumber = "Primeiro";
 let trackPoints = {
   "Primeiro" : [[-180, 0, -30], [-150, 0, -270], [90, 0, -240], [60, 0, 0]],
@@ -52,17 +55,6 @@ let isPaused = false;
 // Variavel para amarzenar o tempo gasto entre os frames
 let clock = new THREE.Clock();
 
-// Informações básicas do jogo
-// let controls = new InfoBox();
-// controls.add("Basic Controls");
-// controls.addParagraph();
-// controls.add("Keyboard commands:");
-// controls.add("* 1 to change to track1");
-// controls.add("* 2 to change to track2");
-// controls.add("* 3 to change to track3");
-// controls.add("* R to reset vehicle");
-// controls.add("* Arrow keys to drive");
-// controls.show();
 
 createHavac(scene);
 
@@ -75,6 +67,10 @@ const lapsDisplay = createLapsCount();
 // Constante pare exibir a quantidade de checkpoints que o veiculo fez
 const checkPointDisplay = createCheckPointCount();
 
+// Constante para exibir a quantidade de tiros que aidna resta do jogador
+const bulletDisplay = createBulletCount();
+
+
 render();
 
 function render() {
@@ -86,12 +82,21 @@ function render() {
    if (isPaused) return
 
    const dt = clock.getDelta();
-   const result = keyboardUpdate(keyboard, velocity, aceleration, dt, scene, cameraHolder, laps_count, checkpoints_count, trackNumber);
+   const result = keyboardUpdate(keyboard, velocity, aceleration, dt, scene, cameraHolder, laps_count, checkpoints_count, trackNumber, nBullets, bulletsInGame);
    velocity = result.velocity;
    aceleration = result.aceleration;
    laps_count = result.laps_count;
    checkpoints_count = result.checkpoints_count;
    trackNumber = result.trackNumber;
+   nBullets = result.nBullets;
+   bulletsInGame = result.bulletsInGame;
+
+  //  console.log(bulletsInGame);
+   bulletsInGame.forEach(element => {
+         element.translateX(-200 * dt);
+         element.userData.updateOBB();
+        //  if()
+   });
 
    updateVehicleMovement(dt, scene, velocity, keyboard, scene.getObjectByName("light"));
    
@@ -119,6 +124,7 @@ function render() {
    }
    updateLapDisplay(laps_count, lapsDisplay);
    updateCheckPointDisplay(checkpoints_count, checkPointDisplay);
+   updateBulletDisplay(nBullets, bulletDisplay);
 
    if(laps_count == 4){
     showFinishScreen(scene);
@@ -162,7 +168,7 @@ function checkCarCollision(car, carBox) {
   const [isColided, angle, normal, wall] = collisionSystem.checkCollision(car, carBox, scene);
     if (isColided) {
         // Handle collision - stop car, play sound, etc.
-        console.log("Collision detected!");
+        // console.log("Collision detected!");
         return [true, angle, normal, wall];
     }
     return [false, null, null, null];
@@ -191,9 +197,9 @@ function checkLapCompletion(carPos) {
    // If car leaves finish zone after entering, complete the lap
    if (isInFinishZone && checkpoints_count == 4) {
       laps_count++;
-      canCompleteLap = false;
       checkpoints_count = 0;
       console.log(`Lap ${laps_count} completed!`);
+      nBullets = 4;
    }
 }
 
@@ -280,7 +286,7 @@ function applyCollisionResponse(car, angle, normal, wall, dt, velocity, accelera
     }
     else {
       // pior caso, que não deve acontecer
-      console.log("Algum erro aconteceu com o angulo do veiculo!!!!");
+      // console.log("Algum erro aconteceu com o angulo do veiculo!!!!");
         velocity = 0;
         acceleration = 0;
     }

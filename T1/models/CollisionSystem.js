@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+
 // const raycaster = new THREE.Raycaster();
 
 export class CollisionSystem {
@@ -20,6 +21,16 @@ export class CollisionSystem {
         });
     }
 
+    checkbulletcolision(objectOBB){
+        for (const wall of this.wallBoundingBoxes) {
+            const result = objectOBB.intersectsOBB(wall.boundingBox);
+            if (result) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     checkCollision(car, objectOBB, scene) {
 
         for (const wall of this.wallBoundingBoxes) {
@@ -35,8 +46,8 @@ export class CollisionSystem {
 
                 const angleDeg = collisionAngleDeg(carDirection, collisionNormal);
 
-                console.log(collisionNormal)
-                console.log("Collision angle:", angleDeg);
+                // console.log(collisionNormal)
+                // console.log("Collision angle:", angleDeg);
                 // console.log(wall.mesh)
                 
                 return [true, angleDeg, collisionNormal, wall];
@@ -89,7 +100,7 @@ function getCollisionNormal(carDir, wallNormals, wallMesh, carPosition) {
     // This handles the "corner" case or any future ambiguous wall shapes.
     //
     // Create ray from car → wall
-    console.log(carPosition)
+    // console.log(carPosition)
     const wallCenter = new THREE.Vector3();
     wallMesh.getWorldPosition(wallCenter);
 
@@ -110,19 +121,17 @@ function getCollisionNormal(carDir, wallNormals, wallMesh, carPosition) {
         const normalMatrix = new THREE.Matrix3().getNormalMatrix(wallMesh.matrixWorld);
         normal.applyMatrix3(normalMatrix).normalize();
         // console.log(normal);
-        console.log("Raycast foi");
+        // console.log("Raycast foi");
         return normal;
     }
 
     //
     // 3) Emergency fallback (should not happen)
     //
-    console.log("Raycast não foi");
+    // console.log("Raycast não foi");
     const localNormal = new THREE.Vector3(-1, 0, 0);
     return localNormal.clone().applyQuaternion(wallMesh.getWorldQuaternion(new THREE.Quaternion()));
 }
-
-
 
 function collisionAngleDeg(carDir, wallNormal) {
     const dot = Math.abs(carDir.dot(wallNormal));

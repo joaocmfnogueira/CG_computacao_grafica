@@ -3,7 +3,7 @@ import {
     setDefaultMaterial
 } from "../../libs/util/util.js";
 import {OBB} from "./OBB.js";
-import {createOBBHelper} from "../utils.js";
+import {createOBBHelper, updateOBBHelper} from "../utils.js";
 
 // criar carro do jogador
 export function createHavac(scene) {    
@@ -73,7 +73,7 @@ export function createHavac(scene) {
         base.userData.obb.rotation.copy(tempMat3);
 
         // Atualiza o helper
-        updateOBBHelper(base.userData.obb, obbHelper);
+        // updateOBBHelper(base.userData.obb, obbHelper);
     };
 }
 
@@ -297,57 +297,6 @@ function createAntenna(materialAntenna, color){
     return cone;
 }
 
-function createBBHelper(bb, color = "rgb(255, 255, 255)")
-{
-   let helper = new THREE.Box3Helper( bb, color );
-   scene.add( helper );
-   return helper;
-}
 
-
-function updateOBBHelper(obb, helper) {
-    const pos = helper.geometry.attributes.position;
-    const vertices = pos.array;
-
-    const half = obb.halfSize;
-    const signs = [
-        [+1, +1, +1],
-        [+1, +1, -1],
-        [+1, -1, +1],
-        [+1, -1, -1],
-        [-1, +1, +1],
-        [-1, +1, -1],
-        [-1, -1, +1],
-        [-1, -1, -1],
-    ];
-
-    const corners = [];
-    for (const s of signs) {
-        const p = new THREE.Vector3(
-            s[0] * half.x,
-            s[1] * half.y,
-            s[2] * half.z
-        );
-        p.applyMatrix3(obb.rotation).add(obb.center);
-        corners.push(p);
-    }
-
-    const idx = [
-        0,1, 0,2, 0,4,
-        7,6, 7,5, 7,3,
-        1,3, 1,5,
-        2,3, 2,6,
-        4,5, 4,6
-    ];
-
-    for (let i = 0; i < idx.length; i++) {
-        const p = corners[idx[i]];
-        vertices[i * 3] = p.x;
-        vertices[i * 3 + 1] = p.y;
-        vertices[i * 3 + 2] = p.z;
-    }
-
-    pos.needsUpdate = true;
-}
 
 

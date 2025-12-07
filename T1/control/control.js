@@ -8,6 +8,9 @@ import { createTrack1, createTrack2, createTrack3 } from "../models/map.js"
 import { createHavac } from '../models/vehicle.js';
 import { clearScene } from '../utils.js';
 import { initLight} from '../utils.js';
+import {OBB} from "../models/OBB.js";
+import { createOBBHelper, updateOBBHelper } from '../utils.js';
+
 
 // import { collisionSystem } from './models/map.js';
 
@@ -39,13 +42,71 @@ let currentLookAhead = 0;
 let turnProgressLeft = 0;
 let turnProgressRight = 0;
 
-export function keyboardUpdate(keyboard, velocity, aceleration, dt, scene, cameraHolder, laps_count, checkpoints_count, trackNumber) {
+let lastShotTime = 0;
+const shotCooldown = 300; // tempo em milissegundos (ex: 300ms)
+
+export function keyboardUpdate(keyboard, velocity, aceleration, dt, scene, cameraHolder, laps_count, checkpoints_count, trackNumber, nBullets, bulletsInGame) {
    keyboard.update();
+   const now = performance.now();
+
+   if(nBullets > 0 && (keyboard.pressed("Z")) && (now - lastShotTime) >= shotCooldown){
+         lastShotTime = now;
+         let matBullet = new THREE.MeshPhongMaterial(({ 
+               color: "rgba(255, 0, 0, 1)",
+               flatShading: false,
+               shininess: "100",
+               specular: "rgb(255,255,255)" }));
+         let bulletGeo = new THREE.SphereGeometry(1, 20, 20);
+         let bullet = new THREE.Mesh(bulletGeo, matBullet);
+         bullet.position.set(-3, 0, 0);
+
+         bullet.userData.boundingBox = new THREE.Box3().setFromObject(bullet);
+         const obb = new OBB().fromBox3(bullet.userData.boundingBox);
+         bullet.userData.obb = obb;
+
+         scene.getObjectByName("veiculo_principal").add(bullet);
+         scene.attach(bullet);
+
+         const obbHelper = createOBBHelper(bullet.userData.obb, "rgb(255, 255, 255)");
+         
+             // impedir do helper desaparecer depois de um tempo
+             obbHelper.frustumCulled = false;
+         
+             obbHelper.name = "obbHelper";
+             obbHelper.visible = false;
+             scene.add(obbHelper);
+         
+             // Constantes temporarias 
+             const tempMat4 = new THREE.Matrix4();
+             const tempMat3 = new THREE.Matrix3();
+         
+             bullet.userData.updateOBB = function() {
+                 bullet.updateMatrixWorld(true);
+         
+                 const mw = bullet.matrixWorld;
+         
+                 // Atualiza o centro
+                 bullet.userData.obb.center.setFromMatrixPosition(mw);
+         
+                 // Obtem a rotação
+                 tempMat4.extractRotation(mw);           
+                 tempMat3.setFromMatrix4(tempMat4); 
+         
+                 bullet.userData.obb.rotation.copy(tempMat3);
+         
+                 // Atualiza o helper
+               //   updateOBBHelper(bullet.userData.obb, obbHelper);
+             };
+         // console.log("ue");
+         bulletsInGame.push(bullet);
+         nBullets--;
+   }
 
    /* 
    Evento em que caso a aceleração e o freio aconteca simultaneamente ou nenhum deles 
    aconteça, é para aplicar o atrito.
    */
+  
    if(((keyboard.pressed("up") || keyboard.pressed("X")) && keyboard.pressed("down"))
    || (!(keyboard.pressed("up") || keyboard.pressed("X")) && !keyboard.pressed("down"))){
       if (velocity > 0) aceleration = Math.max(aceleration - 1.5 * dt, 0);
@@ -126,7 +187,7 @@ export function keyboardUpdate(keyboard, velocity, aceleration, dt, scene, camer
       trackNumber = "Terceiro";
    } 
 
-   return { velocity, aceleration, laps_count, checkpoints_count, trackNumber};
+   return { velocity, aceleration, laps_count, checkpoints_count, trackNumber, nBullets, bulletsInGame};
 }
 
 export function updateVehicleMovement(dt, scene, velocity, keyboard, light) {
