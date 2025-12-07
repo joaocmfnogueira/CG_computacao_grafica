@@ -271,7 +271,7 @@ function applyCollisionResponse(car, angle, normal, wall, dt, velocity, accelera
         car.rotateY(rotationSign * maxRot);
 
         // push the car slightly away
-        const bump = angle >= 40 && angle <= 70 ? 0.4 * DT : 0.2 * DT;
+        const bump = angle >= 40 && angle <= 70 ? 0.4 * DT : 0.25 * DT;
         car.position.addScaledVector(wallNormal, bump);
 
         // slow down
