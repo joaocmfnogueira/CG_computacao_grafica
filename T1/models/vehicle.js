@@ -9,13 +9,17 @@ import {createOBBHelper} from "../utils.js";
 export function createHavac(scene) {    
     // Materiais
     const materialBase = setDefaultMaterial("rgba(235, 126, 211, 1)"); 
-    const materialBody = setDefaultMaterial("rgba(136, 83, 167, 1)"); 
+    const materialBody = new THREE.MeshPhongMaterial(({ 
+        color: "rgba(136, 83, 167, 1)",
+        flatShading: false,
+        shininess: "100",
+        specular: "rgb(255,255,255)" }));
+    // const materialBody = setDefaultMaterial("rgba(136, 83, 167, 1)");
     const materialAntenna = setDefaultMaterial("rgba(136, 83, 167, 1)");
 
     // Base
     const base = createBase(materialBase);
     const antenna = createAntenna(materialAntenna, "rgba(235, 126, 211, 1)");
-    antenna.castShadow = true;
     const body = createBody(materialBody)
 
     base.scale.set(1,1,1);
@@ -26,8 +30,13 @@ export function createHavac(scene) {
 
 
     base.name = "veiculo_principal";
-    base.castShadow = true;
-    base.receiveShadow = true;
+    // body.castShadow = true;
+    // body.receiveShadow = true;
+    // base.castShadow = true;
+    // base.receiveShadow = true;
+    // antenna.castShadow = true;
+    // antenna.receiveShadow = true;
+
 
     // base.translateY(-0.5);
     scene.add(base);
@@ -70,9 +79,18 @@ export function createHavac(scene) {
 
 
 // criar carro dos inimigos
-function createHavacEnemy(materialBase, materialBody, materialAntenna, id){
+function createHavacEnemy(colorBase, colorBody, colorAntenna, id){
+
+    const materialBase = setDefaultMaterial(colorBase); 
+    const materialBody = new THREE.MeshPhongMaterial(({ 
+        color: colorBody,
+        flatShading: false,
+        shininess: "100",
+        specular: "rgb(255,255,255)" }));
+    // const materialBody = setDefaultMaterial("rgba(136, 83, 167, 1)");
+    const materialAntenna = setDefaultMaterial(colorAntenna);
     const base = createBase(materialBase);
-    const antenna = createAntenna(materialAntenna, "rgba(235, 126, 211, 1)");
+    const antenna = createAntenna(materialAntenna, colorBase);
     antenna.castShadow = true;
     const body = createBody(materialBody)
 
@@ -130,6 +148,8 @@ function createBase(materialBase){
         const baseGeom = new THREE.CapsuleGeometry(0.25, height);
         const base = new THREE.Mesh(baseGeom, materialBase);
         base.rotateZ(THREE.MathUtils.degToRad(90));
+        base.castShadow = true;
+        base.receiveShadow = true;
         return base;
     }
 
@@ -137,18 +157,26 @@ function createBase(materialBase){
         const boxGeo = new THREE.BoxGeometry(5, 0.5, 3);
         const box = new THREE.Mesh(boxGeo, materialBase);
         box.position.y = 0.25;
+        box.receiveShadow = true;
+        box.castShadow = true;
 
         const capsule1 = createCapsule(5);
         capsule1.position.y = 0;
         capsule1.position.z = -1.5;
+        capsule1.receiveShadow = true;
+        capsule1.castShadow = true;
 
         const capsule2 = createCapsule(5);
         capsule2.position.y = 0;
         capsule2.position.z = 1.5;
+        capsule2.receiveShadow = true;
+        capsule2.castShadow = true;
 
         const capsule3 = createCapsule(3)
         capsule3.position.x = 2.5;
         capsule3.rotation.y = THREE.MathUtils.degToRad(90);
+        capsule3.receiveShadow = true;
+        capsule3.castShadow = true;
 
         box.add(capsule1);
         box.add(capsule2);
@@ -161,11 +189,15 @@ function createBase(materialBase){
         const front = new THREE.Mesh( geometry, materialBase );
         front.rotateZ(THREE.MathUtils.degToRad(90));
         front.rotateY(THREE.MathUtils.degToRad(90));
+        front.receiveShadow = true;
+        front.castShadow = true;
 
         const geometry2 = new THREE.CylinderGeometry( 1.5, 1.5, 0.5, 100); 
         const cylinder = new THREE.Mesh( geometry2, materialBase );
         // cylinder.rotateZ(THREE.MathUtils.degToRad(90));
         cylinder.rotateX(THREE.MathUtils.degToRad(90));
+        cylinder.receiveShadow = true;
+        cylinder.castShadow = true;
 
         front.add(cylinder);
 
@@ -185,6 +217,8 @@ function createBody(materialBody){
     function create_base_back(){
         const boxGeo = new THREE.BoxGeometry(5, 0.3, 3);
         const box = new THREE.Mesh(boxGeo, materialBody);
+        box.receiveShadow = true;
+        box.castShadow = true;
         return box;
     }
 
@@ -194,22 +228,20 @@ function createBody(materialBody){
         const cylinder = new THREE.Mesh( geometry2, materialBody );
         // cylinder.rotateZ(THREE.MathUtils.degToRad(90));
         // cylinder.rotateX(THREE.MathUtils.degToRad(90));
-
+        cylinder.receiveShadow = true;
+        cylinder.castShadow = true;
         return cylinder;
     }
 
     function create_head(){
-        const length = 2.5, width = 0.5;
-        const shape = new THREE.Shape();
-        shape.moveTo( 0,0 );
-        shape.lineTo( 0, width );
-        shape.lineTo( length, width );
-        shape.lineTo( length, 0 );
-        shape.lineTo( 0, 0 );
-        const geometry = new THREE.ExtrudeGeometry( shape );
+        
+        const geometry = new THREE.SphereGeometry(1, 64, 64, 0, Math.PI);
         const material = materialBody;
         const mesh = new THREE.Mesh( geometry, material ) ;
-
+        mesh.rotateX(-Math.PI/2);
+        // mesh.position.x = 3;
+        mesh.receiveShadow = true;
+        mesh.castShadow = true;
         return mesh
     }
 
@@ -219,10 +251,11 @@ function createBody(materialBody){
         front.position.x = -2.5;
 
     const head = create_head();
-    head.scale.set(1,1,1.5);
-        head.position.x = -2;
-        head.position.y = 0.1;
-        head.position.z = -0.7;
+    head.scale.set(2,1.25,1.2);
+    head.position.x = -1;
+        // head.position.x = -2;
+        // head.position.y = 0.1;
+        // head.position.z = -0.7;
 
     back.add(front);
     back.position.y = 0.2;
@@ -234,22 +267,28 @@ function createBody(materialBody){
 
 }
 
-function createAntenna(materialAntenna){
+function createAntenna(materialAntenna, color){
     const geometry = new THREE.CylinderGeometry( 0.1, 0.1, 0.75 );
     const material = materialAntenna;
     const cone = new THREE.Mesh(geometry, material);
     cone.position.y = 0.5;
     cone.position.x = 2;
+    cone.receiveShadow = true;
+    cone.castShadow = true;
 
     const geometry2 = new THREE.SphereGeometry( 0.4, 18, 9, 0, 2*Math.PI, 2*Math.PI, 2*Math.PI);
-    const material2 = setDefaultMaterial("rgba(235, 126, 211, 1)");
+    const material2 = setDefaultMaterial(color);
     const sphere = new THREE.Mesh(geometry2, material2);
+    sphere.receiveShadow = true;
+    sphere.castShadow = true;
 
     const geometry3 = new THREE.BoxGeometry( 0.1, 0.2, 1 );
-    const material3 = setDefaultMaterial("rgba(235, 126, 211, 1)");
+    const material3 = setDefaultMaterial(color);
     const box = new THREE.Mesh(geometry3, material3);
     box.position.x = 0.5;
     box.rotateX(THREE.MathUtils.degToRad(35));
+    box.receiveShadow = true;
+    box.castShadow = true;
 
     sphere.position.y = 0.6;
     sphere.add(box);

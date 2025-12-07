@@ -306,7 +306,7 @@ export function initLight(scene, castShadow = true, position = new THREE.Vector3
    const ambientLight = new THREE.HemisphereLight(
       'white', // bright sky color
       'darkslategrey', // dim ground color
-      0.2 * power, // intensity
+      0.3 * power, // intensity
    );
    scene.add(ambientLight);
    

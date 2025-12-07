@@ -8,6 +8,8 @@ import {initRenderer,
         InfoBox,
         SecondaryBox,
         initDefaultSpotlight,
+        initDefaultDirectionalLighting,
+        initDefaultBasicLight,
         createGroundPlane,
         createLightSphere,        
         onWindowResize} from "../libs/util/util.js";
@@ -24,6 +26,8 @@ stats = new Stats();          // To show FPS information
 
 lightPosition = new THREE.Vector3(1.7, 0.8, 1.1);
 light = initDefaultSpotlight(scene, lightPosition, 5); // Use default light
+let light2 = initDefaultBasicLight(scene);
+
 lightSphere = createLightSphere(scene, 0.1, 10, 10, lightPosition);
 
 // To use the keyboard
@@ -92,7 +96,7 @@ function createPhongObject(geometry)
 {
    let material = new THREE.MeshPhongMaterial({
      color:"rgb(255,20,20)",     // Main color of the object
-     shininess:"100",            // Shininess of the object
+     shininess:"500",            // Shininess of the object
      specular:"rgb(255,255,255)" // Color of the specular component
    });
    return buildObject(geometry, material);

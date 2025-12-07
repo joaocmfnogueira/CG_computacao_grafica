@@ -69,7 +69,6 @@ export function createTunnelWithHoles(scene, x, y, z) {
     return finalMesh;
 }
 
-
 function createGround(scene) {
 
     const groundGeometry = new THREE.PlaneGeometry(3000, 3000);
