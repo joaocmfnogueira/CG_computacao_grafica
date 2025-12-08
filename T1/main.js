@@ -34,15 +34,27 @@ let keyboard = new KeyboardState();
 // Criando a pista inicial
 createTrack1(scene);
 
+// Variaveis básicas do sistema de tiro
 let nBullets = 4;
 let bulletsInGame = [];
 
-
+// Variaveis basicas do veiculo do jogador
 let velocity = 0;
 let aceleration = 0;
 let laps_count = 0;
 let checkpoints_count = 0;
+
+// Pista atual
 let trackNumber = "Primeiro";
+
+// Localização dos blocos de canto que vão orietar a direção dos bots, o quarto valor é se tem que virar a direita (1) ou esquerda (-1)
+let tracks = {
+  "Primeiro" : [[-180, 0, 0, 1], [-180, 0, -270, 1], [90, 0, -270, 1], [90, 0, 0, 1]],
+  "Segundo" : [[-180, 0, 0, 1], [-180, 0, -270, 1], [-30, 0, -270, 1], [-30, 0, -120, -1], [90, 0, -120, 1], [90, 0, 0, 1]],
+  "Terceiro" : [[-90, 0, 0, 1], [-90, 0, -270, -1], [-210, 0, -270, -1], [-210, 0, -150, -1], [30, 0, -150, 1], [30, 0, 0, 1]]
+}
+
+// localização dos checkpoints
 let trackPoints = {
   "Primeiro" : [[-180, 0, -30], [-150, 0, -270], [90, 0, -240], [60, 0, 0]],
   "Segundo" : [[-180, 0, -30], [-150, 0, -270], [-30, 0, -240], [90, 0, -90]],
@@ -58,10 +70,18 @@ let clock = new THREE.Clock();
 
 createHavac(scene);
 
-createHavacEnemy(scene, "rgba(126, 235, 126, 1)", "rgba(12, 15, 188, 1)", "rgba(235, 151, 126, 1)", 0);
-createHavacEnemy(scene, "rgba(204, 153, 13, 1)", "rgba(255, 0, 0, 1)", "rgba(75, 12, 12, 1)", 1);
-createHavacEnemy(scene, "rgba(0, 238, 16, 1)", "rgba(0, 118, 14, 1)", "rgba(112, 0, 87, 1)", 2);
-createHavacEnemy(scene, "rgba(163, 205, 220, 1)", "rgba(0, 225, 255, 1)", "rgba(0, 0, 0, 1)", 3);
+// Criando os veiculos adversários e registrando eles
+let enemy1 = createHavacEnemy(scene, "rgba(126, 235, 126, 1)", "rgba(12, 15, 188, 1)", "rgba(235, 151, 126, 1)", 0);
+let enemy2 = createHavacEnemy(scene, "rgba(204, 153, 13, 1)", "rgba(255, 0, 0, 1)", "rgba(75, 12, 12, 1)", 1);
+let enemy3 = createHavacEnemy(scene, "rgba(0, 238, 16, 1)", "rgba(0, 118, 14, 1)", "rgba(112, 0, 87, 1)", 2);
+let enemy4 = createHavacEnemy(scene, "rgba(163, 205, 220, 1)", "rgba(0, 225, 255, 1)", "rgba(0, 0, 0, 1)", 3);
+
+let enemies = [];
+
+registerEnemy(enemy1);
+registerEnemy(enemy2);
+registerEnemy(enemy3);
+registerEnemy(enemy4);
 
 // Constante para exibir o a velocidade do veiculo
 const speedDisplay = createSpeedDisplay();
@@ -114,7 +134,7 @@ function render() {
 }
 
    updateVehicleMovement(dt, scene, velocity, keyboard, scene.getObjectByName("light"));
-   
+  //  updateEnemyMovement(dt);
     // Avalia a colisão
     const [isColided, angle, normal, wall] = checkCarCollision(scene.getObjectByName("veiculo_principal"), scene.getObjectByName("veiculo_principal").userData.obb);
 
@@ -130,6 +150,7 @@ function render() {
    updateSpeedDisplay(velocity, speedDisplay);
 
    const car = scene.getObjectByName("veiculo_principal");
+  //  console.log(car.position);
    if (car) {
       const carPosition = car.getWorldPosition(new THREE.Vector3());
       // console.log(carPosition)
@@ -179,6 +200,7 @@ window.addEventListener('focus', () => {
   console.log("Jogo voltou");
 });
 
+// Método para verificar a colisão do carro
 function checkCarCollision(car, carBox) {
   const [isColided, angle, normal, wall] = collisionSystem.checkCollision(car, carBox, scene);
     if (isColided) {
@@ -189,6 +211,7 @@ function checkCarCollision(car, carBox) {
     return [false, null, null, null];
 }
 
+// Método usado para evitar bugs em alguns cenários
 function resetKeyboardState() {
   if (KeyboardState.status) {
     for (let key in KeyboardState.status) {
@@ -197,6 +220,7 @@ function resetKeyboardState() {
   }
 }
 
+// Método para verificar se o carro completou a volta
 function checkLapCompletion(carPos) {
    // Check if car is within the finish line area
    const isInFinishZone = 
@@ -218,7 +242,7 @@ function checkLapCompletion(carPos) {
    }
 }
 
-// lembrar de passar a pista como paramêtro ao invez de verificar todos;
+// Método para verificar se o carro passou por um checkpoint
 function checkCheckPointCompletion(carPos, trackNumber) {
   const R = 12.5;
   let points = trackPoints[trackNumber];
@@ -237,6 +261,7 @@ function checkCheckPointCompletion(carPos, trackNumber) {
     }
 }
 
+// Método que aplica a resposta da colisão
 function applyCollisionResponse(car, angle, normal, wall, dt, velocity, acceleration) {
 
     // segurança absoluta – evitar quaternions degenerados
@@ -311,5 +336,79 @@ function applyCollisionResponse(car, angle, normal, wall, dt, velocity, accelera
     return [velocity, acceleration];
 }
 
+// Método que implementa a logica de movimentação dos bots
+function updateEnemyMovement(dt) {
+
+    const path = tracks[trackNumber]; 
+    if (!path) return;
+
+    enemies.forEach(enemy => {
+
+        const mesh = enemy.mesh;
+        const wp = path[enemy.wpIndex];
+
+        const [tx, ty, tz, turnDir] = wp;
+
+        const target = new THREE.Vector3(
+            tx, 
+            ty, 
+            tz
+        );
+
+        const toTarget = new THREE.Vector3().subVectors(target, mesh.position);
+        const distance = toTarget.length();
+        toTarget.normalize();
+        // console.log(toTarget);
+        console.log(distance);
+
+        // // rotação suave em direção ao ponto
+        // const desiredQuat = new THREE.Quaternion().setFromUnitVectors(
+        //     new THREE.Vector3(0, -1, 0).applyQuaternion(mesh.quaternion),
+        //     toTarget
+        // );
+        // mesh.quaternion.slerp(desiredQuat, dt * enemy.turnSpeed);
+
+        // // curva estética baseada no 4º valor
+
+        // if (turnDir === 1 && distance < 25){
+        //   mesh.rotateY(-dt * 1.5);
+        // } 
+        // else if (turnDir === -1 && distance < 25){
+        //   mesh.rotateY(dt * 1.5);
+        // } 
+
+        if (distance < 25 && (turnDir === 1 || turnDir === -1)) {
+
+        const currentQuat = mesh.quaternion.clone();
+
+        const targetQuat = new THREE.Quaternion();
+        const axis = new THREE.Vector3(0, 1, 0); // gira em Y
+
+        const angle = (Math.PI / 2) * (turnDir === 1 ? -1 : 1); 
+
+        targetQuat.setFromAxisAngle(axis, angle);
+
+        const finalQuat = currentQuat.clone().multiply(targetQuat);
+
+        mesh.quaternion.slerp(finalQuat, dt * 3.0); 
+        // aumente multiplcador p/ virar mais rápido
+        }
+
+        mesh.translateX(-enemy.speed * dt);
+
+        if (distance < 1) {
+            enemy.wpIndex++;
+            if (enemy.wpIndex >= path.length) enemy.wpIndex = 0;
+        }
+    });
+}
+
+function registerEnemy(mesh) {
+    enemies.push({
+        mesh: mesh,
+        wpIndex: 0,
+        speed: 40,
+        turnSpeed: 2});
+}
 
 

@@ -5,11 +5,11 @@ import {
    onWindowResize
 } from "../../libs/util/util.js";
 import { createTrack1, createTrack2, createTrack3 } from "../models/map.js"
-import { createHavac } from '../models/vehicle.js';
+import { createHavac, createHavacEnemy } from '../models/vehicle.js';
 import { clearScene } from '../utils.js';
 import { initLight} from '../utils.js';
 import {OBB} from "../models/OBB.js";
-import { createOBBHelper, updateOBBHelper } from '../utils.js';
+import { createOBBHelper } from '../utils.js';
 
 
 // import { collisionSystem } from './models/map.js';
@@ -291,7 +291,6 @@ export function updateCamera(dt, scene, velocity, aceleration, keyboard, cameraH
             targetLookAhead = (-CAMERA_LOOK_AHEAD * turnProgressLeft) + (CAMERA_LOOK_AHEAD * turnProgressRight);
         }
     } else {
-        // Reset turn progress when not moving
         turnProgressLeft = 0;
         turnProgressRight = 0;
     }
@@ -336,6 +335,11 @@ function switchTrack(trackNumber, scene, cameraHolder) {
 
    initLight(scene);
    createHavac(scene);
+   createHavacEnemy(scene, "rgba(126, 235, 126, 1)", "rgba(12, 15, 188, 1)", "rgba(235, 151, 126, 1)", 0);
+   createHavacEnemy(scene, "rgba(204, 153, 13, 1)", "rgba(255, 0, 0, 1)", "rgba(75, 12, 12, 1)", 1);
+   createHavacEnemy(scene, "rgba(0, 238, 16, 1)", "rgba(0, 118, 14, 1)", "rgba(112, 0, 87, 1)", 2);
+   createHavacEnemy(scene, "rgba(163, 205, 220, 1)", "rgba(0, 225, 255, 1)", "rgba(0, 0, 0, 1)", 3);
+   
    resetVehicle(scene);
 
    // cameraHolder was preserved, so just re-add it

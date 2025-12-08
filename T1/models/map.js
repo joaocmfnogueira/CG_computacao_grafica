@@ -45,7 +45,6 @@ export function createTunnelWithHoles(scene, x, y, z) {
                 0
             );
 
-            // IMPORTANT — do not add to scene!
             cutter.updateMatrixWorld(true);
             holeCutters.push(cutter);
         }
@@ -156,7 +155,7 @@ export function createTrack0(scene) {
     // createTree2(scene, 10, 3, 10);
 }
 
-// Criar a primeira pista
+// Cria a primeira pista
 export function createTrack1(scene) {
 
     createGround(scene);
@@ -178,21 +177,17 @@ export function createTrack1(scene) {
         registerWallsForCollision(block);
         debugShowBoundingBoxes(block, scene);
         
-        // posição base em X
         const baseX = 60 - 30 * index;
 
-        // sorteia qual tipo vai usar +25 ou -25
         const types = [createTree1, createTree2];
         const shuffled = types.sort(() => Math.random() - 0.5);
 
-        // gera offset de -5 a +5
         const randOffset = () => (Math.random() * 10 - 5);
 
-        // posição base do Z (pode ser +25 ou -25 conforme sorte)
         const baseZ1 = 25;
         const baseZ2 = -25;
 
-        // --- ÁRVORE 1 ---
+        // ÁRVORE 1 
         if(index%2 == 0){
             shuffled[0](
             scene,
@@ -201,7 +196,7 @@ export function createTrack1(scene) {
             baseZ1 + randOffset()
         );
 
-        // --- ÁRVORE 2 ---
+        // ÁRVORE 2 
         shuffled[1](
             scene,
             baseX + randOffset(),
@@ -366,7 +361,7 @@ export function createTrack1(scene) {
 
 }
 
-// Criar a segunda pista
+// Cria a segunda pista
 export function createTrack2(scene) {
     createGround(scene);
     
@@ -610,7 +605,7 @@ export function createTrack2(scene) {
 
 }
 
-// Criar a terceira pista
+// Cria a terceira pista
 export function createTrack3(scene) {
 
     createGround(scene);

@@ -159,6 +159,7 @@ export function createHavacEnemy(scene, colorBase, colorBody, colorAntenna, id){
         // Atualiza o helper
         updateOBBHelper(base.userData.obb, obbHelper);
     };
+    return base;
 }
 
 

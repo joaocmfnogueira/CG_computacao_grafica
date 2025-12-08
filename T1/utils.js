@@ -13,7 +13,6 @@ export function clearScene(scene, options = {}, renderer) {
 
     const { ignore = [] } = options;
     
-    // Build ignore set (including all descendants)
     const ignoreSet = new Set();
     ignore.forEach(rootIgnored => {
         if (rootIgnored) {
@@ -21,24 +20,19 @@ export function clearScene(scene, options = {}, renderer) {
         }
     });
 
-    // Remove non-ignored objects safely
     const childrenToRemove = scene.children.filter(child => !ignoreSet.has(child));
     childrenToRemove.forEach(child => {
         removeAndDispose(child, ignoreSet);
         scene.remove(child);
     });
 
-    // Clear external systems (pass as parameter!)
     if (collisionSystem) {
         collisionSystem.wallBoundingBoxes.length = 0;
-        // collisionSystem.dynamicObjects.length = 0;
     }
 
-    // Clear renderer caches ONLY
     if (renderer?.renderLists) {
         renderer.renderLists.dispose();
     }
-    console.log(scene);
 }
 
 export function removeAndDispose(object, ignoreSet = null) {
@@ -48,7 +42,6 @@ export function removeAndDispose(object, ignoreSet = null) {
         
     if (!object) return;
 
-    // Process children from a static snapshot
     const children = [...object.children];
     children.forEach(child => {
         removeAndDispose(child, ignoreSet);
@@ -91,7 +84,7 @@ function disposeMaterial(material) {
     material.dispose();
 }
 
-// Métodos para criar e atualizar a tela com a velocidade do veiculo
+// Métodos para criar e atualizar a tela com a velocidade do veículo
 export function createSpeedDisplay() {
    const speedDiv = document.createElement('div');
    speedDiv.style.position = 'absolute';
@@ -116,7 +109,6 @@ export function updateSpeedDisplay(velocity, speedDisplay) {
     const speed = Math.abs(velocity * 20);
     speedDisplay.textContent = `Speed: ${speed.toFixed(2)} km/h`;
 }
-
 
 // Métodos para criar e atualizar a tela de contador de voltas
 export function createLapsCount() {
@@ -195,7 +187,6 @@ export function updateBulletDisplay(bullet_Count, bulletDisplay) {
     const bullets = bullet_Count;
     bulletDisplay.textContent = `🔥 ${bullets} / 4`;
 }
-
 
 // Método para criar a tela de finalização
 export function showFinishScreen(result = "YOU WON THE RACE!!!!") {
@@ -327,6 +318,7 @@ export function createOBBHelper(obb, color = "rgba(155, 155, 155, 1)") {
     return new THREE.LineSegments(geometry, material);
 }
 
+// Método de criar a luz principal e secundária do jogo
 export function initLight(scene, castShadow = true, position = new THREE.Vector3(10, 50, 75)) {
    let power = Math.PI;
    const ambientLight = new THREE.HemisphereLight(
@@ -362,6 +354,7 @@ export function initLight(scene, castShadow = true, position = new THREE.Vector3
    return mainLight;
 }
 
+// Método para criar o renderer
 export function initRenderer(color = "rgb(0, 0, 0)", shadowMapType = THREE.PCFSoftShadowMap ) {
 
    //var props = (typeof additionalProperties !== 'undefined' && additionalProperties) ? additionalProperties : {};
@@ -380,13 +373,13 @@ export function initRenderer(color = "rgb(0, 0, 0)", shadowMapType = THREE.PCFSo
 }
 
 
+// Métodos para criar e atualizar o helper da caixa de colisão
 export function createBBHelper(bb, color = "rgb(255, 255, 255)")
 {
    let helper = new THREE.Box3Helper( bb, color );
    scene.add( helper );
    return helper;
 }
-
 
 export function updateOBBHelper(obb, helper) {
     const pos = helper.geometry.attributes.position;
