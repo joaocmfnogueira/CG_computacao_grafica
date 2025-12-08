@@ -1,15 +1,15 @@
 import * as THREE from  'three';
-import { OrbitControls } from '../build/jsm/controls/OrbitControls.js';
+import { OrbitControls } from './build/jsm/controls/OrbitControls.js';
 import {initRenderer, 
         initCamera,
         initDefaultBasicLight,
         setDefaultMaterial,
         InfoBox,
         onWindowResize,
-        createGroundPlaneXZ} from "../libs/util/util.js";
+        createGroundPlaneXZ} from "./libs/util/util.js";
 
-import {createHavac} from "./models/vehicle.js";
-import{createTrack0, createTrack1,createTrack2,createTrack3} from "./models/map.js";
+import {createHavac} from "./T1/models/vehicle.js";
+import{createTrack0, createTrack1,createTrack2,createTrack3} from "./T1/models/map.js";
 
 let scene, renderer, camera, material, light, orbit; // Initial variables
 scene = new THREE.Scene();    // Create main scene

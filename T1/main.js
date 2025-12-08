@@ -119,7 +119,7 @@ function render() {
   for (let i = bulletsInGame.length - 1; i >= 0; i--) {
     const bullet = bulletsInGame[i];
 
-    bullet.translateX(-200 * dt);
+    bullet.translateX(-150 * dt);
     bullet.userData.updateOBB();
 
     if (collisionSystem.checkbulletcolision(bullet.userData.obb)) {
