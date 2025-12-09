@@ -9,6 +9,7 @@ import { createHavac, createHavacEnemy } from './models/vehicle.js';
 import {createSpeedDisplay, updateSpeedDisplay, createLapsCount, updateLapDisplay, showFinishScreen, initLight, initRenderer, createCheckPointCount, updateCheckPointDisplay, createBulletCount, updateBulletDisplay, removeAndDispose} from './utils.js';
 import {keyboardUpdate, updateVehicleMovement, updateCamera} from './control/control.js';
 import { collisionSystem } from './models/map.js';
+import { WaypointFollower } from './models/WaypointFollower.js';
 
 
 let scene, renderer, camera, light;
@@ -48,11 +49,39 @@ let checkpoints_count = 0;
 let trackNumber = "Primeiro";
 
 // Localização dos blocos de canto que vão orietar a direção dos bots, o quarto valor é se tem que virar a direita (1) ou esquerda (-1)
+// let tracks = {
+//   "Primeiro" : [[-180, 0, 0], [-180, 0, -270], [90, 0, -270], [90, 0, 0]],
+//   "Segundo" : [[-180, 0, 0], [-180, 0, -270], [-30, 0, -270], [-30, 0, -120], [90, 0, -120], [90, 0, 0]],
+//   "Terceiro" : [[-90, 0, 0], [-90, 0, -270], [-210, 0, -270], [-210, 0, -150], [30, 0, -150], [30, 0, 0]]
+// }
+
 let tracks = {
-  "Primeiro" : [[-180, 0, 0, 1], [-180, 0, -270, 1], [90, 0, -270, 1], [90, 0, 0, 1]],
-  "Segundo" : [[-180, 0, 0, 1], [-180, 0, -270, 1], [-30, 0, -270, 1], [-30, 0, -120, -1], [90, 0, -120, 1], [90, 0, 0, 1]],
-  "Terceiro" : [[-90, 0, 0, 1], [-90, 0, -270, -1], [-210, 0, -270, -1], [-210, 0, -150, -1], [30, 0, -150, 1], [30, 0, 0, 1]]
-}
+  "Primeiro" : [
+    new THREE.Vector3(-180, 0,   0),
+    new THREE.Vector3(-180, 0, -270),
+    new THREE.Vector3(  90, 0, -270),
+    new THREE.Vector3(  90, 0,   0)
+  ],
+
+  "Segundo" : [
+    new THREE.Vector3(-180, 0,    0),
+    new THREE.Vector3(-180, 0, -270),
+    new THREE.Vector3( -30, 0, -270),
+    new THREE.Vector3( -30, 0, -120),
+    new THREE.Vector3(  90, 0, -120),
+    new THREE.Vector3(  90, 0,    0)
+  ],
+
+  "Terceiro" : [
+    new THREE.Vector3(-90,  0,   0),
+    new THREE.Vector3(-90,  0, -270),
+    new THREE.Vector3(-210, 0, -270),
+    new THREE.Vector3(-210, 0, -150),
+    new THREE.Vector3(  30, 0, -150),
+    new THREE.Vector3(  30, 0,    0)
+  ]
+};
+
 
 // localização dos checkpoints
 let trackPoints = {
@@ -76,13 +105,6 @@ let enemy2 = createHavacEnemy(scene, "rgba(204, 153, 13, 1)", "rgba(255, 0, 0, 1
 let enemy3 = createHavacEnemy(scene, "rgba(0, 238, 16, 1)", "rgba(0, 118, 14, 1)", "rgba(112, 0, 87, 1)", 2);
 let enemy4 = createHavacEnemy(scene, "rgba(163, 205, 220, 1)", "rgba(0, 225, 255, 1)", "rgba(0, 0, 0, 1)", 3);
 
-let enemies = [];
-
-registerEnemy(enemy1);
-registerEnemy(enemy2);
-registerEnemy(enemy3);
-registerEnemy(enemy4);
-
 // Constante para exibir o a velocidade do veiculo
 const speedDisplay = createSpeedDisplay();
 
@@ -94,6 +116,12 @@ const checkPointDisplay = createCheckPointCount();
 
 // Constante para exibir a quantidade de tiros que ainda resta do jogador
 const bulletDisplay = createBulletCount();
+
+
+const follower = new WaypointFollower(enemy1, tracks["Primeiro"], 50, 5);
+const follower2 = new WaypointFollower(enemy2, tracks["Primeiro"], 50, 5);
+const follower3 = new WaypointFollower(enemy3, tracks["Primeiro"], 50, 5);
+const follower4 = new WaypointFollower(enemy4, tracks["Primeiro"], 50, 5);
 
 
 render();
@@ -133,7 +161,14 @@ function render() {
     }
 }
 
-   updateVehicleMovement(dt, scene, velocity, keyboard, scene.getObjectByName("light"));
+  updateVehicleMovement(dt, scene, velocity, keyboard, scene.getObjectByName("light"));
+  follower.update(dt);
+  follower2.update(dt);
+  follower3.update(dt);
+  follower4.update(dt);
+
+   
+
   //  updateEnemyMovement(dt);
     // Avalia a colisão
     const [isColided, angle, normal, wall] = checkCarCollision(scene.getObjectByName("veiculo_principal"), scene.getObjectByName("veiculo_principal").userData.obb);
@@ -336,79 +371,5 @@ function applyCollisionResponse(car, angle, normal, wall, dt, velocity, accelera
     return [velocity, acceleration];
 }
 
-// Método que implementa a logica de movimentação dos bots
-function updateEnemyMovement(dt) {
-
-    const path = tracks[trackNumber]; 
-    if (!path) return;
-
-    enemies.forEach(enemy => {
-
-        const mesh = enemy.mesh;
-        const wp = path[enemy.wpIndex];
-
-        const [tx, ty, tz, turnDir] = wp;
-
-        const target = new THREE.Vector3(
-            tx, 
-            ty, 
-            tz
-        );
-
-        const toTarget = new THREE.Vector3().subVectors(target, mesh.position);
-        const distance = toTarget.length();
-        toTarget.normalize();
-        // console.log(toTarget);
-        console.log(distance);
-
-        // // rotação suave em direção ao ponto
-        // const desiredQuat = new THREE.Quaternion().setFromUnitVectors(
-        //     new THREE.Vector3(0, -1, 0).applyQuaternion(mesh.quaternion),
-        //     toTarget
-        // );
-        // mesh.quaternion.slerp(desiredQuat, dt * enemy.turnSpeed);
-
-        // // curva estética baseada no 4º valor
-
-        // if (turnDir === 1 && distance < 25){
-        //   mesh.rotateY(-dt * 1.5);
-        // } 
-        // else if (turnDir === -1 && distance < 25){
-        //   mesh.rotateY(dt * 1.5);
-        // } 
-
-        if (distance < 25 && (turnDir === 1 || turnDir === -1)) {
-
-        const currentQuat = mesh.quaternion.clone();
-
-        const targetQuat = new THREE.Quaternion();
-        const axis = new THREE.Vector3(0, 1, 0); // gira em Y
-
-        const angle = (Math.PI / 2) * (turnDir === 1 ? -1 : 1); 
-
-        targetQuat.setFromAxisAngle(axis, angle);
-
-        const finalQuat = currentQuat.clone().multiply(targetQuat);
-
-        mesh.quaternion.slerp(finalQuat, dt * 3.0); 
-        // aumente multiplcador p/ virar mais rápido
-        }
-
-        mesh.translateX(-enemy.speed * dt);
-
-        if (distance < 1) {
-            enemy.wpIndex++;
-            if (enemy.wpIndex >= path.length) enemy.wpIndex = 0;
-        }
-    });
-}
-
-function registerEnemy(mesh) {
-    enemies.push({
-        mesh: mesh,
-        wpIndex: 0,
-        speed: 40,
-        turnSpeed: 2});
-}
 
 
