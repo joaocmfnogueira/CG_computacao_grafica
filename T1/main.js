@@ -135,7 +135,13 @@ function render() {
    if (isPaused) return
     // console.log(bulletsInGame);
    const dt = clock.getDelta();
-   const result = keyboardUpdate(keyboard, velocity, aceleration, dt, scene, cameraHolder, laps_count, checkpoints_count, trackNumber, nBullets, bulletsInGame);
+   const [isColided, angle, normal, wall] = checkCarCollision(scene.getObjectByName("veiculo_principal"), scene.getObjectByName("veiculo_principal").userData.obb);
+
+    if (isColided){
+      const car = scene.getObjectByName("veiculo_principal");
+      [velocity, aceleration] = applyCollisionResponse(car, angle, normal, wall, dt, velocity, aceleration);
+    }
+   const result = keyboardUpdate(keyboard, velocity, aceleration, dt, scene, cameraHolder, laps_count, checkpoints_count, trackNumber, nBullets, bulletsInGame, isColided);
    velocity = result.velocity;
    aceleration = result.aceleration;
    laps_count = result.laps_count;
@@ -167,20 +173,13 @@ function render() {
   follower3.update(dt);
   follower4.update(dt);
 
-   
-
   //  updateEnemyMovement(dt);
     // Avalia a colisão
-    const [isColided, angle, normal, wall] = checkCarCollision(scene.getObjectByName("veiculo_principal"), scene.getObjectByName("veiculo_principal").userData.obb);
-
-    if (isColided){
-      const car = scene.getObjectByName("veiculo_principal");
-      [velocity, aceleration] = applyCollisionResponse(car, angle, normal, wall, dt, velocity, aceleration);
-    }
+    
   
   
 
-   updateCamera(dt, scene, velocity, aceleration, keyboard, cameraHolder);
+   updateCamera(dt, scene, velocity, aceleration, keyboard, cameraHolder, isColided);
 
    updateSpeedDisplay(velocity, speedDisplay);
 
@@ -298,75 +297,99 @@ function checkCheckPointCompletion(carPos, trackNumber) {
 
 // Método que aplica a resposta da colisão
 function applyCollisionResponse(car, angle, normal, wall, dt, velocity, acceleration) {
-
-    // segurança absoluta – evitar quaternions degenerados
     const DT = dt * 50;
-    // console.log(dt);
-    // console.log(DT);
     car.quaternion.normalize();
-    // console.log(velocity)
-    if (angle < 40 && velocity > 0) {
-
-        const bump = velocity > 2
-            ? 0.5 * DT + Math.log(velocity * 20) * DT
-            : 0.5 * DT;
-        // console.log(bump);
-        car.translateX(bump);
-        velocity = -velocity / 2;
-        acceleration = -acceleration;
-    }
-    else if (angle < 40 && velocity < 0) {
-
-        const bump = velocity < -2
-            ? -0.5 * DT - Math.log(-velocity * 20) * DT
-            : -0.5 * DT;
-
-        car.translateX(bump);
-        velocity = -velocity / 2;
-        acceleration = -acceleration;
-    }
-    // else if (angle >= 35 && angle < 45) {
-
-    //     velocity = 0;
-    //     acceleration = 0;
-    // }
-    else if (angle >= 40) {
-
-        // direction car → wall
-        const forward = new THREE.Vector3(-1,0,0)
+    
+    // Calcula a direção forward do carro
+    const forward = new THREE.Vector3(-1, 0, 0)
         .applyQuaternion(car.quaternion)
         .normalize();
-
-        // use wall normal, not wall.position
-        const wallNormal = normal.clone().normalize();
-        // console.log(velocity * 20);
-
-        // rotation sign: should we rotate left or right to escape the wall?
-        const cross = new THREE.Vector3().crossVectors(forward, wallNormal);
-        let rotationSign = Math.sign(cross.y);
-        // if(wall.mesh.name.includes("rightWall"))
-        //     rotationSign *= -1;
-        // console.log(wall.mesh.name);
-        // smooth rotation away from the wall
-        const maxRot = angle >= 40 && angle <= 70 ? THREE.MathUtils.degToRad(0.5 * DT * velocity * 4) : THREE.MathUtils.degToRad(0.25 * DT);
-        car.rotateY(rotationSign * maxRot);
-
-        // push the car slightly away
-        const bump = angle >= 40 && angle <= 70 ? 0.4 * DT : 0.25 * DT;
-        car.position.addScaledVector(wallNormal, bump);
-
-        // slow down
-        const smooth = 0.01;
-        velocity = velocity / (1 + (90 - angle) * smooth);
+    
+    const wallNormal = normal.clone().normalize();
+    
+    // Calcula o quanto o carro está se movendo em direção à parede
+    const dotProduct = forward.dot(wallNormal);
+    const movingTowardWall = dotProduct > 0;
+    
+    // Fator baseado na velocidade (quanto mais rápido, mais forte a resposta)
+    const speedFactor = Math.min(Math.abs(velocity) / 10, 1);
+    
+    if (angle < 40) {
+        if (angle < 40) {
+        const direction = Math.sign(velocity);
+        const speed = Math.abs(velocity);
+        
+        const bump = speed > 2
+            ? (0.5 * DT + Math.log(speed * 20) * DT) * direction
+            : 0.5 * DT * direction;
+        
+        car.translateX(bump);
+        velocity = -velocity / 2;
+        acceleration = -acceleration;
+    }
+    }
+    else if (angle >= 40) {
+        // Colisão lateral - física mais realista
+        
+        // 1. Calcula a penetração atual (estimativa)
+        const penetrationDepth = (1 + speedFactor) * 0.3 * DT;
+        
+        // 2. Correção de posição PRIORITÁRIA - empurra para fora da parede
+        // Usa a normal da parede para empurrar o carro para fora
+        car.position.addScaledVector(wallNormal, penetrationDepth);
+        
+        // 3. Se o carro está se movendo em direção à parede, reflete a velocidade
+        if (movingTowardWall && Math.abs(velocity) > 0.1) {
+            // Calcula o vetor tangente à parede
+            const up = new THREE.Vector3(0, 1, 0);
+            const tangent = new THREE.Vector3()
+                .crossVectors(wallNormal, up)
+                .normalize();
+            
+            // Calcula quanto da velocidade vai contra a parede
+            const velocityAgainstWall = velocity * dotProduct;
+            
+            // Reduz drasticamente a componente da velocidade contra a parede
+            const velocityReduction = 0.9 + (0.1 * (90 - angle) / 50); // Maior redução para ângulos mais agudos
+            
+            // Remove a componente contra a parede
+            velocity = velocity - (velocityAgainstWall * velocityReduction);
+            
+            // Mantém a componente tangencial (deslizamento)
+            const tangentVelocity = velocity * forward.dot(tangent);
+            
+            // 4. Ajusta a direção para deslizar ao longo da parede
+            if (Math.abs(tangentVelocity) > 0.1) {
+                // Determina se deve girar para esquerda ou direita
+                const cross = new THREE.Vector3().crossVectors(forward, tangent);
+                const rotationSign = Math.sign(cross.y);
+                
+                // Aplica rotação suave mas significativa
+                const rotationAmount = THREE.MathUtils.degToRad(
+                    0.8 * DT * Math.sign(tangentVelocity) * (1 + speedFactor)
+                );
+                
+                car.rotateY(rotationAmount);
+            }
+            
+            // 5. Reduz aceleração na direção da parede
+            const accelerationReduction = 0.5 + (0.5 * Math.abs(dotProduct));
+            acceleration *= (1 - accelerationReduction);
+        }
+        
+        // 6. Amortecimento adicional para evitar oscilações
+        velocity *= 0.95;
     }
     else {
-      // pior caso, que não deve acontecer
-      // console.log("Algum erro aconteceu com o angulo do veiculo!!!!");
-        velocity = 0;
-        acceleration = 0;
+        // Caso de segurança
+        velocity *= 0.8;
+        acceleration *= 0.8;
     }
-
-    // **garante que eixos não invertam nunca**
+    
+    // Limitações para estabilidade
+    if (Math.abs(velocity) < 0.05) velocity = 0;
+    if (Math.abs(acceleration) < 0.05) acceleration = 0;
+    
     car.quaternion.normalize();
     return [velocity, acceleration];
 }
