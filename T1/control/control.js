@@ -225,12 +225,36 @@ export function updateVehicleMovement(dt, scene, velocity, keyboard, light) {
    vehicle.userData.updateOBB();
    // console.log(vehicle.castShadow);
 
-   const worldPos = new THREE.Vector3();
-   vehicle.getWorldPosition(worldPos);
+   // Pega posições atuais (para extrair a direção original)
+   const oldLightPos = new THREE.Vector3().copy(light.position);
+   const oldTargetPos = new THREE.Vector3();
+   light.target.getWorldPosition(oldTargetPos);
 
-   light.position.set(worldPos.x + 10, worldPos.y + 50, worldPos.z + 75);
-   light.target.position.set(worldPos.x, worldPos.y, worldPos.z);
+   // Direção original da luz (do light -> target)
+   const baseDir = new THREE.Vector3().subVectors(oldTargetPos, oldLightPos).normalize();
+
+   // Calcula o ponto À FRENTE do carro no mundo (sem rotacionar a luz)
+   const localFront = new THREE.Vector3(-75, 0, 0); // ajuste 50 conforme quiser (distância à frente)
+   const worldFront = localFront.clone().applyMatrix4(vehicle.matrixWorld);
+
+   // Define o novo target na frente do carro
+   light.target.position.copy(worldFront);
    light.target.updateMatrixWorld();
+
+   // Escolhe quão longe posicionar a luz atrás do novo target
+   const desiredDistance = 140; // quanto mais alto, maior o alcance aparente (ajuste)
+   const newLightPos = worldFront.clone().sub(baseDir.clone().multiplyScalar(desiredDistance));
+
+   // Aplica nova posição da luz (mantendo a mesma direção base)
+   light.position.copy(newLightPos);
+   light.updateMatrixWorld();
+
+   // const dirHelper = new THREE.DirectionalLightHelper(light, 10); // 10 = tamanho da seta
+   // scene.add(dirHelper);
+
+   // const shadowHelper = new THREE.CameraHelper(light.shadow.camera);
+   // scene.add(shadowHelper);
+
 
 
    // console.log(light.position);
