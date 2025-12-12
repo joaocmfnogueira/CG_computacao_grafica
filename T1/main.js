@@ -6,7 +6,7 @@ import Stats from '../build/jsm/libs/stats.module.js';
 import KeyboardState from '../libs/util/KeyboardState.js';
 import { createTrack2, createTrack1, createTrack0} from "./models/map.js"
 import { createHavac, createHavacEnemy } from './models/vehicle.js';
-import {createSpeedDisplay, updateSpeedDisplay, createLapsCount, updateLapDisplay, showFinishScreen, initLight, initRenderer, createCheckPointCount, updateCheckPointDisplay, createBulletCount, updateBulletDisplay, removeAndDispose} from './utils.js';
+import {applyLateralSlide, createSpeedDisplay, updateSpeedDisplay, createLapsCount, updateLapDisplay, showFinishScreen, initLight, initRenderer, createCheckPointCount, updateCheckPointDisplay, createBulletCount, updateBulletDisplay, removeAndDispose} from './utils.js';
 import {keyboardUpdate, updateVehicleMovement, updateCamera} from './control/control.js';
 import { collisionSystem } from './models/map.js';
 import { WaypointFollower } from './models/WaypointFollower.js';
@@ -18,6 +18,7 @@ const stats = new Stats();
 container.appendChild( stats.dom );
 scene = new THREE.Scene();
 renderer = initRenderer();
+const BLOCK_SIZE = 30;
 
 // Adicionando a câmera
 let position_camera = new THREE.Vector3(50, 25, 0);
@@ -131,17 +132,36 @@ function render() {
    scene.updateMatrixWorld(true);
    requestAnimationFrame(render);
 
-   // Avalia se algum evento de troca de tela ou perca de foco aconteceu, se acontecer, congela as atualizações 
-   if (isPaused) return
-    // console.log(bulletsInGame);
-   const dt = clock.getDelta();
-   const [isColided, angle, normal, wall] = checkCarCollision(scene.getObjectByName("veiculo_principal"), scene.getObjectByName("veiculo_principal").userData.obb);
+   if (isPaused) return;
 
-    if (isColided){
-      const car = scene.getObjectByName("veiculo_principal");
-      [velocity, aceleration] = applyCollisionResponse(car, angle, normal, wall, dt, velocity, aceleration);
-    }
-   const result = keyboardUpdate(keyboard, velocity, aceleration, dt, scene, cameraHolder, laps_count, checkpoints_count, trackNumber, nBullets, bulletsInGame, isColided);
+   const dt = clock.getDelta();
+   
+   // --- PHYSICS SUB-STEPPING START ---
+   // We divide the frame time into smaller chunks (e.g., 5 steps).
+   // This ensures that even at high speeds or low FPS, we catch collisions early.
+   const SUBSTEPS = 5; 
+   const subDt = dt / SUBSTEPS;
+
+   for (let i = 0; i < SUBSTEPS; i++) {
+       // 1. Move the vehicle (Prediction)
+       updateVehicleMovement(subDt, scene, velocity, keyboard, scene.getObjectByName("light"));
+       
+       // 2. Check for collision
+       const car = scene.getObjectByName("veiculo_principal");
+       const [isColided, angle, normal, wall] = checkCarCollision(car, car.userData.obb);
+
+       // 3. Resolve collision immediately
+       if (isColided) {
+           [velocity, aceleration] = applyCollisionResponse(car, angle, normal, wall, subDt, velocity, aceleration);
+       }
+   }
+   // --- PHYSICS SUB-STEPPING END ---
+
+
+   // Update game logic (inputs, followers, displays) using the total dt
+   // Note: We pass 'false' for isColided here because we handled physics above
+   const result = keyboardUpdate(keyboard, velocity, aceleration, dt, scene, cameraHolder, laps_count, checkpoints_count, trackNumber, nBullets, bulletsInGame, false);
+   
    velocity = result.velocity;
    aceleration = result.aceleration;
    laps_count = result.laps_count;
@@ -150,56 +170,43 @@ function render() {
    nBullets = result.nBullets;
    bulletsInGame = result.bulletsInGame;
 
-  for (let i = bulletsInGame.length - 1; i >= 0; i--) {
-    const bullet = bulletsInGame[i];
+   // Bullet logic
+   for (let i = bulletsInGame.length - 1; i >= 0; i--) {
+       const bullet = bulletsInGame[i];
+       bullet.translateX(-150 * dt);
+       bullet.userData.updateOBB();
 
-    bullet.translateX(-150 * dt);
-    bullet.userData.updateOBB();
+       if (collisionSystem.checkbulletcolision(bullet.userData.obb)) {
+           removeAndDispose(bullet);
+           scene.remove(bullet);
+           bulletsInGame.splice(i, 1);
+       }
+   }
 
-    if (collisionSystem.checkbulletcolision(bullet.userData.obb)) {
+   // Update bots
+   follower.update(dt);
+   follower2.update(dt);
+   follower3.update(dt);
+   follower4.update(dt);
 
-        // remove from scene
-        removeAndDispose(bullet);
-        scene.remove(bullet);
-
-        // remove from array
-        bulletsInGame.splice(i, 1);
-    }
-}
-
-  updateVehicleMovement(dt, scene, velocity, keyboard, scene.getObjectByName("light"));
-  follower.update(dt);
-  follower2.update(dt);
-  follower3.update(dt);
-  follower4.update(dt);
-
-  //  updateEnemyMovement(dt);
-    // Avalia a colisão
-    
-  
-  
-
-   updateCamera(dt, scene, velocity, aceleration, keyboard, cameraHolder, isColided);
-
+   updateCamera(dt, scene, velocity, aceleration, keyboard, cameraHolder, false);
    updateSpeedDisplay(velocity, speedDisplay);
 
+   // Checkpoints and Laps
    const car = scene.getObjectByName("veiculo_principal");
-  //  console.log(car.position);
    if (car) {
       const carPosition = car.getWorldPosition(new THREE.Vector3());
-      // console.log(carPosition)
-      
       checkLapCompletion(carPosition);
       checkCheckPointCompletion(carPosition, trackNumber);
    }
+   
    updateLapDisplay(laps_count, lapsDisplay);
    updateCheckPointDisplay(checkpoints_count, checkPointDisplay);
    updateBulletDisplay(nBullets, bulletDisplay);
 
    if(laps_count == 4){
-    showFinishScreen();
+       showFinishScreen();
    }
-
 
    renderer.render(scene, camera);
 }
@@ -297,102 +304,86 @@ function checkCheckPointCompletion(carPos, trackNumber) {
 
 // Método que aplica a resposta da colisão
 function applyCollisionResponse(car, angle, normal, wall, dt, velocity, acceleration) {
-    const DT = dt * 50;
-    car.quaternion.normalize();
-    
-    // Calcula a direção forward do carro
-    const forward = new THREE.Vector3(-1, 0, 0)
-        .applyQuaternion(car.quaternion)
-        .normalize();
-    
+    const BLOCK_SIZE = 30;
+
+    // 1. Identify Directions
+    // Car's physical forward direction (Local -X axis in World Space)
+    const carForward = new THREE.Vector3(-1, 0, 0).applyQuaternion(car.quaternion).normalize();
+    const velocityVec = carForward.clone().multiplyScalar(velocity);
     const wallNormal = normal.clone().normalize();
-    
-    // Calcula o quanto o carro está se movendo em direção à parede
-    const dotProduct = forward.dot(wallNormal);
-    const movingTowardWall = dotProduct > 0;
-    
-    // Fator baseado na velocidade (quanto mais rápido, mais forte a resposta)
-    const speedFactor = Math.min(Math.abs(velocity) / 10, 1);
-    
-    if (angle < 40) {
-        if (angle < 40) {
-        const direction = Math.sign(velocity);
-        const speed = Math.abs(velocity);
-        
-        const bump = speed > 2
-            ? (0.5 * DT + Math.log(speed * 20) * DT) * direction
-            : 0.5 * DT * direction;
-        
-        car.translateX(bump);
-        velocity = -velocity / 2;
-        acceleration = -acceleration;
+
+    // 2. Positional Correction (Anti-Tunneling)
+    // Push the car out of the wall immediately to stop it from getting stuck
+    const projection = velocityVec.dot(wallNormal);
+    if (projection < 0) {
+        // Calculate how deep we are and push out + a tiny safety margin
+        const pushFactor = Math.abs(projection * dt * BLOCK_SIZE) + 0.05;
+        car.position.addScaledVector(wallNormal, pushFactor);
+        car.userData.updateOBB(); 
     }
-    }
-    else if (angle >= 40) {
-        // Colisão lateral - física mais realista
+
+    // 3. Calculate Slide Vector
+    // Remove the speed that is going INTO the wall, keep the speed along the wall.
+    const dot = velocityVec.dot(wallNormal);
+    const slideVec = velocityVec.clone().sub(wallNormal.clone().multiplyScalar(dot));
+    
+    // Apply Wall Friction (slow down while scraping)
+    const wallFriction = 0.92; 
+    slideVec.multiplyScalar(wallFriction);
+
+    // 4. Update Velocity/Acceleration
+    if (angle < 30) {
+        // Hard crash (Head on) -> Stop
+        velocity = -velocity * 0.3; 
+        acceleration = 0;
+    } else {
+        // Glancing hit -> Slide
+        // Check if we are reversing so we keep the sign correct
+        const isReversing = velocityVec.dot(carForward) < 0;
         
-        // 1. Calcula a penetração atual (estimativa)
-        const penetrationDepth = (1 + speedFactor) * 0.3 * DT;
+        velocity = slideVec.length();
+        if (isReversing) velocity = -velocity; // Keep negative speed if reversing
+
+        acceleration *= 0.5; // Lose power while sliding
+
+        // --- 5. FIXED ROTATION ALIGNMENT ---
+        // We want the car's NOSE (-X) to point along the slide direction.
         
-        // 2. Correção de posição PRIORITÁRIA - empurra para fora da parede
-        // Usa a normal da parede para empurrar o carro para fora
-        car.position.addScaledVector(wallNormal, penetrationDepth);
-        
-        // 3. Se o carro está se movendo em direção à parede, reflete a velocidade
-        if (movingTowardWall && Math.abs(velocity) > 0.1) {
-            // Calcula o vetor tangente à parede
-            const up = new THREE.Vector3(0, 1, 0);
-            const tangent = new THREE.Vector3()
-                .crossVectors(wallNormal, up)
-                .normalize();
-            
-            // Calcula quanto da velocidade vai contra a parede
-            const velocityAgainstWall = velocity * dotProduct;
-            
-            // Reduz drasticamente a componente da velocidade contra a parede
-            const velocityReduction = 0.9 + (0.1 * (90 - angle) / 50); // Maior redução para ângulos mais agudos
-            
-            // Remove a componente contra a parede
-            velocity = velocity - (velocityAgainstWall * velocityReduction);
-            
-            // Mantém a componente tangencial (deslizamento)
-            const tangentVelocity = velocity * forward.dot(tangent);
-            
-            // 4. Ajusta a direção para deslizar ao longo da parede
-            if (Math.abs(tangentVelocity) > 0.1) {
-                // Determina se deve girar para esquerda ou direita
-                const cross = new THREE.Vector3().crossVectors(forward, tangent);
-                const rotationSign = Math.sign(cross.y);
-                
-                // Aplica rotação suave mas significativa
-                const rotationAmount = THREE.MathUtils.degToRad(
-                    0.8 * DT * Math.sign(tangentVelocity) * (1 + speedFactor)
-                );
-                
-                car.rotateY(rotationAmount);
+        if (Math.abs(velocity) > 0.05) {
+            let targetDir = slideVec.clone().normalize();
+
+            // CRITICAL FIX: Prevent 180 flip.
+            // If the slide direction is opposite to where the car is facing 
+            // (e.g. sliding backwards), flip the target vector so the nose 
+            // still points "forward" relative to the car geometry.
+            if (targetDir.dot(carForward) < 0) {
+                targetDir.negate();
             }
+
+            // Construct a Rotation Matrix manually for -X Forward geometry
+            // We want: Local -X axis -> targetDir
+            // Therefore: Local +X axis -> -targetDir
+            const xAxis = targetDir.clone().negate(); 
+            const yAxis = new THREE.Vector3(0, 1, 0); // World Up
             
-            // 5. Reduz aceleração na direção da parede
-            const accelerationReduction = 0.5 + (0.5 * Math.abs(dotProduct));
-            acceleration *= (1 - accelerationReduction);
+            // Z = X cross Y
+            const zAxis = new THREE.Vector3().crossVectors(xAxis, yAxis).normalize();
+            
+            // Recalculate X to ensure it's strictly perpendicular to Y and Z
+            xAxis.crossVectors(yAxis, zAxis).normalize();
+
+            // Create Matrix
+            const targetRotationMat = new THREE.Matrix4().makeBasis(xAxis, yAxis, zAxis);
+            const targetQuat = new THREE.Quaternion().setFromRotationMatrix(targetRotationMat);
+
+            // Smoothly rotate the car to match the wall angle
+            // 0.15 is the "stiffness" of the alignment (higher = snaps faster)
+            car.quaternion.slerp(targetQuat, 0.15);
         }
-        
-        // 6. Amortecimento adicional para evitar oscilações
-        velocity *= 0.95;
     }
-    else {
-        // Caso de segurança
-        velocity *= 0.8;
-        acceleration *= 0.8;
-    }
-    
-    // Limitações para estabilidade
-    if (Math.abs(velocity) < 0.05) velocity = 0;
-    if (Math.abs(acceleration) < 0.05) acceleration = 0;
-    
-    car.quaternion.normalize();
+
+    // Stop completely if too slow
+    if (Math.abs(velocity) < 0.1) velocity = 0;
+
     return [velocity, acceleration];
 }
-
-
-

@@ -337,8 +337,8 @@ export function initLight(scene, castShadow = true, position = new THREE.Vector3
    // and its left, right, bottom, top, near and far parameters are, respectively,
    // (-5, 5, -5, 5, 0.5, 500).    
    const shadow = mainLight.shadow;
-   shadow.mapSize.width = 4096;
-   shadow.mapSize.height = 4096;
+   shadow.mapSize.width = 2048;
+   shadow.mapSize.height = 2048;
    shadow.camera.left = -150;
    shadow.camera.right = 150;
    shadow.camera.top = 150;
@@ -424,4 +424,19 @@ export function updateOBBHelper(obb, helper) {
     }
 
     pos.needsUpdate = true;
+}
+
+export function applyLateralSlide(car, velocityVec, wallNormal, penetrationDepth = 0.2) {
+    // Normalize the normal
+    const N = wallNormal.clone().normalize();
+
+    // Slide vector: remove the component in the normal direction
+    const dot = velocityVec.dot(N);
+    const slide = velocityVec.clone().sub(N.clone().multiplyScalar(dot));
+
+    // Replace car velocity with tangent-only motion
+    car.userData.velocity.copy(slide);
+
+    // Push car slightly out of the wall
+    car.position.add(N.clone().multiplyScalar(penetrationDepth));
 }

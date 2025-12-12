@@ -14,7 +14,7 @@ export class WaypointFollower {
         if (this.waypoints.length === 0) return;
 
         const target = this.waypoints[this.current];
-        console.log(target);
+        // console.log(target);
 
         // console.log(target);
 

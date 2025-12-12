@@ -45,7 +45,7 @@ let turnProgressRight = 0;
 let lastShotTime = 0;
 const shotCooldown = 300; // tempo em milissegundos (ex: 300ms)
 
-export function keyboardUpdate(keyboard, velocity, aceleration, dt, scene, cameraHolder, laps_count, checkpoints_count, trackNumber, nBullets, bulletsInGame) {
+export function keyboardUpdate(keyboard, velocity, aceleration, dt, scene, cameraHolder, laps_count, checkpoints_count, trackNumber, nBullets, bulletsInGame, isColided) {
    keyboard.update();
    const now = performance.now();
 
@@ -199,7 +199,7 @@ export function keyboardUpdate(keyboard, velocity, aceleration, dt, scene, camer
    return { velocity, aceleration, laps_count, checkpoints_count, trackNumber, nBullets, bulletsInGame};
 }
 
-export function updateVehicleMovement(dt, scene, velocity, keyboard, light) {
+export function updateVehicleMovement(dt, scene, velocity, keyboard, light, isColided) {
    const vehicle = scene.getObjectByName("veiculo_principal");
    if (!vehicle) return;
 
@@ -261,7 +261,7 @@ export function updateVehicleMovement(dt, scene, velocity, keyboard, light) {
    
 }
 
-export function updateCamera(dt, scene, velocity, aceleration, keyboard, cameraHolder) {
+export function updateCamera(dt, scene, velocity, aceleration, keyboard, cameraHolder, isColided) {
     const vehicle = scene.getObjectByName("veiculo_principal");
     if (!vehicle) return;
 
