@@ -66,10 +66,19 @@ let clock = new THREE.Clock();
 createHavac(scene);
 
 // Create Enemies
+// ... (criação dos inimigos existente)
 let enemy1 = createHavacEnemy(scene, "rgba(126, 235, 126, 1)", "rgba(12, 15, 188, 1)", "rgba(235, 151, 126, 1)", 0);
+enemy1.userData.nBullets = 4; // <--- ADICIONE ISTO
+
 let enemy2 = createHavacEnemy(scene, "rgba(204, 153, 13, 1)", "rgba(255, 0, 0, 1)", "rgba(75, 12, 12, 1)", 1);
+enemy2.userData.nBullets = 4; // <--- ADICIONE ISTO
+
 let enemy3 = createHavacEnemy(scene, "rgba(0, 238, 16, 1)", "rgba(0, 118, 14, 1)", "rgba(112, 0, 87, 1)", 2);
+enemy3.userData.nBullets = 4; // <--- ADICIONE ISTO
+
 let enemy4 = createHavacEnemy(scene, "rgba(163, 205, 220, 1)", "rgba(0, 225, 255, 1)", "rgba(0, 0, 0, 1)", 3);
+enemy4.userData.nBullets = 4; // <--- ADICIONE ISTO
+// ...
 
 const speedDisplay = createSpeedDisplay();
 const lapsDisplay = createLapsCount();
@@ -280,67 +289,69 @@ function checkVehicleToVehicleCollision(vehicles) {
 // --- HELPER FUNCTIONS ---
 
 function createBulletInteraction(shooter, scene) {
-   // INCREASED OFFSET: -22 ensures the bullet spawns well in front of the car
-   // This prevents the bullet's bounding box from overlapping the shooter immediately
-   const offset = new THREE.Vector3(-22, 2, 0).applyQuaternion(shooter.quaternion);
+   // Offset ajustado para não colidir com o próprio carro (-22)
+   const offset = new THREE.Vector3(-4, 0, 0).applyQuaternion(shooter.quaternion);
    const spawnPos = shooter.position.clone().add(offset);
    
-   const geometry = new THREE.BoxGeometry(1, 1, 3);
-   const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+   // --- MALHA IGUAL A DO JOGADOR ---
+
+   const geometry = new THREE.SphereGeometry(1, 20, 20);
+   const material = new THREE.MeshPhongMaterial(({ 
+                  color: "rgba(255, 0, 0, 1)",
+                  flatShading: false,
+                  shininess: "100",
+                  specular: "rgb(255,255,255)" }));
    const bullet = new THREE.Mesh(geometry, material);
+   // --------------------------------
    
    bullet.position.copy(spawnPos);
    bullet.quaternion.copy(shooter.quaternion);
    
-   // Physics Setup
+   // Física
    bullet.geometry.computeBoundingBox();
    bullet.userData.obb = new OBB();
    bullet.userData.obb.fromBox3(bullet.geometry.boundingBox);
    
-   bullet.userData.shooter = shooter; // Important: Identify the owner
+   bullet.userData.shooter = shooter; 
    
    scene.add(bullet);
    bulletsInGame.push(bullet); 
 }
 
 function updateBotShooting(botMesh, targets, scene) {
-    // 1. Cooldown Check (1000ms = 1 second between shots to prevent spam)
+    // 1. Checa se tem munição (NOVO)
+    if (botMesh.userData.nBullets <= 0) return;
+
+    // 2. Cooldown (1 segundo entre tiros)
     const now = Date.now();
     if (botMesh.userData.lastShotTime && now - botMesh.userData.lastShotTime < 1000) {
         return;
     }
 
-    // 2. Get Bot Info
-    const botPos = botMesh.position; // No clone needed for reading
-    // Bot faces -X local axis
+    const botPos = botMesh.position; 
     const botForward = new THREE.Vector3(-1, 0, 0).applyQuaternion(botMesh.quaternion).normalize();
 
-    // 3. Check All Targets
     for (let target of targets) {
-        if (target === botMesh) continue; // Don't shoot self
+        if (target === botMesh) continue; 
 
-        // --- A. Distance Check ---
-        // Calculate squared distance for performance (avoid sqrt)
+        // Distância (80 unidades)
         const distSq = botPos.distanceToSquared(target.position);
-        
-        // Range: 80 units (80 * 80 = 6400)
         if (distSq > 6400) continue; 
 
-        // --- B. Angle Check (Cone of Vision) ---
-        // Vector pointing from Bot -> Target
+        // Ângulo de Visão (Cone de 10 graus)
         const toTarget = new THREE.Vector3().subVectors(target.position, botPos).normalize();
-        
-        // Calculate angle between "Forward" and "ToTarget"
-        const angle = botForward.angleTo(toTarget); // Returns radians
+        const angle = botForward.angleTo(toTarget);
         const angleDeg = THREE.MathUtils.radToDeg(angle);
 
-        // Define a cone of 10 degrees (5 left, 5 right)
-        // If the target is within this cone, the bot "sees" it.
         if (angleDeg < 10) {
-            // FIRE!
+            // ATIRAR!
             createBulletInteraction(botMesh, scene);
+            
+            // Atualiza estado do bot
             botMesh.userData.lastShotTime = now;
-            return; // Stop checking other targets, we already shot
+            botMesh.userData.nBullets--; // Gasta uma bala
+            
+            return; 
         }
     }
 }
