@@ -261,11 +261,125 @@ export function updateVehicleMovement(dt, scene, velocity, keyboard, light, isCo
    
 }
 
+// export function updateCamera(dt, scene, velocity, aceleration, keyboard, cameraHolder, isColided) {
+//     const vehicle = scene.getObjectByName("veiculo_principal");
+//     if (!vehicle) return;
+
+//     // Calcula a distancia da camera com o veiculo com base na aceleração
+//     const speedFactor = Math.abs(velocity) / MAX_FORWARD_SPEED;
+//     const accelerationFactor = Math.max(0, aceleration) / ACCELERATION_RATE;
+    
+//     const targetDistance = CAMERA_BASE_DISTANCE + 
+//                           (speedFactor * CAMERA_ACCELERATION_OFFSET) + 
+//                           (accelerationFactor * CAMERA_ACCELERATION_OFFSET * 0.9);
+
+//    // Altera levemente a altura da camera em relação a aceleração
+//     const targetHeight = CAMERA_BASE_HEIGHT + (speedFactor * 5);
+
+//     // Interpolação suave usando o lerp para a distancia e altura
+//     currentCameraDistance = THREE.MathUtils.lerp(
+//         currentCameraDistance, 
+//         targetDistance, 
+//         CAMERA_SMOOTHNESS * dt
+//     );
+//     currentCameraHeight = THREE.MathUtils.lerp(
+//         currentCameraHeight, 
+//         targetHeight, 
+//         CAMERA_SMOOTHNESS * dt
+//     );
+
+//     // Criando a logica de incrinação da camera em relação ao veiculo com base no tempo as setas laterais estão pressionadas
+//     let targetLateralOffset = 0;
+//     let targetLookAhead = 0;
+    
+//     if (Math.abs(velocity) > 0.1 && !isColided) {
+//         if (keyboard.pressed("left")) {
+//             turnProgressLeft = Math.min(turnProgressLeft + dt * 2, 1);
+//             turnProgressRight = Math.max(turnProgressRight - dt * 3, 0);
+            
+//             targetLateralOffset = CAMERA_TURN_OFFSET * turnProgressLeft;
+//             targetLookAhead = -CAMERA_LOOK_AHEAD * turnProgressLeft;
+            
+//         } else if (keyboard.pressed("right")) {
+//             turnProgressRight = Math.min(turnProgressRight + dt * 2, 1); 
+//             turnProgressLeft = Math.max(turnProgressLeft - dt * 3, 0); 
+            
+//             targetLateralOffset = -CAMERA_TURN_OFFSET * turnProgressRight;
+//             targetLookAhead = CAMERA_LOOK_AHEAD * turnProgressRight;
+            
+//         } else {
+//             turnProgressLeft = Math.max(turnProgressLeft - dt * 2, 0);
+//             turnProgressRight = Math.max(turnProgressRight - dt * 2, 0);
+            
+//             targetLateralOffset = (CAMERA_TURN_OFFSET * turnProgressLeft) + (-CAMERA_TURN_OFFSET * turnProgressRight);
+//             targetLookAhead = (-CAMERA_LOOK_AHEAD * turnProgressLeft) + (CAMERA_LOOK_AHEAD * turnProgressRight);
+//         }
+//     } else {
+//         turnProgressLeft = 0;
+//         turnProgressRight = 0;
+//     }
+
+//     // Interpolação suave nas laterais usando o lerp
+//     currentLateralOffset = THREE.MathUtils.lerp(currentLateralOffset, targetLateralOffset, CAMERA_SMOOTHNESS * dt * 0.8);
+//     currentLookAhead = THREE.MathUtils.lerp(currentLookAhead, targetLookAhead, CAMERA_SMOOTHNESS * dt * 0.8);
+
+//     // Atualização da camera em relação ao veículo
+//     const camera = cameraHolder.children[0];
+//     if (camera) {
+//         const behindOffset = new THREE.Vector3(currentCameraDistance, 0, 0);
+//         behindOffset.applyQuaternion(vehicle.quaternion);
+        
+//         const lateralOffset = new THREE.Vector3(0, 0, currentLateralOffset);
+//         lateralOffset.applyQuaternion(vehicle.quaternion);
+        
+//         const lookAheadOffset = new THREE.Vector3(-currentLookAhead * currentCameraDistance, 0, 0);
+//         lookAheadOffset.applyQuaternion(vehicle.quaternion);
+
+//         // Colocando a posição da camera
+//         camera.position.copy(vehicle.position)
+//             .add(behindOffset)
+//             .add(lateralOffset)
+//             .add(new THREE.Vector3(0, currentCameraHeight, 0));
+
+//         // Apontando a camera para uma posição a frente do veiculo
+//         const lookAtPoint = vehicle.position.clone()
+//             .add(lookAheadOffset)
+//             .add(new THREE.Vector3(0, currentCameraHeight * 0.3, 0));
+        
+//         camera.lookAt(lookAtPoint);
+//     }
+//  }
+
 export function updateCamera(dt, scene, velocity, aceleration, keyboard, cameraHolder, isColided) {
     const vehicle = scene.getObjectByName("veiculo_principal");
     if (!vehicle) return;
 
-    // Calcula a distancia da camera com o veiculo com base na aceleração
+    // --- JITTER FIX START: Initialize Smoothing State ---
+    // We store a "smoothed" position/rotation inside the cameraHolder's userData
+    // This acts as a buffer between the jittery physics car and the camera.
+    if (!cameraHolder.userData.smoothPosition) {
+        cameraHolder.userData.smoothPosition = vehicle.position.clone();
+        cameraHolder.userData.smoothQuaternion = vehicle.quaternion.clone();
+    }
+
+    // 1. Determine how tightly we follow the car
+    // If colliding, we lower the speed (2.0) to ignore vibrations.
+    // If normal, we follow quickly (10.0) to feel responsive.
+    const smoothingSpeed = isColided ? 2.0 : 10.0; 
+    
+    // 2. Update the "Ghost" position/rotation
+    // We LERP (Linear Interpolate) towards the real car, filtering out high-frequency noise.
+    cameraHolder.userData.smoothPosition.lerp(vehicle.position, smoothingSpeed * dt);
+    cameraHolder.userData.smoothQuaternion.slerp(vehicle.quaternion, smoothingSpeed * dt);
+
+    // 3. Define the source for calculations
+    // INSTEAD of using 'vehicle', we use our smooth ghost values.
+    const sourcePos = cameraHolder.userData.smoothPosition;
+    const sourceQuat = cameraHolder.userData.smoothQuaternion;
+    // --- JITTER FIX END ---
+
+
+    // Calculate target distance based on acceleration
     const speedFactor = Math.abs(velocity) / MAX_FORWARD_SPEED;
     const accelerationFactor = Math.max(0, aceleration) / ACCELERATION_RATE;
     
@@ -273,10 +387,9 @@ export function updateCamera(dt, scene, velocity, aceleration, keyboard, cameraH
                           (speedFactor * CAMERA_ACCELERATION_OFFSET) + 
                           (accelerationFactor * CAMERA_ACCELERATION_OFFSET * 0.9);
 
-   // Altera levemente a altura da camera em relação a aceleração
     const targetHeight = CAMERA_BASE_HEIGHT + (speedFactor * 5);
 
-    // Interpolação suave usando o lerp para a distancia e altura
+    // Smooth interpolation for distance/height
     currentCameraDistance = THREE.MathUtils.lerp(
         currentCameraDistance, 
         targetDistance, 
@@ -288,7 +401,7 @@ export function updateCamera(dt, scene, velocity, aceleration, keyboard, cameraH
         CAMERA_SMOOTHNESS * dt
     );
 
-    // Criando a logica de incrinação da camera em relação ao veiculo com base no tempo as setas laterais estão pressionadas
+    // Lateral inclination logic
     let targetLateralOffset = 0;
     let targetLookAhead = 0;
     
@@ -319,36 +432,37 @@ export function updateCamera(dt, scene, velocity, aceleration, keyboard, cameraH
         turnProgressRight = 0;
     }
 
-    // Interpolação suave nas laterais usando o lerp
     currentLateralOffset = THREE.MathUtils.lerp(currentLateralOffset, targetLateralOffset, CAMERA_SMOOTHNESS * dt * 0.8);
     currentLookAhead = THREE.MathUtils.lerp(currentLookAhead, targetLookAhead, CAMERA_SMOOTHNESS * dt * 0.8);
 
-    // Atualização da camera em relação ao veículo
+    // Update Camera Position
     const camera = cameraHolder.children[0];
     if (camera) {
+        // NOTE: We now use 'sourceQuat' and 'sourcePos' instead of vehicle.quaternion/position
+        
         const behindOffset = new THREE.Vector3(currentCameraDistance, 0, 0);
-        behindOffset.applyQuaternion(vehicle.quaternion);
+        behindOffset.applyQuaternion(sourceQuat);
         
         const lateralOffset = new THREE.Vector3(0, 0, currentLateralOffset);
-        lateralOffset.applyQuaternion(vehicle.quaternion);
+        lateralOffset.applyQuaternion(sourceQuat);
         
         const lookAheadOffset = new THREE.Vector3(-currentLookAhead * currentCameraDistance, 0, 0);
-        lookAheadOffset.applyQuaternion(vehicle.quaternion);
+        lookAheadOffset.applyQuaternion(sourceQuat);
 
-        // Colocando a posição da camera
-        camera.position.copy(vehicle.position)
+        // Set camera position
+        camera.position.copy(sourcePos)
             .add(behindOffset)
             .add(lateralOffset)
             .add(new THREE.Vector3(0, currentCameraHeight, 0));
 
-        // Apontando a camera para uma posição a frente do veiculo
-        const lookAtPoint = vehicle.position.clone()
+        // Look At Point (also smoothed)
+        const lookAtPoint = sourcePos.clone()
             .add(lookAheadOffset)
             .add(new THREE.Vector3(0, currentCameraHeight * 0.3, 0));
         
         camera.lookAt(lookAtPoint);
     }
- }
+}
 
 function switchTrack(trackNumber, scene, cameraHolder) {
    clearScene(scene, { ignore: [cameraHolder] });
