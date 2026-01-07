@@ -442,11 +442,11 @@ function applyCollisionResponse(car, angle, normal, wall, dt, velocity, accelera
     const dot = velocityVec.dot(wallNormal);
     const slideVec = velocityVec.clone().sub(wallNormal.clone().multiplyScalar(dot));
     
-    const wallFriction = 0.92; 
+    const wallFriction = 0.98; 
     slideVec.multiplyScalar(wallFriction);
-
+    console.log(angle);
     if (angle < 30) {
-        velocity = -velocity * 0.3; 
+        velocity = -velocity * 0.8; 
         acceleration = 0;
     } else {
         const isReversing = velocityVec.dot(carForward) < 0;
