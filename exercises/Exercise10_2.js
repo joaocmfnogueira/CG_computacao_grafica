@@ -17,15 +17,16 @@ var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHei
   camera.up.set( 0, 1, 0 );
 
 var ambientLight = new THREE.AmbientLight("rgba(233, 233, 233, 1)");
-   ambientLight.intensity = 10;
+   ambientLight.intensity = 2;
 scene.add(ambientLight);
 
-var lightPosition = new THREE.Vector3(5, 5, 0.0);
-  var light = new THREE.SpotLight(0xffffff);
+var lightPosition = new THREE.Vector3(7, 7, 0.0);
+  var light = new THREE.DirectionalLight(0xffffff);
   light.position.copy(lightPosition);
   light.castShadow = true;
   light.penumbra = 0.5;    
-  light.intensity = 30;
+  light.intensity = 8;
+  light.shadow.camera.far = 20;
 scene.add(light);
 
 var lightSphere = createLightSphere(scene, 0.1, 10, 10, lightPosition);  
@@ -43,7 +44,7 @@ scene.add( axesHelper );
 
 //-- Scene Objects -----------------------------------------------------------
 // Ground
-var groundPlane = createGroundPlane(10.0, 10.0, 100, 100); // width and height
+var groundPlane = createGroundPlane(15.0, 15.0, 100, 100); // width and height
   groundPlane.rotateX(THREE.MathUtils.degToRad(-90));
 scene.add(groundPlane);
 
@@ -63,12 +64,29 @@ let mat = new THREE.MeshStandardMaterial({
     displacementMap: dispmap,
     displacementScale: 0.2
 });
-mat.map.repeat.x = 3;
-mat.map.repeat.y = 4;
+
+colormap.wrapS = THREE.RepeatWrapping;
+colormap.wrapT = THREE.RepeatWrapping;
+
+normalmap.wrapS = THREE.RepeatWrapping;
+normalmap.wrapT = THREE.RepeatWrapping;
+
+dispmap.wrapS = THREE.RepeatWrapping;
+dispmap.wrapT = THREE.RepeatWrapping;
+
+
+mat.map.repeat.x = 4;
+mat.map.repeat.y = 3;
+mat.normalMap.repeat.x = 4;
+mat.normalMap.repeat.y = 3;
+mat.displacementMap.repeat.x = 4;
+mat.displacementMap.repeat.y = 3;
 // mat.normalScale.set(0.7, 0.7);
 
 let mesh = new THREE.Mesh(sphereGeometry, mat);
 mesh.position.y = 3.5;
+mesh.receiveShadow = true;
+mesh.castShadow = true;
 scene.add(mesh);
 //----------------------------------------------------------------------------
 //-- Use TextureLoader to load texture files
