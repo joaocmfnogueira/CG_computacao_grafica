@@ -51,12 +51,30 @@ let tracks = {
     new THREE.Vector3(  90, 0, -270),
     new THREE.Vector3(  90, 0,   0)
   ],
-  // ... (Other tracks kept as is) ...
+
+  "Segundo" : [
+    new THREE.Vector3(-180, 0,    0),
+    new THREE.Vector3(-180, 0, -270),
+    new THREE.Vector3( -30, 0, -270),
+    new THREE.Vector3( -30, 0, -120),
+    new THREE.Vector3(  90, 0, -120),
+    new THREE.Vector3(  90, 0,    0)
+  ],
+
+  "Terceiro" : [
+    new THREE.Vector3(-90,  0,   0),
+    new THREE.Vector3(-90,  0, -270),
+    new THREE.Vector3(-210, 0, -270),
+    new THREE.Vector3(-210, 0, -150),
+    new THREE.Vector3(  30, 0, -150),
+    new THREE.Vector3(  30, 0,    0)
+  ]
 };
 
 let trackPoints = {
   "Primeiro" : [[-180, 0, -30], [-150, 0, -270], [90, 0, -240], [60, 0, 0]],
-  // ... (Other points kept as is) ...
+  "Segundo" : [[-180, 0, -30], [-150, 0, -270], [-30, 0, -240], [90, 0, -90]],
+  "Terceiro" : [[-90, 0, -30], [-120, 0, -270], [-180, 0, -150], [30, 0, -120]]
 }
 
 let isPaused = false;
@@ -86,17 +104,17 @@ const checkPointDisplay = createCheckPointCount();
 const bulletDisplay = createBulletCount();
 
 // Link followers to meshes
-const follower = new WaypointFollower(enemy1, tracks["Primeiro"], 20, 5);
-enemy1.userData.follower = follower;
+// const follower = new WaypointFollower(enemy1, tracks["Primeiro"], 20, 5);
+// enemy1.userData.follower = follower;
 
-const follower2 = new WaypointFollower(enemy2, tracks["Primeiro"], 20, 5);
-enemy2.userData.follower = follower2;
+// const follower2 = new WaypointFollower(enemy2, tracks["Primeiro"], 20, 5);
+// enemy2.userData.follower = follower2;
 
-const follower3 = new WaypointFollower(enemy3, tracks["Primeiro"], 20, 5);
-enemy3.userData.follower = follower3;
+// const follower3 = new WaypointFollower(enemy3, tracks["Primeiro"], 20, 5);
+// enemy3.userData.follower = follower3;
 
-const follower4 = new WaypointFollower(enemy4, tracks["Primeiro"], 20, 5);
-enemy4.userData.follower = follower4;
+// const follower4 = new WaypointFollower(enemy4, tracks["Primeiro"], 20, 5);
+// enemy4.userData.follower = follower4;
 
 const botRaycaster = new THREE.Raycaster();
 
@@ -113,7 +131,8 @@ function render() {
 
    // --- 1. GATHER ALL VEHICLES ---
    const playerCar = scene.getObjectByName("veiculo_principal");
-   const bots = [enemy1, enemy2, enemy3, enemy4].filter(b => b !== undefined);
+   console.log(trackNumber);
+   const bots = [scene.getObjectByName("enemy0"), scene.getObjectByName("enemy1"), scene.getObjectByName("enemy2"), scene.getObjectByName("enemy3")].filter(b => b !== undefined);
    const allVehicles = [];
    if (playerCar) allVehicles.push(playerCar);
    bots.forEach(b => allVehicles.push(b));
@@ -246,6 +265,7 @@ function render() {
       const carPosition = playerCar.getWorldPosition(new THREE.Vector3());
       checkLapCompletion(carPosition);
       checkCheckPointCompletion(carPosition, trackNumber);
+      
    }
    
    updateLapDisplay(laps_count, lapsDisplay);
@@ -408,7 +428,36 @@ function checkLapCompletion(carPos) {
    }
 }
 
+function checkBotLapCompletion(carPos) {
+   const isInFinishZone = 
+   (carPos.x <= 12.5 && carPos.x >= -12.5) && (carPos.z <= 12.5 && carPos.z >= -12.5) ;
+   
+   if (isInFinishZone && checkpoints_count == 4) {
+      laps_count++;
+      checkpoints_count = 0;
+      console.log(`Lap ${laps_count} completed!`);
+      nBullets = 4;
+   }
+}
+
 function checkCheckPointCompletion(carPos, trackNumber) {
+  const R = 12.5;
+  let points = trackPoints[trackNumber];
+    if (checkpoints_count >= points.length) return;
+
+    const checkpoint = points[checkpoints_count];
+    const [x, y, z] = checkpoint;
+
+    const dentro =
+      carPos.x >= x - R && carPos.x <= x + R &&
+      carPos.z >= z - R && carPos.z <= z + R;
+
+    if (dentro) {
+      checkpoints_count++;
+    }
+}
+
+function checkBotCheckPointCompletion(carPos, trackNumber) {
   const R = 12.5;
   let points = trackPoints[trackNumber];
     if (checkpoints_count >= points.length) return;

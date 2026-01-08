@@ -466,17 +466,29 @@ export function updateCamera(dt, scene, velocity, aceleration, keyboard, cameraH
 
 function switchTrack(trackNumber, scene, cameraHolder) {
    clearScene(scene, { ignore: [cameraHolder] });
+   let trackNumberString;
+   if (trackNumber === 1){
+      createTrack1(scene);
+      trackNumberString = "Primeiro";
+   } 
+   else if (trackNumber === 2){
+      createTrack2(scene);
+      trackNumberString = "Segundo";
 
-   if (trackNumber === 1) createTrack1(scene);
-   else if (trackNumber === 2) createTrack2(scene);
-   else if (trackNumber === 3) createTrack3(scene);
+   } 
+   else if (trackNumber === 3){
+      createTrack3(scene);
+      trackNumberString = "Terceiro";
+
+   } 
 
    initLight(scene);
    createHavac(scene);
-   createHavacEnemy(scene, "rgba(126, 235, 126, 1)", "rgba(12, 15, 188, 1)", "rgba(235, 151, 126, 1)", 0);
-   createHavacEnemy(scene, "rgba(204, 153, 13, 1)", "rgba(255, 0, 0, 1)", "rgba(75, 12, 12, 1)", 1);
-   createHavacEnemy(scene, "rgba(0, 238, 16, 1)", "rgba(0, 118, 14, 1)", "rgba(112, 0, 87, 1)", 2);
-   createHavacEnemy(scene, "rgba(163, 205, 220, 1)", "rgba(0, 225, 255, 1)", "rgba(0, 0, 0, 1)", 3);
+   
+   createHavacEnemy(scene, "rgba(126, 235, 126, 1)", "rgba(12, 15, 188, 1)", "rgba(235, 151, 126, 1)", 0, trackNumberString);
+   createHavacEnemy(scene, "rgba(204, 153, 13, 1)", "rgba(255, 0, 0, 1)", "rgba(75, 12, 12, 1)", 1, trackNumberString);
+   createHavacEnemy(scene, "rgba(0, 238, 16, 1)", "rgba(0, 118, 14, 1)", "rgba(112, 0, 87, 1)", 2, trackNumberString);
+   createHavacEnemy(scene, "rgba(163, 205, 220, 1)", "rgba(0, 225, 255, 1)", "rgba(0, 0, 0, 1)", 3, trackNumberString);
    
    resetVehicle(scene);
 

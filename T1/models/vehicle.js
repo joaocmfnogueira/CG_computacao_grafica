@@ -4,7 +4,7 @@ import {
 } from "../../libs/util/util.js";
 import {OBB} from "./OBB.js";
 import {createOBBHelper, updateOBBHelper} from "../utils.js";
-
+import { WaypointFollower } from './WaypointFollower.js';
 // criar carro do jogador
 export function createHavac(scene) {    
     // Materiais
@@ -77,9 +77,35 @@ export function createHavac(scene) {
     };
 }
 
+let tracks = {
+  "Primeiro" : [
+    new THREE.Vector3(-180, 0,   0),
+    new THREE.Vector3(-180, 0, -270),
+    new THREE.Vector3(  90, 0, -270),
+    new THREE.Vector3(  90, 0,   0)
+  ],
+
+  "Segundo" : [
+    new THREE.Vector3(-180, 0,    0),
+    new THREE.Vector3(-180, 0, -270),
+    new THREE.Vector3( -30, 0, -270),
+    new THREE.Vector3( -30, 0, -120),
+    new THREE.Vector3(  90, 0, -120),
+    new THREE.Vector3(  90, 0,    0)
+  ],
+
+  "Terceiro" : [
+    new THREE.Vector3(-90,  0,   0),
+    new THREE.Vector3(-90,  0, -270),
+    new THREE.Vector3(-210, 0, -270),
+    new THREE.Vector3(-210, 0, -150),
+    new THREE.Vector3(  30, 0, -150),
+    new THREE.Vector3(  30, 0,    0)
+  ]
+};
 
 // criar carro dos inimigos
-export function createHavacEnemy(scene, colorBase, colorBody, colorAntenna, id){
+export function createHavacEnemy(scene, colorBase, colorBody, colorAntenna, id, tracksNumber = "Primeiro"){
 
     const materialBase = setDefaultMaterial(colorBase); 
     const materialBody = new THREE.MeshPhongMaterial(({ 
@@ -123,8 +149,6 @@ export function createHavacEnemy(scene, colorBase, colorBody, colorAntenna, id){
         base.position.z =  7.8;
     }
         
-
-
     base.userData.boundingBox = new THREE.Box3().setFromObject(base);
     const obb = new OBB().fromBox3(base.userData.boundingBox);
     base.userData.obb = obb;
@@ -141,6 +165,12 @@ export function createHavacEnemy(scene, colorBase, colorBody, colorAntenna, id){
     // Constantes temporarias 
     const tempMat4 = new THREE.Matrix4();
     const tempMat3 = new THREE.Matrix3();
+    
+    // Criando um waypointFolower
+    const follower = new WaypointFollower(base, tracks[tracksNumber], 20, 5);
+    base.userData.follower = follower;
+
+    base.name = "enemy" + id;
 
     base.userData.updateOBB = function() {
         base.updateMatrixWorld(true);
