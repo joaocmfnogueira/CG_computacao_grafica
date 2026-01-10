@@ -5,6 +5,35 @@ import {
 import {OBB} from "./OBB.js";
 import {createOBBHelper, updateOBBHelper} from "../utils.js";
 import { WaypointFollower } from './WaypointFollower.js';
+
+// Posições de waypoints
+let tracks = {
+  "Primeiro" : [
+    new THREE.Vector3(-180, 0,   0),
+    new THREE.Vector3(-180, 0, -270),
+    new THREE.Vector3(  90, 0, -270),
+    new THREE.Vector3(  90, 0,   0)
+  ],
+
+  "Segundo" : [
+    new THREE.Vector3(-180, 0,    0),
+    new THREE.Vector3(-180, 0, -270),
+    new THREE.Vector3( -30, 0, -270),
+    new THREE.Vector3( -30, 0, -120),
+    new THREE.Vector3(  90, 0, -120),
+    new THREE.Vector3(  90, 0,    0)
+  ],
+
+  "Terceiro" : [
+    new THREE.Vector3(-90,  0,   0),
+    new THREE.Vector3(-90,  0, -270),
+    new THREE.Vector3(-210, 0, -270),
+    new THREE.Vector3(-210, 0, -150),
+    new THREE.Vector3(  30, 0, -150),
+    new THREE.Vector3(  30, 0,    0)
+  ]
+};
+
 // criar carro do jogador
 export function createHavac(scene) {    
     // Materiais
@@ -76,33 +105,6 @@ export function createHavac(scene) {
         // updateOBBHelper(base.userData.obb, obbHelper);
     };
 }
-
-let tracks = {
-  "Primeiro" : [
-    new THREE.Vector3(-180, 0,   0),
-    new THREE.Vector3(-180, 0, -270),
-    new THREE.Vector3(  90, 0, -270),
-    new THREE.Vector3(  90, 0,   0)
-  ],
-
-  "Segundo" : [
-    new THREE.Vector3(-180, 0,    0),
-    new THREE.Vector3(-180, 0, -270),
-    new THREE.Vector3( -30, 0, -270),
-    new THREE.Vector3( -30, 0, -120),
-    new THREE.Vector3(  90, 0, -120),
-    new THREE.Vector3(  90, 0,    0)
-  ],
-
-  "Terceiro" : [
-    new THREE.Vector3(-90,  0,   0),
-    new THREE.Vector3(-90,  0, -270),
-    new THREE.Vector3(-210, 0, -270),
-    new THREE.Vector3(-210, 0, -150),
-    new THREE.Vector3(  30, 0, -150),
-    new THREE.Vector3(  30, 0,    0)
-  ]
-};
 
 // criar carro dos inimigos
 export function createHavacEnemy(scene, colorBase, colorBody, colorAntenna, id, tracksNumber = "Primeiro"){
@@ -191,7 +193,6 @@ export function createHavacEnemy(scene, colorBase, colorBody, colorAntenna, id, 
     };
     return base;
 }
-
 
 function createBase(materialBase){
     function createCapsule(height){
