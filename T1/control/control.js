@@ -14,7 +14,6 @@ import { createOBBHelper } from '../utils.js';
 
 // import { collisionSystem } from './models/map.js';
 
-
 // Ajuste para pista 
 const BLOCK_SIZE = 30;
 
@@ -45,9 +44,17 @@ let turnProgressRight = 0;
 let lastShotTime = 0;
 const shotCooldown = 300; // tempo em milissegundos (ex: 300ms)
 
-export function keyboardUpdate(keyboard, velocity, aceleration, dt, scene, cameraHolder, laps_count, checkpoints_count, trackNumber, nBullets, bulletsInGame, isColided) {
+export function keyboardUpdate(keyboard, vehicle, dt, scene, cameraHolder, bulletsInGame) {
    keyboard.update();
    const now = performance.now();
+
+   let velocity = vehicle.userData.velocity;
+   let aceleration = vehicle.userData.aceleration;
+   let laps_count = vehicle.userData.laps_count;
+   let checkpoints_count = vehicle.userData.checkpoints_count;
+   let trackNumber = vehicle.userData.trackNumber;
+   let nBullets = vehicle.userData.nBullets;
+
 
    if(nBullets > 0 && (keyboard.pressed("Z")) && (now - lastShotTime) >= shotCooldown){
          lastShotTime = now;
@@ -64,7 +71,7 @@ export function keyboardUpdate(keyboard, velocity, aceleration, dt, scene, camer
          const obb = new OBB().fromBox3(bullet.userData.boundingBox);
          bullet.userData.obb = obb;
 
-         scene.getObjectByName("veiculo_principal").add(bullet);
+         vehicle.add(bullet);
          scene.attach(bullet);
 
          const obbHelper = createOBBHelper(bullet.userData.obb, "rgb(255, 255, 255)");
@@ -133,8 +140,6 @@ export function keyboardUpdate(keyboard, velocity, aceleration, dt, scene, camer
       }
    }
 
-   
-
    // Atualiza velocidade
    velocity += aceleration * dt;
 
@@ -196,12 +201,21 @@ export function keyboardUpdate(keyboard, velocity, aceleration, dt, scene, camer
       bulletsInGame = [];
    } 
 
-   return { velocity, aceleration, laps_count, checkpoints_count, trackNumber, nBullets, bulletsInGame};
+   vehicle.userData.velocity = velocity;
+   vehicle.userData.aceleration = aceleration;
+   vehicle.userData.laps_count = laps_count;
+   vehicle.userData.checkpoints_count = checkpoints_count;
+   vehicle.userData.trackNumber = trackNumber;
+   vehicle.userData.nBullets = nBullets;
+
+   return {bulletsInGame};
 }
 
-export function updateVehicleMovement(dt, scene, velocity, keyboard, light, isColided) {
-   const vehicle = scene.getObjectByName("veiculo_principal");
+export function updateVehicleMovement(dt, vehicle, keyboard) {
+   // const vehicle = scene.getObjectByName("veiculo_principal");
    if (!vehicle) return;
+
+   let velocity = vehicle.userData.velocity;
 
    // Reduz resposta da direção conforme velocidade
    const speedFactor = Math.min(Math.abs(velocity) / MAX_FORWARD_SPEED, 1);
@@ -224,7 +238,10 @@ export function updateVehicleMovement(dt, scene, velocity, keyboard, light, isCo
    vehicle.userData.boundingBox.setFromObject(vehicle);
    vehicle.userData.updateOBB();
    // console.log(vehicle.castShadow);
+}
 
+export function updateLightMovement(scene, vehicle, light) {
+   
    // Pega posições atuais (para extrair a direção original)
    const oldLightPos = new THREE.Vector3().copy(light.position);
    const oldTargetPos = new THREE.Vector3();
@@ -255,105 +272,14 @@ export function updateVehicleMovement(dt, scene, velocity, keyboard, light, isCo
    // const shadowHelper = new THREE.CameraHelper(light.shadow.camera);
    // scene.add(shadowHelper);
 
-
-
    // console.log(light.position);
-   
 }
 
-// export function updateCamera(dt, scene, velocity, aceleration, keyboard, cameraHolder, isColided) {
-//     const vehicle = scene.getObjectByName("veiculo_principal");
-//     if (!vehicle) return;
-
-//     // Calcula a distancia da camera com o veiculo com base na aceleração
-//     const speedFactor = Math.abs(velocity) / MAX_FORWARD_SPEED;
-//     const accelerationFactor = Math.max(0, aceleration) / ACCELERATION_RATE;
-    
-//     const targetDistance = CAMERA_BASE_DISTANCE + 
-//                           (speedFactor * CAMERA_ACCELERATION_OFFSET) + 
-//                           (accelerationFactor * CAMERA_ACCELERATION_OFFSET * 0.9);
-
-//    // Altera levemente a altura da camera em relação a aceleração
-//     const targetHeight = CAMERA_BASE_HEIGHT + (speedFactor * 5);
-
-//     // Interpolação suave usando o lerp para a distancia e altura
-//     currentCameraDistance = THREE.MathUtils.lerp(
-//         currentCameraDistance, 
-//         targetDistance, 
-//         CAMERA_SMOOTHNESS * dt
-//     );
-//     currentCameraHeight = THREE.MathUtils.lerp(
-//         currentCameraHeight, 
-//         targetHeight, 
-//         CAMERA_SMOOTHNESS * dt
-//     );
-
-//     // Criando a logica de incrinação da camera em relação ao veiculo com base no tempo as setas laterais estão pressionadas
-//     let targetLateralOffset = 0;
-//     let targetLookAhead = 0;
-    
-//     if (Math.abs(velocity) > 0.1 && !isColided) {
-//         if (keyboard.pressed("left")) {
-//             turnProgressLeft = Math.min(turnProgressLeft + dt * 2, 1);
-//             turnProgressRight = Math.max(turnProgressRight - dt * 3, 0);
-            
-//             targetLateralOffset = CAMERA_TURN_OFFSET * turnProgressLeft;
-//             targetLookAhead = -CAMERA_LOOK_AHEAD * turnProgressLeft;
-            
-//         } else if (keyboard.pressed("right")) {
-//             turnProgressRight = Math.min(turnProgressRight + dt * 2, 1); 
-//             turnProgressLeft = Math.max(turnProgressLeft - dt * 3, 0); 
-            
-//             targetLateralOffset = -CAMERA_TURN_OFFSET * turnProgressRight;
-//             targetLookAhead = CAMERA_LOOK_AHEAD * turnProgressRight;
-            
-//         } else {
-//             turnProgressLeft = Math.max(turnProgressLeft - dt * 2, 0);
-//             turnProgressRight = Math.max(turnProgressRight - dt * 2, 0);
-            
-//             targetLateralOffset = (CAMERA_TURN_OFFSET * turnProgressLeft) + (-CAMERA_TURN_OFFSET * turnProgressRight);
-//             targetLookAhead = (-CAMERA_LOOK_AHEAD * turnProgressLeft) + (CAMERA_LOOK_AHEAD * turnProgressRight);
-//         }
-//     } else {
-//         turnProgressLeft = 0;
-//         turnProgressRight = 0;
-//     }
-
-//     // Interpolação suave nas laterais usando o lerp
-//     currentLateralOffset = THREE.MathUtils.lerp(currentLateralOffset, targetLateralOffset, CAMERA_SMOOTHNESS * dt * 0.8);
-//     currentLookAhead = THREE.MathUtils.lerp(currentLookAhead, targetLookAhead, CAMERA_SMOOTHNESS * dt * 0.8);
-
-//     // Atualização da camera em relação ao veículo
-//     const camera = cameraHolder.children[0];
-//     if (camera) {
-//         const behindOffset = new THREE.Vector3(currentCameraDistance, 0, 0);
-//         behindOffset.applyQuaternion(vehicle.quaternion);
-        
-//         const lateralOffset = new THREE.Vector3(0, 0, currentLateralOffset);
-//         lateralOffset.applyQuaternion(vehicle.quaternion);
-        
-//         const lookAheadOffset = new THREE.Vector3(-currentLookAhead * currentCameraDistance, 0, 0);
-//         lookAheadOffset.applyQuaternion(vehicle.quaternion);
-
-//         // Colocando a posição da camera
-//         camera.position.copy(vehicle.position)
-//             .add(behindOffset)
-//             .add(lateralOffset)
-//             .add(new THREE.Vector3(0, currentCameraHeight, 0));
-
-//         // Apontando a camera para uma posição a frente do veiculo
-//         const lookAtPoint = vehicle.position.clone()
-//             .add(lookAheadOffset)
-//             .add(new THREE.Vector3(0, currentCameraHeight * 0.3, 0));
-        
-//         camera.lookAt(lookAtPoint);
-//     }
-//  }
-
-export function updateCamera(dt, scene, velocity, aceleration, keyboard, cameraHolder, isColided) {
-    const vehicle = scene.getObjectByName("veiculo_principal");
+export function updateCamera(dt, vehicle, keyboard, cameraHolder, isColided) {
     if (!vehicle) return;
 
+    let velocity = vehicle.userData.velocity;
+    let aceleration = vehicle.userData.acceleration;
     // --- JITTER FIX START: Initialize Smoothing State ---
     // We store a "smoothed" position/rotation inside the cameraHolder's userData
     // This acts as a buffer between the jittery physics car and the camera.
@@ -495,7 +421,6 @@ function switchTrack(trackNumber, scene, cameraHolder) {
    // cameraHolder was preserved, so just re-add it
    scene.add(cameraHolder);
 }
-
 
 export function resetVehicle(scene) {
    const vehicle = scene.getObjectByName("veiculo_principal");

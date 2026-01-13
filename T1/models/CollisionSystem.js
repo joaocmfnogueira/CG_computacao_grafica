@@ -31,10 +31,10 @@ export class CollisionSystem {
         return false;
     }
 
-    checkCollision(car, objectOBB, scene) {
+    checkCollision(car, scene) {
 
         for (const wall of this.wallBoundingBoxes) {
-            const result = objectOBB.intersectsOBB(wall.boundingBox);
+            const result = car.userData.obb.intersectsOBB(wall.boundingBox);
             if (result) {
                 // debugWallBounding(scene, wall);
                 // console.log(wall.boundingBox);

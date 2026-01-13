@@ -1,15 +1,11 @@
 import * as THREE from 'three';
-import {
-   InfoBox
-} from "../libs/util/util.js";
 import Stats from '../build/jsm/libs/stats.module.js';
 import KeyboardState from '../libs/util/KeyboardState.js';
 import { createTrack2, createTrack1, createTrack0} from "./models/map.js"
 import { createHavac, createHavacEnemy } from './models/vehicle.js';
 import {applyLateralSlide, createSpeedDisplay, updateSpeedDisplay, createLapsCount, updateLapDisplay, showFinishScreen, initLight, initRenderer, createCheckPointCount, updateCheckPointDisplay, createBulletCount, updateBulletDisplay, removeAndDispose} from './utils.js';
-import {keyboardUpdate, updateVehicleMovement, updateCamera} from './control/control.js';
+import {keyboardUpdate, updateVehicleMovement, updateCamera, updateLightMovement} from './control/control.js';
 import { collisionSystem } from './models/map.js';
-import { WaypointFollower } from './models/WaypointFollower.js';
 import { OBB } from './models/OBB.js'
 
 let scene, renderer, camera, light;
@@ -35,41 +31,13 @@ let keyboard = new KeyboardState();
 createTrack1(scene);
 
 // Game Variables
-let nBullets = 4;
+// let nBullets = 4;
 let bulletsInGame = []; // Stores all bullets (Player + Bots)
-let velocity = 0;
-let aceleration = 0;
-let laps_count = 0;
-let checkpoints_count = 0;
-let trackNumber = "Primeiro";
-
-// Track Data
-let tracks = {
-  "Primeiro" : [
-    new THREE.Vector3(-180, 0,   0),
-    new THREE.Vector3(-180, 0, -270),
-    new THREE.Vector3(  90, 0, -270),
-    new THREE.Vector3(  90, 0,   0)
-  ],
-
-  "Segundo" : [
-    new THREE.Vector3(-180, 0,    0),
-    new THREE.Vector3(-180, 0, -270),
-    new THREE.Vector3( -30, 0, -270),
-    new THREE.Vector3( -30, 0, -120),
-    new THREE.Vector3(  90, 0, -120),
-    new THREE.Vector3(  90, 0,    0)
-  ],
-
-  "Terceiro" : [
-    new THREE.Vector3(-90,  0,   0),
-    new THREE.Vector3(-90,  0, -270),
-    new THREE.Vector3(-210, 0, -270),
-    new THREE.Vector3(-210, 0, -150),
-    new THREE.Vector3(  30, 0, -150),
-    new THREE.Vector3(  30, 0,    0)
-  ]
-};
+// let velocity = 0;
+// let aceleration = 0;
+// let laps_count = 0;
+// let checkpoints_count = 0;
+// let trackNumber = "Primeiro";
 
 let trackPoints = {
   "Primeiro" : [[-180, 0, -30], [-150, 0, -270], [90, 0, -240], [60, 0, 0]],
@@ -84,37 +52,15 @@ let clock = new THREE.Clock();
 createHavac(scene);
 
 // Create Enemies
-// ... (criação dos inimigos existente)
-let enemy1 = createHavacEnemy(scene, "rgba(126, 235, 126, 1)", "rgba(12, 15, 188, 1)", "rgba(235, 151, 126, 1)", 0);
-enemy1.userData.nBullets = 4; // <--- ADICIONE ISTO
-
-let enemy2 = createHavacEnemy(scene, "rgba(204, 153, 13, 1)", "rgba(255, 0, 0, 1)", "rgba(75, 12, 12, 1)", 1);
-enemy2.userData.nBullets = 4; // <--- ADICIONE ISTO
-
-let enemy3 = createHavacEnemy(scene, "rgba(0, 238, 16, 1)", "rgba(0, 118, 14, 1)", "rgba(112, 0, 87, 1)", 2);
-enemy3.userData.nBullets = 4; // <--- ADICIONE ISTO
-
-let enemy4 = createHavacEnemy(scene, "rgba(163, 205, 220, 1)", "rgba(0, 225, 255, 1)", "rgba(0, 0, 0, 1)", 3);
-enemy4.userData.nBullets = 4; // <--- ADICIONE ISTO
-// ...
+createHavacEnemy(scene, "rgba(126, 235, 126, 1)", "rgba(12, 15, 188, 1)", "rgba(235, 151, 126, 1)", 0);
+createHavacEnemy(scene, "rgba(204, 153, 13, 1)", "rgba(255, 0, 0, 1)", "rgba(75, 12, 12, 1)", 1);
+createHavacEnemy(scene, "rgba(0, 238, 16, 1)", "rgba(0, 118, 14, 1)", "rgba(112, 0, 87, 1)", 2);
+createHavacEnemy(scene, "rgba(163, 205, 220, 1)", "rgba(0, 225, 255, 1)", "rgba(0, 0, 0, 1)", 3);
 
 const speedDisplay = createSpeedDisplay();
 const lapsDisplay = createLapsCount();
 const checkPointDisplay = createCheckPointCount();
 const bulletDisplay = createBulletCount();
-
-// Link followers to meshes
-// const follower = new WaypointFollower(enemy1, tracks["Primeiro"], 20, 5);
-// enemy1.userData.follower = follower;
-
-// const follower2 = new WaypointFollower(enemy2, tracks["Primeiro"], 20, 5);
-// enemy2.userData.follower = follower2;
-
-// const follower3 = new WaypointFollower(enemy3, tracks["Primeiro"], 20, 5);
-// enemy3.userData.follower = follower3;
-
-// const follower4 = new WaypointFollower(enemy4, tracks["Primeiro"], 20, 5);
-// enemy4.userData.follower = follower4;
 
 const botRaycaster = new THREE.Raycaster();
 
@@ -131,7 +77,7 @@ function render() {
 
    // --- 1. GATHER ALL VEHICLES ---
    const playerCar = scene.getObjectByName("veiculo_principal");
-   console.log(trackNumber);
+//    console.log(trackNumber);
    const bots = [scene.getObjectByName("enemy0"), scene.getObjectByName("enemy1"), scene.getObjectByName("enemy2"), scene.getObjectByName("enemy3")].filter(b => b !== undefined);
    const allVehicles = [];
    if (playerCar) allVehicles.push(playerCar);
@@ -206,13 +152,12 @@ function render() {
         botMesh.userData.obb.fromBox3(botMesh.geometry.boundingBox);
         botMesh.userData.obb.applyMatrix4(botMesh.matrixWorld);
 
+        botMesh.userData.velocity = botFollower.speed;
         // Wall Collision
         const [isColided, angle, normal, wall] = checkCarCollision(botMesh, botMesh.userData.obb);
         if (isColided) {
-            let [newSpeed, _] = applyCollisionResponse(
-                botMesh, angle, normal, wall, dt, botFollower.speed, 0
-            );
-            botFollower.speed = newSpeed;
+            applyCollisionResponse(botMesh, angle, normal, dt);
+            botFollower.speed = botMesh.userData.velocity;
             if (Math.abs(botFollower.speed) < 5) botFollower.speed = 5; 
         }
     });
@@ -222,7 +167,8 @@ function render() {
    const subDt = dt / SUBSTEPS;
 
    for (let i = 0; i < SUBSTEPS; i++) {
-       updateVehicleMovement(subDt, scene, velocity, keyboard, scene.getObjectByName("light"));
+       updateVehicleMovement(subDt, playerCar, keyboard);
+       updateLightMovement(scene, playerCar, scene.getObjectByName("light"));
        
        if (playerCar) {
             // Update OBB
@@ -230,22 +176,15 @@ function render() {
             playerCar.userData.obb.fromBox3(playerCar.geometry.boundingBox);
             playerCar.userData.obb.applyMatrix4(playerCar.matrixWorld);
 
-            const [isColided, angle, normal, wall] = checkCarCollision(playerCar, playerCar.userData.obb);
-            if (isColided) {
-                [velocity, aceleration] = applyCollisionResponse(playerCar, angle, normal, wall, subDt, velocity, aceleration);
-            }
+            const [isColided, angle, normal, wall] = checkCarCollision(playerCar);
+            if (isColided) 
+                applyCollisionResponse(playerCar, angle, normal, subDt);
        }
    }
 
    // --- 7. HUD & INPUT ---
-   const result = keyboardUpdate(keyboard, velocity, aceleration, dt, scene, cameraHolder, laps_count, checkpoints_count, trackNumber, nBullets, bulletsInGame, false);
-   
-   velocity = result.velocity;
-   aceleration = result.aceleration;
-   laps_count = result.laps_count;
-   checkpoints_count = result.checkpoints_count;
-   trackNumber = result.trackNumber;
-   nBullets = result.nBullets;
+   const result = keyboardUpdate(keyboard, playerCar, dt, scene, cameraHolder, bulletsInGame);
+
    bulletsInGame = result.bulletsInGame;
 
    // If Player Fired, we need to mark their bullet's shooter to avoid self-collision
@@ -258,21 +197,20 @@ function render() {
        }
    });
 
-   updateCamera(dt, scene, velocity, aceleration, keyboard, cameraHolder, false);
-   updateSpeedDisplay(velocity, speedDisplay);
+   updateCamera(dt, playerCar, keyboard, cameraHolder, false);
+   updateSpeedDisplay(playerCar.userData.velocity, speedDisplay);
 
    if (playerCar) {
-      const carPosition = playerCar.getWorldPosition(new THREE.Vector3());
-      checkLapCompletion(carPosition);
-      checkCheckPointCompletion(carPosition, trackNumber);
+      checkLapCompletion(playerCar);
+      checkCheckPointCompletion(playerCar);
       
    }
    
-   updateLapDisplay(laps_count, lapsDisplay);
-   updateCheckPointDisplay(checkpoints_count, checkPointDisplay);
-   updateBulletDisplay(nBullets, bulletDisplay);
+   updateLapDisplay(playerCar.userData.laps_count, lapsDisplay);
+   updateCheckPointDisplay(playerCar.userData.checkpoints_count, checkPointDisplay);
+   updateBulletDisplay(playerCar.userData.nBullets, bulletDisplay);
 
-   if(laps_count == 4) showFinishScreen();
+   if(playerCar.userData.laps_count == 4) showFinishScreen();
 
    renderer.render(scene, camera);
 }
@@ -400,8 +338,8 @@ window.addEventListener('focus', () => {
   clock.start();
 });
 
-function checkCarCollision(car, carBox) {
-  const [isColided, angle, normal, wall] = collisionSystem.checkCollision(car, carBox, scene);
+function checkCarCollision(car) {
+  const [isColided, angle, normal, wall] = collisionSystem.checkCollision(car, scene);
     if (isColided) {
         return [true, angle, normal, wall];
     }
@@ -416,15 +354,16 @@ function resetKeyboardState() {
   }
 }
 
-function checkLapCompletion(carPos) {
+function checkLapCompletion(vehicle) {
+   const carPos = vehicle.getWorldPosition(new THREE.Vector3());
    const isInFinishZone = 
    (carPos.x <= 12.5 && carPos.x >= -12.5) && (carPos.z <= 12.5 && carPos.z >= -12.5) ;
    
-   if (isInFinishZone && checkpoints_count == 4) {
-      laps_count++;
-      checkpoints_count = 0;
+   if (isInFinishZone && vehicle.userData.checkpoints_count == 4) {
+      vehicle.userData.laps_count++;
+      vehicle.userData.checkpoints_count = 0;
       console.log(`Lap ${laps_count} completed!`);
-      nBullets = 4;
+      vehicle.userData.nBullets = 4;
    }
 }
 
@@ -440,12 +379,13 @@ function checkBotLapCompletion(carPos) {
    }
 }
 
-function checkCheckPointCompletion(carPos, trackNumber) {
+function checkCheckPointCompletion(vehicle) {
+  const carPos = vehicle.getWorldPosition(new THREE.Vector3());
   const R = 12.5;
-  let points = trackPoints[trackNumber];
-    if (checkpoints_count >= points.length) return;
+  let points = trackPoints[vehicle.userData.trackNumber];
+    if (vehicle.userData.checkpoints_count >= points.length) return;
 
-    const checkpoint = points[checkpoints_count];
+    const checkpoint = points[vehicle.userData.checkpoints_count];
     const [x, y, z] = checkpoint;
 
     const dentro =
@@ -453,7 +393,7 @@ function checkCheckPointCompletion(carPos, trackNumber) {
       carPos.z >= z - R && carPos.z <= z + R;
 
     if (dentro) {
-      checkpoints_count++;
+      vehicle.userData.checkpoints_count++;
     }
 }
 
@@ -474,7 +414,7 @@ function checkBotCheckPointCompletion(carPos, trackNumber) {
     }
 }
 
-function applyCollisionResponse(car, angle, normal, wall, dt, velocity, acceleration) {
+function applyCollisionResponse(car, angle, normal, dt) {
     const BLOCK_SIZE = 30;
 
     const carForward = new THREE.Vector3(-1, 0, 0).applyQuaternion(car.quaternion).normalize();
@@ -482,6 +422,10 @@ function applyCollisionResponse(car, angle, normal, wall, dt, velocity, accelera
     const wallNormal = normal.clone().normalize();
 
     const projection = velocityVec.dot(wallNormal);
+
+    let velocity = car.userData.velocity;
+    let acceleration = car.userData.acceleration;
+
     if (projection < 0) {
         const pushFactor = Math.abs(projection * dt * BLOCK_SIZE) + 0.05;
         car.position.addScaledVector(wallNormal, pushFactor);
@@ -519,7 +463,9 @@ function applyCollisionResponse(car, angle, normal, wall, dt, velocity, accelera
     }
 
     if (Math.abs(velocity) < 0.1) velocity = 0;
-    return [velocity, acceleration];
+    car.userData.velocity = velocity;
+    car.userData.acceleration = acceleration;
+    // return [velocity, acceleration];
 }
 
 function applyBulletHit(vehicleObj, isPlayer = false) {

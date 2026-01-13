@@ -43,7 +43,6 @@ export function createHavac(scene) {
         flatShading: false,
         shininess: "100",
         specular: "rgb(255,255,255)" }));
-    // const materialBody = setDefaultMaterial("rgba(136, 83, 167, 1)");
     const materialAntenna = setDefaultMaterial("rgba(136, 83, 167, 1)");
 
     // Base
@@ -51,56 +50,47 @@ export function createHavac(scene) {
     const antenna = createAntenna(materialAntenna, "rgba(235, 126, 211, 1)");
     const body = createBody(materialBody)
 
+    // Montando o veiculo
     base.scale.set(1,1,1);
-
     body.add(antenna);
     body.scale.set(1,1,1);
     base.add(body);
-
-
-    base.name = "veiculo_principal";
-    // body.castShadow = true;
-    // body.receiveShadow = true;
-    // base.castShadow = true;
-    // base.receiveShadow = true;
-    // antenna.castShadow = true;
-    // antenna.receiveShadow = true;
-
-
-    // base.translateY(-0.5);
     scene.add(base);
+    base.name = "veiculo_principal";
 
+    // Outros atributos relevantes
+    base.userData.nBullets = 4;
+    base.userData.aceleration = 0;
+    base.userData.velocity = 0;
+    base.userData.laps_count = 0;
+    base.userData.checkpoints_count = 0;
+    base.userData.trackNumber = "Primeiro";
+
+    // Criando a caixa de colisão
     base.userData.boundingBox = new THREE.Box3().setFromObject(base);
     const obb = new OBB().fromBox3(base.userData.boundingBox);
     base.userData.obb = obb;
-
     const obbHelper = createOBBHelper(base.userData.obb, "rgb(255, 255, 255)");
-
     // impedir do helper desaparecer depois de um tempo
     obbHelper.frustumCulled = false;
-
-    obbHelper.name = "obbHelper";
     obbHelper.visible = false;
     scene.add(obbHelper);
+    obbHelper.name = "obbHelper";
 
+    /*Criando método responsável pela atualização da caixa de colisão*/
     // Constantes temporarias 
     const tempMat4 = new THREE.Matrix4();
     const tempMat3 = new THREE.Matrix3();
 
     base.userData.updateOBB = function() {
         base.updateMatrixWorld(true);
-
         const mw = base.matrixWorld;
-
         // Atualiza o centro
         base.userData.obb.center.setFromMatrixPosition(mw);
-
         // Obtem a rotação
         tempMat4.extractRotation(mw);           
         tempMat3.setFromMatrix4(tempMat4); 
-
         base.userData.obb.rotation.copy(tempMat3);
-
         // Atualiza o helper
         // updateOBBHelper(base.userData.obb, obbHelper);
     };
@@ -150,6 +140,14 @@ export function createHavacEnemy(scene, colorBase, colorBody, colorAntenna, id, 
         base.position.x =  -7.8;
         base.position.z =  7.8;
     }
+
+    // Outros atributos relevantes
+    base.userData.nBullets = 4;
+    base.userData.aceleration = 0;
+    base.userData.velocity = 0;
+    base.userData.laps_count = 0;
+    base.userData.checkpoints_count = 0;
+    base.userData.trackNumber = "Primeiro";
         
     base.userData.boundingBox = new THREE.Box3().setFromObject(base);
     const obb = new OBB().fromBox3(base.userData.boundingBox);
@@ -191,7 +189,6 @@ export function createHavacEnemy(scene, colorBase, colorBody, colorAntenna, id, 
         // Atualiza o helper
         updateOBBHelper(base.userData.obb, obbHelper);
     };
-    return base;
 }
 
 function createBase(materialBase){
