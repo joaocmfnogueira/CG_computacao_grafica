@@ -31,13 +31,7 @@ let keyboard = new KeyboardState();
 createTrack1(scene);
 
 // Game Variables
-// let nBullets = 4;
 let bulletsInGame = []; // Stores all bullets (Player + Bots)
-// let velocity = 0;
-// let aceleration = 0;
-// let laps_count = 0;
-// let checkpoints_count = 0;
-// let trackNumber = "Primeiro";
 
 let trackPoints = {
   "Primeiro" : [[-180, 0, -30], [-150, 0, -270], [90, 0, -240], [60, 0, 0]],
@@ -55,7 +49,6 @@ createHavac(scene);
 createHavacEnemy(scene, "rgba(126, 235, 126, 1)", "rgba(12, 15, 188, 1)", "rgba(235, 151, 126, 1)", 0);
 createHavacEnemy(scene, "rgba(204, 153, 13, 1)", "rgba(255, 0, 0, 1)", "rgba(75, 12, 12, 1)", 1);
 createHavacEnemy(scene, "rgba(0, 238, 16, 1)", "rgba(0, 118, 14, 1)", "rgba(112, 0, 87, 1)", 2);
-createHavacEnemy(scene, "rgba(163, 205, 220, 1)", "rgba(0, 225, 255, 1)", "rgba(0, 0, 0, 1)", 3);
 
 const speedDisplay = createSpeedDisplay();
 const lapsDisplay = createLapsCount();
@@ -77,7 +70,7 @@ function render() {
 
    // --- 1. GATHER ALL VEHICLES ---
    const playerCar = scene.getObjectByName("veiculo_principal");
-   const bots = [scene.getObjectByName("enemy0"), scene.getObjectByName("enemy1"), scene.getObjectByName("enemy2"), scene.getObjectByName("enemy3")].filter(b => b !== undefined);
+   const bots = [scene.getObjectByName("enemy0"), scene.getObjectByName("enemy1"), scene.getObjectByName("enemy2")].filter(b => b !== undefined);
    const allVehicles = [];
    if (playerCar) allVehicles.push(playerCar);
    bots.forEach(b => allVehicles.push(b));

@@ -57,6 +57,8 @@ export function createHavac(scene, trackNumber = "Primeiro") {
     base.add(body);
     scene.add(base);
     base.name = "veiculo_principal";
+    base.position.x =  10;
+    base.position.z =  -6;
 
     // Outros atributos relevantes
     base.userData.nBullets = 4;
@@ -124,21 +126,16 @@ export function createHavacEnemy(scene, colorBase, colorBody, colorAntenna, id, 
     base.receiveShadow = true;
     scene.add(base);
     if(id == 0){
-        base.position.x = 7.8;
-        base.position.z = -7.8;
+        base.position.x = -10;
+        base.position.z = 6;
     }
     if(id == 1){
-        base.position.x = 3.9;
-        base.position.z = -3.9;
+        base.position.x = 10;
+        base.position.z = 6;
     }
     if(id == 2){
-        base.position.x =  -3.9;
-        base.position.z =  3.9;
-    }
-        
-    if(id == 3){
-        base.position.x =  -7.8;
-        base.position.z =  7.8;
+        base.position.x =  -10;
+        base.position.z =  -6;
     }
 
     // Outros atributos relevantes

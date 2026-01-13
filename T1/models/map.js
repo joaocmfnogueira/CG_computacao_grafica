@@ -10,129 +10,6 @@ import { CSG } from "../../libs/other/CSGMesh.js";
 
 export const collisionSystem = new CollisionSystem();
 
-export function createTunnelWithHoles(scene, x, y, z) {
-
-    const tunnelGeom = new THREE.CylinderGeometry(20, 20, 90, 16, 1);
-    const tunnelMat = new THREE.MeshStandardMaterial({
-        color: 0x777777,
-        side: THREE.DoubleSide
-    });
-
-    const tunnel = new THREE.Mesh(tunnelGeom, tunnelMat);
-    tunnel.rotation.z = Math.PI / 2;
-    tunnel.updateMatrixWorld(true);
-
-    const tunnelGeom2 = new THREE.CylinderGeometry(19.5, 19.5, 90, 16, 1);
-    const tunnelMat2 = new THREE.MeshStandardMaterial({
-        color: 0x777777,
-        side: THREE.DoubleSide
-    });
-
-    const tunnel2 = new THREE.Mesh(tunnelGeom2, tunnelMat2);
-    tunnel2.rotation.z = Math.PI / 2;
-    tunnel2.updateMatrixWorld(true);
-
-
-    const holeCutters = [];
-        for (let i = 0; i < 4; i++) {
-            const cutter = new THREE.Mesh(
-                new THREE.CylinderGeometry(6, 6, 40, 32)
-            );
-
-            cutter.position.set(
-                -37.5 + i * 25,
-                0,
-                0
-            );
-
-            cutter.updateMatrixWorld(true);
-            holeCutters.push(cutter);
-        }
-
-    let csg = CSG.fromMesh(tunnel);
-    let temp = CSG.fromMesh(tunnel2);
-    
-    for (const cutter of holeCutters) {
-        csg = csg.subtract(CSG.fromMesh(cutter));
-    }
-    csg = csg.subtract(temp);
-
-    const finalMesh = CSG.toMesh(csg, new THREE.Matrix4());
-    finalMesh.material = tunnelMat;
-
-    finalMesh.position.set(x, y, z);
-    finalMesh.updateMatrixWorld(true);
-    finalMesh.castShadow = true;
-
-    scene.add(finalMesh);
-    return finalMesh;
-}
-
-function createGround(scene) {
-
-    const groundGeometry = new THREE.PlaneGeometry(3000, 3000);
-    const groundMaterial = setDefaultMaterial("rgba(87, 215, 138, 1)"); 
-    
-    const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-    ground.rotation.x = THREE.MathUtils.degToRad(-90);
-    ground.position.y = -0.5; 
-    ground.receiveShadow = true;
-    ground.name = "ground";
-    
-    scene.add(ground);
-}
-
-function createSky(scene) {
-    scene.background = new THREE.Color(0x87CEEB); 
-}
-
-export function createTree1(scene, x, y, z){
-    const troncoGeometry = new THREE.CylinderGeometry(0.3, 0.5, 6, 18, 18);
-    const troncoMaterial = setDefaultMaterial("rgba(139, 69, 19, 1)");
-
-    const tronco = new THREE.Mesh(troncoGeometry, troncoMaterial);
-
-    const copaGeometry = new THREE.IcosahedronGeometry(4);
-    const copaMaterial = setDefaultMaterial("rgba(70, 214, 77, 1)");
-
-    const copa = new THREE.Mesh(copaGeometry, copaMaterial);
-    // tronco.rotation.x = THREE.MathUtils.degToRad(-90);
-
-    tronco.add(copa);
-    copa.translateY(5);
-
-    copa.receiveShadow = true;
-    copa.castShadow = true;
-    tronco.receiveShadow = true;
-    tronco.castShadow = true;
-    
-    scene.add(tronco);
-    tronco.position.set(x, y, z);
-}
-
-export function createTree2(scene, x, y, z){
-    const troncoGeometry = new THREE.CylinderGeometry(0.3, 0.5, 6, 18, 18);
-    const troncoMaterial = setDefaultMaterial("rgba(139, 69, 19, 1)");
-
-    const tronco = new THREE.Mesh(troncoGeometry, troncoMaterial);
-
-    const copaGeometry = new THREE.ConeGeometry(3, 8, 8);
-    const copaMaterial = setDefaultMaterial("rgba(4, 104, 9, 1)");
-
-    const copa = new THREE.Mesh(copaGeometry, copaMaterial);
-    // tronco.rotation.x = THREE.MathUtils.degToRad(-90);
-
-    tronco.add(copa);
-    copa.translateY(5);
-    copa.receiveShadow = true;
-    copa.castShadow = true;
-    tronco.receiveShadow = true;
-    tronco.castShadow = true;
-    
-    scene.add(tronco);
-    tronco.position.set(x, y, z);
-}
-
 // Pista de teste
 export function createTrack0(scene) {
 
@@ -491,39 +368,6 @@ export function createTrack2(scene) {
         scene.add(block);
         registerWallsForCollision(block);
         debugShowBoundingBoxes(block, scene);
-
-        // if(index != 0 && index != 3){
-        //     // posição base em X
-        //     const baseX = -150 + 30 * index;
-
-        //     // sorteia qual tipo vai usar +25 ou -25
-        //     const types = [createTree1, createTree2];
-        //     const shuffled = types.sort(() => Math.random() - 0.5);
-
-        //     // gera offset de -5 a +5
-        //     const randOffset = () => (Math.random() * 10 - 5);
-
-        //     // posição base do Z (pode ser +25 ou -25 conforme sorte)
-        //     const baseZ1 = -245;
-        //     const baseZ2 = -295;
-
-        //     // --- ÁRVORE 1 ---
-        //     shuffled[0](
-        //         scene,
-        //         baseX + randOffset(),
-        //         2.5,
-        //         baseZ1 + randOffset()
-        //     );
-
-        //     // --- ÁRVORE 2 ---
-        //     shuffled[1](
-        //         scene,
-        //         baseX + randOffset(),
-        //         2.5,
-        //         baseZ2 + randOffset()
-        //     );
-        // }
-
     }
 
     let blockConer3 = createBlock(2, "rgb(190,190,190)", "rgb(255,165,0)");
@@ -1009,6 +853,130 @@ export function createTrack3(scene) {
     
 }
 
+/*Objetos independnetes adicionados ao cenário*/
+function createTunnelWithHoles(scene, x, y, z) {
+
+    const tunnelGeom = new THREE.CylinderGeometry(20, 20, 90, 16, 1);
+    const tunnelMat = new THREE.MeshStandardMaterial({
+        color: 0x777777,
+        side: THREE.DoubleSide
+    });
+
+    const tunnel = new THREE.Mesh(tunnelGeom, tunnelMat);
+    tunnel.rotation.z = Math.PI / 2;
+    tunnel.updateMatrixWorld(true);
+
+    const tunnelGeom2 = new THREE.CylinderGeometry(19.5, 19.5, 90, 16, 1);
+    const tunnelMat2 = new THREE.MeshStandardMaterial({
+        color: 0x777777,
+        side: THREE.DoubleSide
+    });
+
+    const tunnel2 = new THREE.Mesh(tunnelGeom2, tunnelMat2);
+    tunnel2.rotation.z = Math.PI / 2;
+    tunnel2.updateMatrixWorld(true);
+
+
+    const holeCutters = [];
+        for (let i = 0; i < 4; i++) {
+            const cutter = new THREE.Mesh(
+                new THREE.CylinderGeometry(6, 6, 40, 32)
+            );
+
+            cutter.position.set(
+                -37.5 + i * 25,
+                0,
+                0
+            );
+
+            cutter.updateMatrixWorld(true);
+            holeCutters.push(cutter);
+        }
+
+    let csg = CSG.fromMesh(tunnel);
+    let temp = CSG.fromMesh(tunnel2);
+    
+    for (const cutter of holeCutters) {
+        csg = csg.subtract(CSG.fromMesh(cutter));
+    }
+    csg = csg.subtract(temp);
+
+    const finalMesh = CSG.toMesh(csg, new THREE.Matrix4());
+    finalMesh.material = tunnelMat;
+
+    finalMesh.position.set(x, y, z);
+    finalMesh.updateMatrixWorld(true);
+    finalMesh.castShadow = true;
+
+    scene.add(finalMesh);
+    return finalMesh;
+}
+
+function createGround(scene) {
+
+    const groundGeometry = new THREE.PlaneGeometry(3000, 3000);
+    const groundMaterial = setDefaultMaterial("rgba(87, 215, 138, 1)"); 
+    
+    const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+    ground.rotation.x = THREE.MathUtils.degToRad(-90);
+    ground.position.y = -0.5; 
+    ground.receiveShadow = true;
+    ground.name = "ground";
+    
+    scene.add(ground);
+}
+
+function createSky(scene) {
+    scene.background = new THREE.Color(0x87CEEB); 
+}
+
+function createTree1(scene, x, y, z){
+    const troncoGeometry = new THREE.CylinderGeometry(0.3, 0.5, 6, 18, 18);
+    const troncoMaterial = setDefaultMaterial("rgba(139, 69, 19, 1)");
+
+    const tronco = new THREE.Mesh(troncoGeometry, troncoMaterial);
+
+    const copaGeometry = new THREE.IcosahedronGeometry(4);
+    const copaMaterial = setDefaultMaterial("rgba(70, 214, 77, 1)");
+
+    const copa = new THREE.Mesh(copaGeometry, copaMaterial);
+
+    tronco.add(copa);
+    copa.translateY(5);
+
+    copa.receiveShadow = true;
+    copa.castShadow = true;
+    tronco.receiveShadow = true;
+    tronco.castShadow = true;
+    
+    scene.add(tronco);
+    tronco.position.set(x, y, z);
+}
+
+function createTree2(scene, x, y, z){
+    const troncoGeometry = new THREE.CylinderGeometry(0.3, 0.5, 6, 18, 18);
+    const troncoMaterial = setDefaultMaterial("rgba(139, 69, 19, 1)");
+
+    const tronco = new THREE.Mesh(troncoGeometry, troncoMaterial);
+
+    const copaGeometry = new THREE.ConeGeometry(3, 8, 8);
+    const copaMaterial = setDefaultMaterial("rgba(4, 104, 9, 1)");
+
+    const copa = new THREE.Mesh(copaGeometry, copaMaterial);
+    // tronco.rotation.x = THREE.MathUtils.degToRad(-90);
+
+    tronco.add(copa);
+    copa.translateY(5);
+    copa.receiveShadow = true;
+    copa.castShadow = true;
+    tronco.receiveShadow = true;
+    tronco.castShadow = true;
+    
+    scene.add(tronco);
+    tronco.position.set(x, y, z);
+}
+
+
 // Cria os três tipos de blocos (piso + mureta):
 // Primeiro ->  As muretas estão paralelas;
 // Segundo -> As muretas estão adjacentes;
@@ -1019,11 +987,11 @@ function createBlock(type, colorFloor, colorWall, type_pattern = 1, colorConer =
         return floor;
     }
     else if (type == 2) {
-        let floor = auxCreateCreate_Adjacent(colorFloor, colorWall, type_pattern, colorConer);
+        let floor = auxCreateBlock_Adjacent(colorFloor, colorWall, type_pattern, colorConer);
         return floor;
     }
     else if (type == 3) {
-        let floor = auxCreateCreate_Corners(colorFloor, colorWall);
+        let floor = auxCreateBlock_Corners(colorFloor, colorWall);
         return floor;
     }
     else {
@@ -1067,7 +1035,7 @@ function auxCreateBlock_parallel(colorFloor, colorWall) {
 }
 
 // Função auxiliar para criar o tipo de bloco adjacente
-function auxCreateCreate_Adjacent(colorFloor, colorWall, type_pattern = 1, colorConer = "rgb(255,255,255)") {
+function auxCreateBlock_Adjacent(colorFloor, colorWall, type_pattern = 1, colorConer = "rgb(255,255,255)") {
 
     const floor = createFloor(colorFloor);
 
@@ -1115,7 +1083,7 @@ function auxCreateCreate_Adjacent(colorFloor, colorWall, type_pattern = 1, color
 }
 
 // Função auxiliar para criar o tipo de bloco mureta
-function auxCreateCreate_Corners(colorFloor, colorWall) {
+function auxCreateBlock_Corners(colorFloor, colorWall) {
 
     const floor = createFloor(colorFloor);
 
@@ -1163,7 +1131,7 @@ function createWall(color) {
     return cube;
 }
 
-// Função para registrar as colisões
+// Função para registrar as colisões das muretas de um bloco
 function registerWallsForCollision(block) {
   block.updateMatrixWorld(true);
 
@@ -1214,7 +1182,7 @@ function debugShowBoundingBoxes(block, scene) {
   
 }
 
-export function addWallNormalHelper(wallMesh, scene, length = 2, color = 0xff0000) {
+function addWallNormalHelper(wallMesh, scene, length = 2, color = 0xff0000) {
     // Normal of a plane in local space (pointing +Z in this case)
     const localNormal = new THREE.Vector3(0, -1, 0);
 
