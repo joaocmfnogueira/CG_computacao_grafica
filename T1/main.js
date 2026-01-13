@@ -77,7 +77,6 @@ function render() {
 
    // --- 1. GATHER ALL VEHICLES ---
    const playerCar = scene.getObjectByName("veiculo_principal");
-//    console.log(trackNumber);
    const bots = [scene.getObjectByName("enemy0"), scene.getObjectByName("enemy1"), scene.getObjectByName("enemy2"), scene.getObjectByName("enemy3")].filter(b => b !== undefined);
    const allVehicles = [];
    if (playerCar) allVehicles.push(playerCar);
@@ -196,8 +195,9 @@ function render() {
            // Ideally update control.js offset too.
        }
    });
+   playerCar.updateMatrixWorld(true);
 
-   updateCamera(dt, playerCar, keyboard, cameraHolder, false);
+   updateCamera(dt, scene, playerCar.userData.velocity, playerCar.userData.aceleration, keyboard, cameraHolder, false);
    updateSpeedDisplay(playerCar.userData.velocity, speedDisplay);
 
    if (playerCar) {
@@ -211,8 +211,10 @@ function render() {
    updateBulletDisplay(playerCar.userData.nBullets, bulletDisplay);
 
    if(playerCar.userData.laps_count == 4) showFinishScreen();
-   console.log(camera);
-   console.log(cameraHolder);
+
+   
+//    const axes = new THREE.AxesHelper(20);
+//    playerCar.add(axes);
    renderer.render(scene, camera);
 }
 
@@ -363,7 +365,7 @@ function checkLapCompletion(vehicle) {
    if (isInFinishZone && vehicle.userData.checkpoints_count == 4) {
       vehicle.userData.laps_count++;
       vehicle.userData.checkpoints_count = 0;
-      console.log(`Lap ${laps_count} completed!`);
+      console.log(`Lap ${vehicle.userData.laps_count} completed!`);
       vehicle.userData.nBullets = 4;
    }
 }
@@ -384,6 +386,7 @@ function checkCheckPointCompletion(vehicle) {
   const carPos = vehicle.getWorldPosition(new THREE.Vector3());
   const R = 12.5;
   let points = trackPoints[vehicle.userData.trackNumber];
+  console.log(vehicle.userData.trackNumber);
     if (vehicle.userData.checkpoints_count >= points.length) return;
 
     const checkpoint = points[vehicle.userData.checkpoints_count];
@@ -417,7 +420,7 @@ function checkBotCheckPointCompletion(carPos, trackNumber) {
 
 function applyCollisionResponse(car, angle, normal, dt) {
     let velocity = car.userData.velocity;
-    let acceleration = car.userData.acceleration;
+    let aceleration = car.userData.aceleration;
 
     const BLOCK_SIZE = 30;
 
@@ -438,15 +441,15 @@ function applyCollisionResponse(car, angle, normal, dt) {
     
     const wallFriction = 0.98; 
     slideVec.multiplyScalar(wallFriction);
-    console.log(angle);
+    // console.log(angle);
     if (angle < 30) {
         velocity = -velocity * 0.8; 
-        acceleration = 0;
+        aceleration = 0;
     } else {
         const isReversing = velocityVec.dot(carForward) < 0;
         velocity = slideVec.length();
         if (isReversing) velocity = -velocity; 
-        acceleration *= 0.5;
+        aceleration *= 0.5;
 
         if (Math.abs(velocity) > 0.05) {
             let targetDir = slideVec.clone().normalize();
@@ -465,8 +468,8 @@ function applyCollisionResponse(car, angle, normal, dt) {
 
     if (Math.abs(velocity) < 0.1) velocity = 0;
     car.userData.velocity = velocity;
-    car.userData.acceleration = acceleration;
-    // return [velocity, acceleration];
+    car.userData.aceleration = aceleration;
+    // return [velocity, aceleration];
 }
 
 function applyBulletHit(vehicleObj, isPlayer = false) {
@@ -480,8 +483,8 @@ function applyBulletHit(vehicleObj, isPlayer = false) {
         }
     }
     if (isPlayer) {
-        velocity = velocity * 0.3;
-        aceleration = 0; 
+        vehicleObj.userData.velocity *= 0.3;
+        vehicleObj.userData.aceleration = 0; 
     } else {
         if (vehicleObj.userData.follower) {
             vehicleObj.userData.follower.speed = vehicleObj.userData.follower.speed * 0.3;

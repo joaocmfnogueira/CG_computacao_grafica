@@ -275,11 +275,10 @@ export function updateLightMovement(scene, vehicle, light) {
    // console.log(light.position);
 }
 
-export function updateCamera(dt, vehicle, keyboard, cameraHolder, isColided) {
+export function updateCamera(dt, scene, velocity, aceleration, keyboard, cameraHolder, isColided) {
+    const vehicle = scene.getObjectByName("veiculo_principal");
     if (!vehicle) return;
 
-    let velocity = vehicle.userData.velocity;
-    let aceleration = vehicle.userData.acceleration;
     // --- JITTER FIX START: Initialize Smoothing State ---
     // We store a "smoothed" position/rotation inside the cameraHolder's userData
     // This acts as a buffer between the jittery physics car and the camera.
@@ -409,7 +408,7 @@ function switchTrack(trackNumber, scene, cameraHolder) {
    } 
 
    initLight(scene);
-   createHavac(scene);
+   createHavac(scene, trackNumberString);
    
    createHavacEnemy(scene, "rgba(126, 235, 126, 1)", "rgba(12, 15, 188, 1)", "rgba(235, 151, 126, 1)", 0, trackNumberString);
    createHavacEnemy(scene, "rgba(204, 153, 13, 1)", "rgba(255, 0, 0, 1)", "rgba(75, 12, 12, 1)", 1, trackNumberString);

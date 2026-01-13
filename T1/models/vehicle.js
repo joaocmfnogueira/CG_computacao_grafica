@@ -35,7 +35,7 @@ let tracks = {
 };
 
 // criar carro do jogador
-export function createHavac(scene) {    
+export function createHavac(scene, trackNumber = "Primeiro") {    
     // Materiais
     const materialBase = setDefaultMaterial("rgba(235, 126, 211, 1)"); 
     const materialBody = new THREE.MeshPhongMaterial(({ 
@@ -64,7 +64,7 @@ export function createHavac(scene) {
     base.userData.velocity = 0;
     base.userData.laps_count = 0;
     base.userData.checkpoints_count = 0;
-    base.userData.trackNumber = "Primeiro";
+    base.userData.trackNumber = trackNumber;
 
     // Criando a caixa de colisão
     base.userData.boundingBox = new THREE.Box3().setFromObject(base);
