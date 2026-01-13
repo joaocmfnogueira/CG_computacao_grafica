@@ -211,7 +211,8 @@ function render() {
    updateBulletDisplay(playerCar.userData.nBullets, bulletDisplay);
 
    if(playerCar.userData.laps_count == 4) showFinishScreen();
-
+   console.log(camera);
+   console.log(cameraHolder);
    renderer.render(scene, camera);
 }
 
@@ -415,6 +416,9 @@ function checkBotCheckPointCompletion(carPos, trackNumber) {
 }
 
 function applyCollisionResponse(car, angle, normal, dt) {
+    let velocity = car.userData.velocity;
+    let acceleration = car.userData.acceleration;
+
     const BLOCK_SIZE = 30;
 
     const carForward = new THREE.Vector3(-1, 0, 0).applyQuaternion(car.quaternion).normalize();
@@ -422,9 +426,6 @@ function applyCollisionResponse(car, angle, normal, dt) {
     const wallNormal = normal.clone().normalize();
 
     const projection = velocityVec.dot(wallNormal);
-
-    let velocity = car.userData.velocity;
-    let acceleration = car.userData.acceleration;
 
     if (projection < 0) {
         const pushFactor = Math.abs(projection * dt * BLOCK_SIZE) + 0.05;
