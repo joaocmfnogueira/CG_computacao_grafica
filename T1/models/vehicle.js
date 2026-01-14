@@ -164,7 +164,7 @@ export function createHavacEnemy(scene, colorBase, colorBody, colorAntenna, id, 
     const tempMat3 = new THREE.Matrix3();
     
     // Criando um waypointFolower
-    const follower = new WaypointFollower(base, tracks[tracksNumber], 30, 3);
+    const follower = new WaypointFollower(base, tracks[tracksNumber], 50, 2);
     base.userData.follower = follower;
 
     base.name = "enemy" + id;

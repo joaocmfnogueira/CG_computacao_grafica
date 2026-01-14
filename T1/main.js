@@ -68,6 +68,9 @@ function render() {
 
    const dt = clock.getDelta();
 
+   const SUBSTEPS = 5; 
+   const subDt = dt / SUBSTEPS;
+
    // --- 1. GATHER ALL VEHICLES ---
    const playerCar = scene.getObjectByName("veiculo_principal");
    const bots = [scene.getObjectByName("enemy0"), scene.getObjectByName("enemy1"), scene.getObjectByName("enemy2")].filter(b => b !== undefined);
@@ -75,94 +78,94 @@ function render() {
    if (playerCar) allVehicles.push(playerCar);
    bots.forEach(b => allVehicles.push(b));
 
-   // --- 2. STUN LOGIC ---
-   allVehicles.forEach(v => updateStunTimers(dt, v, (v === playerCar)));
+   for (let index = 0; index < 5; index++) {
+            // --- 2. STUN LOGIC ---
+    allVehicles.forEach(v => updateStunTimers(subDt, v, (v === playerCar)));
 
-   // --- 3. VEHICLE-TO-VEHICLE COLLISION ---
-   // This prevents cars from driving inside each other
-   checkVehicleToVehicleCollision(allVehicles);
+    // --- 3. VEHICLE-TO-VEHICLE COLLISION ---
+    // This prevents cars from driving inside each other
+    checkVehicleToVehicleCollision(allVehicles);
 
-   // --- 4. BULLET LOGIC ---
-   for (let i = bulletsInGame.length - 1; i >= 0; i--) {
-        const bullet = bulletsInGame[i];
-        bullet.translateX(-150 * dt); 
-        
-        // Correct OBB Update
-        if (!bullet.userData.obb) bullet.userData.obb = new OBB();
-        bullet.userData.obb.fromBox3(bullet.geometry.boundingBox);
-        bullet.userData.obb.applyMatrix4(bullet.matrixWorld);
+    // --- 4. BULLET LOGIC ---
+    for (let i = bulletsInGame.length - 1; i >= 0; i--) {
+            const bullet = bulletsInGame[i];
+            bullet.translateX(-150 * subDt); 
+            
+            // Correct OBB Update
+            if (!bullet.userData.obb) bullet.userData.obb = new OBB();
+            bullet.userData.obb.fromBox3(bullet.geometry.boundingBox);
+            bullet.userData.obb.applyMatrix4(bullet.matrixWorld);
 
-        let bulletRemoved = false;
+            let bulletRemoved = false;
 
-        // A. Wall Collision
-        if (collisionSystem.checkbulletcolision(bullet.userData.obb)) {
-            removeAndDispose(bullet);
-            scene.remove(bullet);
-            bulletsInGame.splice(i, 1);
-            bulletRemoved = true;
-        }
+            // A. Wall Collision
+            if (collisionSystem.checkbulletcolision(bullet.userData.obb)) {
+                removeAndDispose(bullet);
+                scene.remove(bullet);
+                bulletsInGame.splice(i, 1);
+                bulletRemoved = true;
+            }
 
-        // B. Vehicle Collision
-        if (!bulletRemoved) {
-            for (const vehicle of allVehicles) {
-                // Skip if this vehicle fired the bullet
-                if (bullet.userData.shooter === vehicle) continue;
-                
-                // Ensure vehicle OBB is up to date
-                if (!vehicle.userData.obb) vehicle.userData.obb = new OBB();
-                // We update vehicle OBBs in their own movement loops, but safety check:
-                // vehicle.userData.obb.fromBox3(vehicle.geometry.boundingBox).applyMatrix4(vehicle.matrixWorld);
-
-                if (vehicle.userData.obb && bullet.userData.obb.intersectsOBB(vehicle.userData.obb)) {
-                    // HIT!
-                    applyBulletHit(vehicle, (vehicle === playerCar));
+            // B. Vehicle Collision
+            if (!bulletRemoved) {
+                for (const vehicle of allVehicles) {
+                    // Skip if this vehicle fired the bullet
+                    if (bullet.userData.shooter === vehicle) continue;
                     
-                    removeAndDispose(bullet);
-                    scene.remove(bullet);
-                    bulletsInGame.splice(i, 1);
-                    bulletRemoved = true;
-                    break; 
+                    // Ensure vehicle OBB is up to date
+                    if (!vehicle.userData.obb) vehicle.userData.obb = new OBB();
+                    // We update vehicle OBBs in their own movement loops, but safety check:
+                    // vehicle.userData.obb.fromBox3(vehicle.geometry.boundingBox).applyMatrix4(vehicle.matrixWorld);
+
+                    if (vehicle.userData.obb && bullet.userData.obb.intersectsOBB(vehicle.userData.obb)) {
+                        // HIT!
+                        applyBulletHit(vehicle, (vehicle === playerCar));
+                        
+                        removeAndDispose(bullet);
+                        scene.remove(bullet);
+                        bulletsInGame.splice(i, 1);
+                        bulletRemoved = true;
+                        break; 
+                    }
                 }
             }
-        }
-   }
+    }
+    // --- 5. BOT LOGIC (Physics + Shooting) ---
+    
+        bots.forEach(botMesh => {
+                if (!botMesh) return;
 
-   // --- 5. BOT LOGIC (Physics + Shooting) ---
-   bots.forEach(botMesh => {
-        if (!botMesh) return;
+                // Shoot at Player or other Bots
+                updateBotShooting(botMesh, allVehicles, scene);
 
-        // Shoot at Player or other Bots
-        updateBotShooting(botMesh, allVehicles, scene);
+                // Move
+                const botFollower = botMesh.userData.follower;
+                botFollower.update(subDt);
+                botMesh.updateMatrixWorld();
 
-        // Move
-        const botFollower = botMesh.userData.follower;
-        botFollower.update(dt);
-        botMesh.updateMatrixWorld();
+                // Update OBB correctly
+                if (!botMesh.userData.obb) botMesh.userData.obb = new OBB();
+                botMesh.userData.obb.fromBox3(botMesh.geometry.boundingBox);
+                botMesh.userData.obb.applyMatrix4(botMesh.matrixWorld);
 
-        // Update OBB correctly
-        if (!botMesh.userData.obb) botMesh.userData.obb = new OBB();
-        botMesh.userData.obb.fromBox3(botMesh.geometry.boundingBox);
-        botMesh.userData.obb.applyMatrix4(botMesh.matrixWorld);
+                botMesh.userData.velocity = botFollower.currentSpeed;
+                // Wall Collision
+                const [isColided, angle, normal, wall] = checkCarCollision(botMesh, botMesh.userData.obb);
+                if (isColided) {
+                    applyBotCollisionResponse(botMesh, angle, normal, subDt);
+                    botFollower.currentSpeed = botMesh.userData.velocity;
+                    // console.log("COLIDIU");
+                    // if (Math.abs(botFollower.currentSpeed) < 5) botFollower.currentSpeed = 5; 
+                }
+            });
+        
 
-        botMesh.userData.velocity = botFollower.speed;
-        // Wall Collision
-        const [isColided, angle, normal, wall] = checkCarCollision(botMesh, botMesh.userData.obb);
-        if (isColided) {
-            applyCollisionResponse(botMesh, angle, normal, dt);
-            botFollower.speed = botMesh.userData.velocity;
-            if (Math.abs(botFollower.speed) < 5) botFollower.speed = 5; 
-        }
-    });
-
-   // --- 6. PLAYER PHYSICS ---
-   const SUBSTEPS = 5; 
-   const subDt = dt / SUBSTEPS;
-
-   for (let i = 0; i < SUBSTEPS; i++) {
-       updateVehicleMovement(subDt, playerCar, keyboard);
-       updateLightMovement(scene, playerCar, scene.getObjectByName("light"));
-       
-       if (playerCar) {
+    // --- 6. PLAYER PHYSICS ---
+    
+        updateVehicleMovement(subDt, playerCar, keyboard);
+        updateLightMovement(scene, playerCar, scene.getObjectByName("light"));
+        
+        if (playerCar) {
             // Update OBB
             if (!playerCar.userData.obb) playerCar.userData.obb = new OBB();
             playerCar.userData.obb.fromBox3(playerCar.geometry.boundingBox);
@@ -171,9 +174,9 @@ function render() {
             const [isColided, angle, normal, wall] = checkCarCollision(playerCar);
             if (isColided) 
                 applyCollisionResponse(playerCar, angle, normal, subDt);
-       }
+        }
    }
-
+   
    if (playerCar) {
       checkLapCompletion(playerCar);
       checkCheckPointCompletion(playerCar);
@@ -237,7 +240,7 @@ function checkVehicleToVehicleCollision(vehicles) {
                 const dir = new THREE.Vector3().subVectors(p1, p2).normalize();
                 
                 // Nudge both cars apart
-                const pushForce = 0.5; // Adjustment amount
+                const pushForce = 0.2; // Adjustment amount
                 v1.position.addScaledVector(dir, pushForce);
                 v2.position.addScaledVector(dir, -pushForce);
                 
@@ -265,6 +268,9 @@ function applyCollisionResponse(car, angle, normal, dt) {
         const pushFactor = Math.abs(projection * dt * BLOCK_SIZE) + 0.05;
         car.position.addScaledVector(wallNormal, pushFactor);
         car.userData.updateOBB(); 
+    }
+    else{
+        car.position.addScaledVector(wallNormal, 0.01);
     }
 
     const dot = velocityVec.dot(wallNormal);
@@ -301,6 +307,90 @@ function applyCollisionResponse(car, angle, normal, dt) {
     car.userData.velocity = velocity;
     car.userData.aceleration = aceleration;
     // return [velocity, aceleration];
+}
+
+ function applyBotCollisionResponse(base, angle, normal, dt) {
+    const follower = base.userData.follower;
+    if (!follower) return;
+
+    const BLOCK_SIZE = 30;
+
+    const forward = new THREE.Vector3(-1, 0, 0)
+        .applyQuaternion(base.quaternion)
+        .normalize();
+
+    const velocityVec = forward.clone()
+        .multiplyScalar(follower.currentSpeed);
+
+    const wallNormal = normal.clone().normalize();
+
+    /* ======================
+       PUSH OUT DA PAREDE
+    ====================== */
+    const projection = velocityVec.dot(wallNormal);
+    if (projection < 0) {
+        const pushFactor =
+            Math.abs(projection * dt) + 0.05;
+        base.position.addScaledVector(wallNormal, pushFactor);
+        base.userData.updateOBB?.();
+    }
+    else{
+        base.position.addScaledVector(wallNormal, 0.05);
+    }
+    console.log("colidindo");
+
+    /* ======================
+       TRATAMENTO POR ÂNGULO
+    ====================== */
+    if (angle < 30) {
+        // impacto frontal → freada forte
+        follower.currentSpeed *= 0.3;
+    } else {
+        // colisão lateral → vira para fora da parede
+
+        follower.currentSpeed *= 0.9;
+
+        /* ======================
+           DIREÇÃO DE FUGA
+        ====================== */
+        // let escapeDir = wallNormal.clone();
+        // escapeDir.y = 0;
+        // escapeDir.normalize();
+
+        // // garante que não fique de ré
+        // if (escapeDir.dot(forward) < 0) {
+        //     escapeDir.negate();
+        // }
+
+        // /* ======================
+        //    ROTACIONA PARA FORA
+        // ====================== */
+        // const xAxis = escapeDir.clone().negate();
+        // const yAxis = new THREE.Vector3(0, 1, 0);
+        // const zAxis = new THREE.Vector3()
+        //     .crossVectors(xAxis, yAxis)
+        //     .normalize();
+        // xAxis.crossVectors(yAxis, zAxis).normalize();
+
+        // const targetMat = new THREE.Matrix4().makeBasis(
+        //     xAxis, yAxis, zAxis
+        // );
+        // const targetQuat = new THREE.Quaternion()
+        //     .setFromRotationMatrix(targetMat);
+
+        // // slerp mais agressivo que o player
+        // base.quaternion.slerp(targetQuat, 0.35);
+
+        // // temporariamente vira melhor
+        // follower.turnSpeed = Math.min(
+        //     follower.turnSpeed * 1.3,
+        //     4.5
+        // );
+    }
+
+    if (follower.currentSpeed < 0.1) {
+        follower.currentSpeed = 0;
+    }
 }
 
 function createBulletInteraction(shooter, scene) {
@@ -386,7 +476,7 @@ function applyBulletHit(vehicleObj, isPlayer = false) {
         vehicleObj.userData.stunTimer = 3.0; 
         if (!isPlayer && vehicleObj.userData.follower) {
              if (!vehicleObj.userData.follower.baseSpeed) {
-                 vehicleObj.userData.follower.baseSpeed = vehicleObj.userData.follower.speed; 
+                 vehicleObj.userData.follower.baseSpeed = vehicleObj.userData.follower.currentSpeed; 
              }
         }
     }
@@ -395,7 +485,7 @@ function applyBulletHit(vehicleObj, isPlayer = false) {
         vehicleObj.userData.aceleration = 0; 
     } else {
         if (vehicleObj.userData.follower) {
-            vehicleObj.userData.follower.speed = vehicleObj.userData.follower.speed * 0.3;
+            vehicleObj.userData.follower.currentSpeed = vehicleObj.userData.follower.currentSpeed * 0.3;
         }
     }
 }
@@ -406,8 +496,9 @@ function updateStunTimers(dt, vehicleObj, isPlayer = false) {
         if (vehicleObj.userData.stunTimer <= 0) {
             vehicleObj.userData.isStunned = false;
             if (!isPlayer && vehicleObj.userData.follower) {
-                 vehicleObj.userData.follower.speed = vehicleObj.userData.follower.baseSpeed || 20;
+                 vehicleObj.userData.follower.currentSpeed *= 0.3;
                  vehicleObj.userData.follower.aceleration = 0; 
+                 console.log("hehe");
             }
         }
     }
@@ -424,6 +515,7 @@ function checkLapCompletion(vehicle) {
       vehicle.userData.checkpoints_count = 0;
       console.log(`Lap ${vehicle.userData.laps_count} completed!`);
       vehicle.userData.nBullets = 4;
+      console.log("AAAAAAAAAAAAAAAAAA");
    }
 }
 
@@ -431,8 +523,8 @@ function checkCheckPointCompletion(vehicle) {
   const carPos = vehicle.getWorldPosition(new THREE.Vector3());
   const R = 12.5;
   let points = trackPoints[vehicle.userData.trackNumber];
-    console.log(Array.isArray(points));
-    console.log(points);
+    // console.log(Array.isArray(points));
+    // console.log(points);
     if (vehicle.userData.checkpoints_count >= points.length) return;
 
     const checkpoint = points[vehicle.userData.checkpoints_count];

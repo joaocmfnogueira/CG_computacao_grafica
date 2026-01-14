@@ -55,7 +55,7 @@ export function keyboardUpdate(keyboard, vehicle, dt, scene, cameraHolder, bulle
    let nBullets = vehicle.userData.nBullets;
 
 
-   if(nBullets > 0 && (keyboard.pressed("Z")) && (now - lastShotTime) >= shotCooldown){
+   if(nBullets > 0 && ((keyboard.pressed("Z")) || (keyboard.pressed("space"))) && (now - lastShotTime) >= shotCooldown){
          lastShotTime = now;
          let matBullet = new THREE.MeshPhongMaterial(({ 
                color: "rgba(255, 0, 0, 1)",
