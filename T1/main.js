@@ -174,6 +174,19 @@ function render() {
        }
    }
 
+   if (playerCar) {
+      checkLapCompletion(playerCar);
+      checkCheckPointCompletion(playerCar);
+      
+   }
+
+   bots.forEach(botMesh => {
+        if (!botMesh) return;
+        
+        checkLapCompletion(botMesh);
+        checkCheckPointCompletion(botMesh);
+    });
+
    // --- 7. HUD & INPUT ---
    const result = keyboardUpdate(keyboard, playerCar, dt, scene, cameraHolder, bulletsInGame);
 
@@ -193,21 +206,6 @@ function render() {
    updateCamera(dt, scene, playerCar.userData.velocity, playerCar.userData.aceleration, keyboard, cameraHolder, false);
    updateSpeedDisplay(playerCar.userData.velocity, speedDisplay);
 
-   if (playerCar) {
-      checkLapCompletion(playerCar);
-      checkCheckPointCompletion(playerCar);
-      
-   }
-
-   bots.forEach(botMesh => {
-        if (!botMesh) return;
-
-        checkLapCompletion(botMesh);
-        checkCheckPointCompletion(botMesh);
-    });
-
-   
-   
    updateLapDisplay(playerCar.userData.laps_count, lapsDisplay);
    updateCheckPointDisplay(playerCar.userData.checkpoints_count, checkPointDisplay);
    updateBulletDisplay(playerCar.userData.nBullets, bulletDisplay);
@@ -218,7 +216,6 @@ function render() {
             showFinishScreen("YOU LOSE THE RACE?????");
     });
 
-   
 //    const axes = new THREE.AxesHelper(20);
 //    playerCar.add(axes);
    renderer.render(scene, camera);
@@ -254,7 +251,6 @@ function checkVehicleToVehicleCollision(vehicles) {
 }
 
 // --- HELPER FUNCTIONS ---
-
 function createBulletInteraction(shooter, scene) {
    // Offset ajustado para não colidir com o próprio carro (-22)
    const offset = new THREE.Vector3(-4, 0, 0).applyQuaternion(shooter.quaternion);
@@ -383,19 +379,19 @@ function checkCheckPointCompletion(vehicle) {
 //   console.log(points);
 //   console.log(vehicle.userData.trackNumber);
 //   console.log(trackPoints);
-// console.log(Array.isArray(points));
-// console.log(points);
+    console.log(Array.isArray(points));
+    console.log(points);
     if (vehicle.userData.checkpoints_count >= points.length) return;
 
     const checkpoint = points[vehicle.userData.checkpoints_count];
     const [x, y, z] = checkpoint;
 
     const dentro =
-      carPos.x >= x - R && carPos.x <= x + R &&
-      carPos.z >= z - R && carPos.z <= z + R;
+        carPos.x >= x - R && carPos.x <= x + R &&
+        carPos.z >= z - R && carPos.z <= z + R;
 
     if (dentro) {
-      vehicle.userData.checkpoints_count++;
+        vehicle.userData.checkpoints_count++;
     }
 }
 
