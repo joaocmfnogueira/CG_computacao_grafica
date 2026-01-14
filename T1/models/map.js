@@ -6,6 +6,7 @@ import { CollisionSystem } from './CollisionSystem.js';
 import {OBB} from "./OBB.js";
 import {createOBBHelper} from "../utils.js";
 import { CSG } from "../../libs/other/CSGMesh.js";
+import { MeshBasicMaterial } from '../../build/three.core.js';
 
 
 export const collisionSystem = new CollisionSystem();
@@ -744,14 +745,33 @@ export function createTrack3(scene) {
     }
 
     for (let index = 0; index < 3; index++) {
-        let block = createBlock(1, "rgb(200,100,100)", "rgb(100,30,255)");
-        block.rotateZ(THREE.MathUtils.degToRad(270));
-        block.position.set(-60 + 30 * index, 0, -150);
-        block.name = "block_vertical2_" + index;
-        scene.add(block);
-        registerWallsForCollision(block);
-        debugShowBoundingBoxes(block, scene);
-
+        if(index == 0){
+            let block = createBlock(1, "rgb(200,100,100)", "rgb(100,30,255)");
+            block.rotateZ(THREE.MathUtils.degToRad(270));
+            block.position.set(-60 + 30 * index, 0, -150);
+            block.name = "block_vertical2_" + index;
+            
+            const cubeGeometry = new THREE.BoxGeometry(8, 5, 0.5);
+            const material = setDefaultMaterial("rgba(15, 228, 199, 1)", null);
+            const caixa = new THREE.Mesh(cubeGeometry, material);
+            caixa.receiveShadow = true;
+            caixa.castShadow = true;
+            caixa.position.set(-5.5, 12.5, -0.15);
+            
+            block.add(caixa);
+            scene.add(block);
+            registerWallsForCollision(block);
+            debugShowBoundingBoxes(block, scene);
+        }
+        else if(index != 1){
+            let block = createBlock(1, "rgb(200,100,100)", "rgb(100,30,255)");
+            block.rotateZ(THREE.MathUtils.degToRad(270));
+            block.position.set(-60 + 30 * index, 0, -150);
+            block.name = "block_vertical2_" + index;
+            scene.add(block);
+            registerWallsForCollision(block);
+            debugShowBoundingBoxes(block, scene);
+        }
         if(index != 0){
             const baseX = -60 + 30 * index;
 
@@ -783,6 +803,8 @@ export function createTrack3(scene) {
             );
 
         }
+
+        
         
     }
     
@@ -919,7 +941,7 @@ function createGround(scene) {
     
     const ground = new THREE.Mesh(groundGeometry, groundMaterial);
     ground.rotation.x = THREE.MathUtils.degToRad(-90);
-    ground.position.y = -0.5; 
+    ground.position.y = -10; 
     ground.receiveShadow = true;
     ground.name = "ground";
     
@@ -951,6 +973,7 @@ function createTree1(scene, x, y, z){
     
     scene.add(tronco);
     tronco.position.set(x, y, z);
+    tronco.position.y = -7;
 }
 
 function createTree2(scene, x, y, z){
@@ -974,6 +997,7 @@ function createTree2(scene, x, y, z){
     
     scene.add(tronco);
     tronco.position.set(x, y, z);
+    tronco.position.y = -7;
 }
 
 
@@ -982,22 +1006,29 @@ function createTree2(scene, x, y, z){
 // Segundo -> As muretas estão adjacentes;
 // Terceiro -> As muretas estão somente nos cantos;
 function createBlock(type, colorFloor, colorWall, type_pattern = 1, colorConer = "rgb(255,255,255)") {
+    let floor;
     if (type == 1) {
-        let floor = auxCreateBlock_parallel(colorFloor, colorWall);
-        return floor;
+        floor = auxCreateBlock_parallel(colorFloor, colorWall);
     }
     else if (type == 2) {
-        let floor = auxCreateBlock_Adjacent(colorFloor, colorWall, type_pattern, colorConer);
-        return floor;
+        floor = auxCreateBlock_Adjacent(colorFloor, colorWall, type_pattern, colorConer);
+
     }
     else if (type == 3) {
-        let floor = auxCreateBlock_Corners(colorFloor, colorWall);
-        return floor;
+        floor = auxCreateBlock_Corners(colorFloor, colorWall);
     }
     else {
         console.log("algum erro aconteceu");
         return;
     }
+    const cubeGeometry = new THREE.BoxGeometry(30, 30, 10);
+    const material = setDefaultMaterial("rgb(60,60,60)", null);
+    const caixa = new THREE.Mesh(cubeGeometry, material);
+    caixa.receiveShadow = true;
+    caixa.castShadow = true;
+    caixa.position.set(0, 0, -5.5);
+    floor.add(caixa);
+    return floor;
 }
 
 // Função auxiliar para criar o tipo de bloco paralelo

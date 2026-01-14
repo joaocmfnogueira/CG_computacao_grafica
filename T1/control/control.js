@@ -10,6 +10,7 @@ import { clearScene } from '../utils.js';
 import { initLight} from '../utils.js';
 import {OBB} from "../models/OBB.js";
 import { createOBBHelper } from '../utils.js';
+import { OrbitControls } from '../../build/jsm/controls/OrbitControls.js';
 
 // import { collisionSystem } from './models/map.js';
 
@@ -158,17 +159,17 @@ export function keyboardUpdate(keyboard, vehicle, dt, scene, cameraHolder, bulle
 
 
    // Reset/troca de pista 
-   if (keyboard.down("R")){
-      resetVehicle(scene);
-      velocity = 0;
-      aceleration = 0;
-      laps_count = 0;
-      checkpoints_count = 0;
-      nBullets = 4;
-      bulletsInGame = [];
+   // if (keyboard.down("R")){
+   //    resetVehicle(scene);
+   //    velocity = 0;
+   //    aceleration = 0;
+   //    laps_count = 0;
+   //    checkpoints_count = 0;
+   //    nBullets = 4;
+   //    bulletsInGame = [];
 
-      // trackNumber = 0;
-   } 
+   //    // trackNumber = 0;
+   // } 
    if (keyboard.down("1")){
       switchTrack(1, scene, cameraHolder);
       velocity = 0;
@@ -388,7 +389,7 @@ export function updateCamera(dt, scene, velocity, aceleration, keyboard, cameraH
     }
 }
 
-function switchTrack(trackNumber, scene, cameraHolder) {
+export function switchTrack(trackNumber, scene, cameraHolder) {
    clearScene(scene, { ignore: [cameraHolder] });
    let trackNumberString;
    if (trackNumber === 1){
@@ -417,6 +418,23 @@ function switchTrack(trackNumber, scene, cameraHolder) {
 
    // cameraHolder was preserved, so just re-add it
    scene.add(cameraHolder);
+}
+
+export function switchTrack_teste(trackNumber, scene, camera) {
+   clearScene(scene, { ignore: [camera] });
+
+   initLight(scene);
+
+   if (trackNumber === 1){
+      createTrack1(scene);
+   } 
+   else if (trackNumber === 2){
+      createTrack2(scene);
+
+   } 
+   else if (trackNumber === 3){
+      createTrack3(scene);
+   } 
 }
 
 export function resetVehicle(scene) {
