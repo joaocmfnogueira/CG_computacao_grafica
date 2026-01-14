@@ -221,7 +221,6 @@ function render() {
    renderer.render(scene, camera);
 }
 
-// --- NEW FUNCTION: VEHICLE vs VEHICLE COLLISION ---
 function checkVehicleToVehicleCollision(vehicles) {
     for (let i = 0; i < vehicles.length; i++) {
         for (let j = i + 1; j < vehicles.length; j++) {
@@ -250,7 +249,60 @@ function checkVehicleToVehicleCollision(vehicles) {
     }
 }
 
-// --- HELPER FUNCTIONS ---
+function applyCollisionResponse(car, angle, normal, dt) {
+    let velocity = car.userData.velocity;
+    let aceleration = car.userData.aceleration;
+
+    const BLOCK_SIZE = 30;
+
+    const carForward = new THREE.Vector3(-1, 0, 0).applyQuaternion(car.quaternion).normalize();
+    const velocityVec = carForward.clone().multiplyScalar(velocity);
+    const wallNormal = normal.clone().normalize();
+
+    const projection = velocityVec.dot(wallNormal);
+
+    if (projection < 0) {
+        const pushFactor = Math.abs(projection * dt * BLOCK_SIZE) + 0.05;
+        car.position.addScaledVector(wallNormal, pushFactor);
+        car.userData.updateOBB(); 
+    }
+
+    const dot = velocityVec.dot(wallNormal);
+    const slideVec = velocityVec.clone().sub(wallNormal.clone().multiplyScalar(dot));
+    
+    const wallFriction = 0.98; 
+    slideVec.multiplyScalar(wallFriction);
+    // console.log(angle);
+    if (angle < 30) {
+        velocity = -velocity * 0.8; 
+        aceleration = 0;
+    } else {
+        const isReversing = velocityVec.dot(carForward) < 0;
+        velocity = slideVec.length();
+        if (isReversing) velocity = -velocity; 
+        aceleration *= 0.5;
+
+        if (Math.abs(velocity) > 0.05) {
+            let targetDir = slideVec.clone().normalize();
+            if (targetDir.dot(carForward) < 0) targetDir.negate();
+
+            const xAxis = targetDir.clone().negate(); 
+            const yAxis = new THREE.Vector3(0, 1, 0); 
+            const zAxis = new THREE.Vector3().crossVectors(xAxis, yAxis).normalize();
+            xAxis.crossVectors(yAxis, zAxis).normalize();
+
+            const targetRotationMat = new THREE.Matrix4().makeBasis(xAxis, yAxis, zAxis);
+            const targetQuat = new THREE.Quaternion().setFromRotationMatrix(targetRotationMat);
+            car.quaternion.slerp(targetQuat, 0.15);
+        }
+    }
+
+    if (Math.abs(velocity) < 0.1) velocity = 0;
+    car.userData.velocity = velocity;
+    car.userData.aceleration = aceleration;
+    // return [velocity, aceleration];
+}
+
 function createBulletInteraction(shooter, scene) {
    // Offset ajustado para não colidir com o próprio carro (-22)
    const offset = new THREE.Vector3(-4, 0, 0).applyQuaternion(shooter.quaternion);
@@ -319,134 +371,13 @@ function updateBotShooting(botMesh, targets, scene) {
     }
 }
 
-// ... (Other functions like events, checkCarCollision, applyCollisionResponse, applyBulletHit, updateStunTimers stay the same as previous step)
-
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden) {
-    isPaused = true;
-    resetKeyboardState();
-  } else {
-    isPaused = false;
-    clock.elapsedTime = 0;
-    clock.start();
-  }
-});
-
-window.addEventListener('blur', () => {
-  isPaused = true;
-  resetKeyboardState();
-});
-
-window.addEventListener('focus', () => {
-  isPaused = false;
-  clock.elapsedTime = 0;
-  clock.start();
-});
-
+// Colisão entre os carros e a mureta
 function checkCarCollision(car) {
   const [isColided, angle, normal, wall] = collisionSystem.checkCollision(car, scene);
     if (isColided) {
         return [true, angle, normal, wall];
     }
     return [false, null, null, null];
-}
-
-function resetKeyboardState() {
-  if (KeyboardState.status) {
-    for (let key in KeyboardState.status) {
-      delete KeyboardState.status[key];
-    }
-  }
-}
-
-function checkLapCompletion(vehicle) {
-   const carPos = vehicle.getWorldPosition(new THREE.Vector3());
-   const isInFinishZone = 
-   (carPos.x <= 12.5 && carPos.x >= -12.5) && (carPos.z <= 12.5 && carPos.z >= -12.5) ;
-   
-   if (isInFinishZone && vehicle.userData.checkpoints_count == 4) {
-      vehicle.userData.laps_count++;
-      vehicle.userData.checkpoints_count = 0;
-      console.log(`Lap ${vehicle.userData.laps_count} completed!`);
-      vehicle.userData.nBullets = 4;
-   }
-}
-
-function checkCheckPointCompletion(vehicle) {
-  const carPos = vehicle.getWorldPosition(new THREE.Vector3());
-  const R = 12.5;
-  let points = trackPoints[vehicle.userData.trackNumber];
-//   console.log(points);
-//   console.log(vehicle.userData.trackNumber);
-//   console.log(trackPoints);
-    console.log(Array.isArray(points));
-    console.log(points);
-    if (vehicle.userData.checkpoints_count >= points.length) return;
-
-    const checkpoint = points[vehicle.userData.checkpoints_count];
-    const [x, y, z] = checkpoint;
-
-    const dentro =
-        carPos.x >= x - R && carPos.x <= x + R &&
-        carPos.z >= z - R && carPos.z <= z + R;
-
-    if (dentro) {
-        vehicle.userData.checkpoints_count++;
-    }
-}
-
-function applyCollisionResponse(car, angle, normal, dt) {
-    let velocity = car.userData.velocity;
-    let aceleration = car.userData.aceleration;
-
-    const BLOCK_SIZE = 30;
-
-    const carForward = new THREE.Vector3(-1, 0, 0).applyQuaternion(car.quaternion).normalize();
-    const velocityVec = carForward.clone().multiplyScalar(velocity);
-    const wallNormal = normal.clone().normalize();
-
-    const projection = velocityVec.dot(wallNormal);
-
-    if (projection < 0) {
-        const pushFactor = Math.abs(projection * dt * BLOCK_SIZE) + 0.05;
-        car.position.addScaledVector(wallNormal, pushFactor);
-        car.userData.updateOBB(); 
-    }
-
-    const dot = velocityVec.dot(wallNormal);
-    const slideVec = velocityVec.clone().sub(wallNormal.clone().multiplyScalar(dot));
-    
-    const wallFriction = 0.98; 
-    slideVec.multiplyScalar(wallFriction);
-    // console.log(angle);
-    if (angle < 30) {
-        velocity = -velocity * 0.8; 
-        aceleration = 0;
-    } else {
-        const isReversing = velocityVec.dot(carForward) < 0;
-        velocity = slideVec.length();
-        if (isReversing) velocity = -velocity; 
-        aceleration *= 0.5;
-
-        if (Math.abs(velocity) > 0.05) {
-            let targetDir = slideVec.clone().normalize();
-            if (targetDir.dot(carForward) < 0) targetDir.negate();
-
-            const xAxis = targetDir.clone().negate(); 
-            const yAxis = new THREE.Vector3(0, 1, 0); 
-            const zAxis = new THREE.Vector3().crossVectors(xAxis, yAxis).normalize();
-            xAxis.crossVectors(yAxis, zAxis).normalize();
-
-            const targetRotationMat = new THREE.Matrix4().makeBasis(xAxis, yAxis, zAxis);
-            const targetQuat = new THREE.Quaternion().setFromRotationMatrix(targetRotationMat);
-            car.quaternion.slerp(targetQuat, 0.15);
-        }
-    }
-
-    if (Math.abs(velocity) < 0.1) velocity = 0;
-    car.userData.velocity = velocity;
-    car.userData.aceleration = aceleration;
-    // return [velocity, aceleration];
 }
 
 function applyBulletHit(vehicleObj, isPlayer = false) {
@@ -475,8 +406,74 @@ function updateStunTimers(dt, vehicleObj, isPlayer = false) {
         if (vehicleObj.userData.stunTimer <= 0) {
             vehicleObj.userData.isStunned = false;
             if (!isPlayer && vehicleObj.userData.follower) {
-                 vehicleObj.userData.follower.speed = vehicleObj.userData.follower.baseSpeed || 20; 
+                 vehicleObj.userData.follower.speed = vehicleObj.userData.follower.baseSpeed || 20;
+                 vehicleObj.userData.follower.aceleration = 0; 
             }
         }
     }
+}
+
+// Funções que verificam a posição do carro em relação a volta e a checkpoint
+function checkLapCompletion(vehicle) {
+   const carPos = vehicle.getWorldPosition(new THREE.Vector3());
+   const isInFinishZone = 
+   (carPos.x <= 12.5 && carPos.x >= -12.5) && (carPos.z <= 12.5 && carPos.z >= -12.5) ;
+   
+   if (isInFinishZone && vehicle.userData.checkpoints_count == 4) {
+      vehicle.userData.laps_count++;
+      vehicle.userData.checkpoints_count = 0;
+      console.log(`Lap ${vehicle.userData.laps_count} completed!`);
+      vehicle.userData.nBullets = 4;
+   }
+}
+
+function checkCheckPointCompletion(vehicle) {
+  const carPos = vehicle.getWorldPosition(new THREE.Vector3());
+  const R = 12.5;
+  let points = trackPoints[vehicle.userData.trackNumber];
+    console.log(Array.isArray(points));
+    console.log(points);
+    if (vehicle.userData.checkpoints_count >= points.length) return;
+
+    const checkpoint = points[vehicle.userData.checkpoints_count];
+    const [x, y, z] = checkpoint;
+
+    const dentro =
+        carPos.x >= x - R && carPos.x <= x + R &&
+        carPos.z >= z - R && carPos.z <= z + R;
+
+    if (dentro) {
+        vehicle.userData.checkpoints_count++;
+    }
+}
+
+// Funções para controlar o estado do jogo no navegador (pausado, em andamento, ...)
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    isPaused = true;
+    resetKeyboardState();
+  } else {
+    isPaused = false;
+    clock.elapsedTime = 0;
+    clock.start();
+  }
+});
+
+window.addEventListener('blur', () => {
+  isPaused = true;
+  resetKeyboardState();
+});
+
+window.addEventListener('focus', () => {
+  isPaused = false;
+  clock.elapsedTime = 0;
+  clock.start();
+});
+
+function resetKeyboardState() {
+  if (KeyboardState.status) {
+    for (let key in KeyboardState.status) {
+      delete KeyboardState.status[key];
+    }
+  }
 }
