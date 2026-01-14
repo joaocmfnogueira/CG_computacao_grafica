@@ -12,9 +12,10 @@ export class WaypointFollower {
         // Cria caminhos únicos com offset para cada bot
         const MAX_OFFSET = 3; 
         this.waypoints = waypoints.map(point => {
-            const offsetX = (Math.random() - 0.5) * 2 * MAX_OFFSET;
-            const offsetZ = (Math.random() - 0.5) * 2 * MAX_OFFSET;
-            return new THREE.Vector3(point.x + offsetX, point.y, point.z + offsetZ);
+            // const offsetX = (Math.random() - 0.5) * 2 * MAX_OFFSET;
+            // const offsetZ = (Math.random() - 0.5) * 2 * MAX_OFFSET;
+            // return new THREE.Vector3(point.x + offsetX, point.y, point.z + offsetZ);
+            return new THREE.Vector3(point.x, point.y, point.z );
         });
     }
 
