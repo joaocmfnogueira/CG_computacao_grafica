@@ -19,7 +19,7 @@ const BLOCK_SIZE = 30;
 
 // Parâmetros de ajuste de camera
 const CAMERA_BASE_DISTANCE = 20;
-const CAMERA_BASE_HEIGHT = 10;
+const CAMERA_BASE_HEIGHT = 7.5;
 const CAMERA_ACCELERATION_OFFSET = 30; 
 const CAMERA_TURN_OFFSET = 15; 
 const CAMERA_SMOOTHNESS = 10; 
