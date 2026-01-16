@@ -161,6 +161,7 @@ function render() {
         
 
     // --- 6. PLAYER PHYSICS ---
+        
     
         updateVehicleMovement(subDt, playerCar, keyboard);
         updateLightMovement(scene, playerCar, scene.getObjectByName("light"));
@@ -176,11 +177,35 @@ function render() {
                 applyCollisionResponse(playerCar, angle, normal, subDt);
         }
    }
+
+   if(playerCar.userData.trackNumber == "Terceiro"){
+            const jumpPort = scene.getObjectByName("jumpPort");
+            if(playerCar.userData.obb.intersectsOBB(jumpPort.userData.obb)){
+                // TODO:Criar função da logica do jump port aqui
+                jumpPort_moviment(playerCar);
+                console.log("Colidiu aqui");
+                playerCar.userData.isInAir = true;
+            }
+            if(playerCar.userData.movimentY > 0 && playerCar.userData.isInAir){
+                playerCar.translateY(0.1);
+                playerCar.userData.movimentY -= 0.1;
+                // console.log(playerCar.userData.movimentY);
+            }
+            else if(playerCar.userData.movimentY <= 0 && playerCar.userData.isInAir && playerCar.position.y > 0){
+                console.log("ue");
+                playerCar.translateY(-0.1);
+                playerCar.userData.movimentY = 0;
+            }
+            else if(playerCar.userData.isInAir && playerCar.position.y < 0){
+                console.log(playerCar.position.y);
+                playerCar.userData.isInAir = false;
+                playerCar.position.y = 0.25;
+            }
+        }
    
    if (playerCar) {
       checkLapCompletion(playerCar);
       checkCheckPointCompletion(playerCar);
-      
    }
 
    bots.forEach(botMesh => {
@@ -250,6 +275,12 @@ function checkVehicleToVehicleCollision(vehicles) {
             }
         }
     }
+}
+
+function jumpPort_moviment(vehicle){
+    vehicle.userData.movimentY = vehicle.userData.velocity;
+    // vehicle.translateY(vehicle.userData.velocity);
+
 }
 
 function applyCollisionResponse(car, angle, normal, dt) {
@@ -337,7 +368,7 @@ function applyCollisionResponse(car, angle, normal, dt) {
     else{
         base.position.addScaledVector(wallNormal, 0.05);
     }
-    console.log("colidindo");
+    // console.log("colidindo");
 
     /* ======================
        TRATAMENTO POR ÂNGULO
@@ -498,7 +529,6 @@ function updateStunTimers(dt, vehicleObj, isPlayer = false) {
             if (!isPlayer && vehicleObj.userData.follower) {
                  vehicleObj.userData.follower.currentSpeed *= 0.3;
                  vehicleObj.userData.follower.aceleration = 0; 
-                 console.log("hehe");
             }
         }
     }
@@ -515,7 +545,7 @@ function checkLapCompletion(vehicle) {
       vehicle.userData.checkpoints_count = 0;
       console.log(`Lap ${vehicle.userData.laps_count} completed!`);
       vehicle.userData.nBullets = 4;
-      console.log("AAAAAAAAAAAAAAAAAA");
+    //   console.log("AAAAAAAAAAAAAAAAAA");
    }
 }
 

@@ -749,16 +749,24 @@ export function createTrack3(scene) {
             let block = createBlock(1, "rgb(200,100,100)", "rgb(100,30,255)");
             block.rotateZ(THREE.MathUtils.degToRad(270));
             block.position.set(-60 + 30 * index, 0, -150);
-            block.name = "block_vertical2_" + index;
+            block.name = "block_vertical2_jumpPort" + index;
             
             const cubeGeometry = new THREE.BoxGeometry(8, 5, 0.5);
             const material = setDefaultMaterial("rgba(15, 228, 199, 1)", null);
             const caixa = new THREE.Mesh(cubeGeometry, material);
             caixa.receiveShadow = true;
             caixa.castShadow = true;
-            caixa.position.set(-5.5, 12.5, -0.15);
-            
+            caixa.name = "jumpPort";
+
             block.add(caixa);
+            caixa.position.set(-5.5, 12.5, 0.25);
+            block.updateWorldMatrix(true, true);
+            const box = new THREE.Box3().setFromObject(caixa);
+            const obb = new OBB().fromBox3(box);
+
+            caixa.userData.boundingBox = box;
+            caixa.userData.obb = obb;
+
             scene.add(block);
             registerWallsForCollision(block);
             debugShowBoundingBoxes(block, scene);
@@ -801,14 +809,9 @@ export function createTrack3(scene) {
                 2.5,
                 baseZ2 + randOffset()
             );
-
         }
-
-        
-        
     }
     
-
     let blockConer5 = createBlock(2, "rgb(200,100,100)", "rgb(100,30,255)", 1, "rgb(255,255,255)");
     blockConer5.rotateZ(THREE.MathUtils.degToRad(0));
     blockConer5.position.set(30, 0, -150);

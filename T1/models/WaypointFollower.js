@@ -10,8 +10,8 @@ export class WaypointFollower {
         this.minSpeed = 2;
 
         // Aceleração / frenagem
-        this.acceleration = 8;
-        this.brakeDeceleration = 16;
+        this.acceleration = 10;
+        this.brakeDeceleration = 26;
 
         this.turnSpeed = turnSpeed;
         this.current = 0;

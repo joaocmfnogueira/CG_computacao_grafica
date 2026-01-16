@@ -62,6 +62,8 @@ export function createHavac(scene, trackNumber = "Primeiro") {
 
     // Outros atributos relevantes
     base.userData.nBullets = 4;
+    base.userData.movimentY = 0;
+    base.userData.isInAir = false;
     base.userData.aceleration = 0;
     base.userData.velocity = 0;
     base.userData.laps_count = 0;
@@ -164,7 +166,7 @@ export function createHavacEnemy(scene, colorBase, colorBody, colorAntenna, id, 
     const tempMat3 = new THREE.Matrix3();
     
     // Criando um waypointFolower
-    const follower = new WaypointFollower(base, tracks[tracksNumber], 50, 2);
+    const follower = new WaypointFollower(base, tracks[tracksNumber], 70, 2);
     base.userData.follower = follower;
 
     base.name = "enemy" + id;
