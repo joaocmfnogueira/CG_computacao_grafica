@@ -16,6 +16,7 @@ scene = new THREE.Scene();
 renderer = initRenderer();
 const BLOCK_SIZE = 30;
 
+
 // Camera Setup
 let position_camera = new THREE.Vector3(50, 25, 0);
 camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 500);
@@ -28,6 +29,13 @@ scene.add(cameraHolder);
 light = initLight(scene);
 let keyboard = new KeyboardState();
 
+// Carregando as texturas
+export const texturas = {
+    "areaExterna_pista1" : carregarTextura('../T1/assets/grass_18k.jpg'),
+    "areaExterna_pista2" : carregarTextura('../assets/textures/sand.jpg'),
+    "areaExterna_pista3" : carregarTextura('../T1/assets/volcano_floor.png')
+};
+
 createTrack1(scene);
 
 // Game Variables
@@ -37,7 +45,7 @@ let trackPoints = {
   "Primeiro" : [[-180, 0, -30], [-150, 0, -270], [90, 0, -240], [60, 0, 0]],
   "Segundo" : [[-180, 0, -30], [-150, 0, -270], [-30, 0, -240], [90, 0, -90]],
   "Terceiro" : [[-90, 0, -30], [-120, 0, -270], [-180, 0, -150], [30, 0, -120]]
-}
+};
 
 let isPaused = false;
 let clock = new THREE.Clock();
@@ -598,4 +606,17 @@ function resetKeyboardState() {
       delete KeyboardState.status[key];
     }
   }
+}
+
+function carregarTextura(path, repeatX = 10, repeatY = 10){
+    const textureLoader = new THREE.TextureLoader();
+    textureLoader.wrapS = THREE.RepeatWrapping;
+    textureLoader.wrapT = THREE.RepeatWrapping;
+    const floor  = textureLoader.load(path);
+    floor.colorSpace = THREE.SRGBColorSpace;
+    floor.wrapS = THREE.RepeatWrapping;
+    floor.wrapT = THREE.RepeatWrapping;
+    floor.repeat.set(repeatX, repeatY);
+    floor.needsUpdate = true;
+    return floor;
 }

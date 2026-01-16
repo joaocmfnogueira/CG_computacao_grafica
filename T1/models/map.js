@@ -8,6 +8,7 @@ import {createOBBHelper} from "../utils.js";
 import { CSG } from "../../libs/other/CSGMesh.js";
 import { MeshBasicMaterial } from '../../build/three.core.js';
 import {CubeTextureLoaderSingleFile} from '../../libs/util/cubeTextureLoaderSingleFile.js';
+import { texturas } from '../main.js';
 
 export const collisionSystem = new CollisionSystem();
 
@@ -36,7 +37,7 @@ export function createTrack0(scene) {
 // Cria a primeira pista
 export function createTrack1(scene) {
 
-    createGround(scene);
+    createGround(scene, 'rgb(51, 255, 51)', "areaExterna_pista1");
     
     createSky(scene);
 
@@ -241,7 +242,7 @@ export function createTrack1(scene) {
 
 // Cria a segunda pista
 export function createTrack2(scene) {
-    createGround(scene);
+    createGround(scene, 'rgb(246, 255, 160)', "areaExterna_pista2");
     
     createSky(scene);
 
@@ -453,7 +454,7 @@ export function createTrack2(scene) {
 // Cria a terceira pista
 export function createTrack3(scene) {
 
-    createGround(scene);
+    createGround(scene, 'rgb(164, 27, 255)', "areaExterna_pista3");
     
     createSky(scene);
 
@@ -937,17 +938,19 @@ function createTunnelWithHoles(scene, x, y, z) {
     return finalMesh;
 }
 
-function createGround(scene) {
+function createGround(scene, color, tex_name) {
 
     const groundGeometry = new THREE.PlaneGeometry(1500, 1500);
-    const groundMaterial = setDefaultMaterial("rgba(87, 215, 138, 1)"); 
+    const groundMaterial = setDefaultMaterial(color); 
     
     const ground = new THREE.Mesh(groundGeometry, groundMaterial);
     ground.rotation.x = THREE.MathUtils.degToRad(-90);
     ground.position.y = -10; 
     ground.receiveShadow = true;
     ground.name = "ground";
-    
+
+    const floor = texturas[tex_name];
+    ground.material.map = floor;
     scene.add(ground);
 }
 
