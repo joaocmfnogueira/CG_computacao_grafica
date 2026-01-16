@@ -7,6 +7,7 @@ import {applyLateralSlide, createSpeedDisplay, updateSpeedDisplay, createLapsCou
 import {keyboardUpdate, updateVehicleMovement, updateCamera, updateLightMovement} from './control/control.js';
 import { collisionSystem } from './models/map.js';
 import { OBB } from './models/OBB.js'
+import {CubeTextureLoaderSingleFile} from '../../libs/util/cubeTextureLoaderSingleFile.js';
 
 let scene, renderer, camera, light;
 const container = document.getElementById( 'container' );
@@ -30,10 +31,14 @@ light = initLight(scene);
 let keyboard = new KeyboardState();
 
 // Carregando as texturas
+
+let skybox = new CubeTextureLoaderSingleFile().loadSingle('../T1/assets/Sky3.png', 1);
+
 export const texturas = {
     "areaExterna_pista1" : carregarTextura('../T1/assets/grass_18k.jpg'),
     "areaExterna_pista2" : carregarTextura('../assets/textures/sand.jpg'),
-    "areaExterna_pista3" : carregarTextura('../T1/assets/volcano_floor.png')
+    "areaExterna_pista3" : carregarTextura('../T1/assets/volcano_floor.png'),
+    "skybox" : skybox
 };
 
 createTrack1(scene);

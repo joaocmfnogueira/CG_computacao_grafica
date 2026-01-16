@@ -7,7 +7,6 @@ import {OBB} from "./OBB.js";
 import {createOBBHelper} from "../utils.js";
 import { CSG } from "../../libs/other/CSGMesh.js";
 import { MeshBasicMaterial } from '../../build/three.core.js';
-import {CubeTextureLoaderSingleFile} from '../../libs/util/cubeTextureLoaderSingleFile.js';
 import { texturas } from '../main.js';
 
 export const collisionSystem = new CollisionSystem();
@@ -955,11 +954,7 @@ function createGround(scene, color, tex_name) {
 }
 
 function createSky(scene) {
-    // T1\assets\Sky1.png
-    const path = '../../T1/assets/Sky3.png';
-    let cubeMapTexture = new CubeTextureLoaderSingleFile().loadSingle(path, 1);
-    // scene.background = new THREE.Color(0x87CEEB); 
-    scene.background = cubeMapTexture; 
+    scene.background = texturas['skybox']; 
 }
 
 function createTree1(scene, x, y, z){
