@@ -939,7 +939,7 @@ function createTunnelWithHoles(scene, x, y, z) {
 
 function createGround(scene) {
 
-    const groundGeometry = new THREE.PlaneGeometry(3000, 3000);
+    const groundGeometry = new THREE.PlaneGeometry(1500, 1500);
     const groundMaterial = setDefaultMaterial("rgba(87, 215, 138, 1)"); 
     
     const ground = new THREE.Mesh(groundGeometry, groundMaterial);

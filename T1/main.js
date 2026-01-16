@@ -18,7 +18,7 @@ const BLOCK_SIZE = 30;
 
 // Camera Setup
 let position_camera = new THREE.Vector3(50, 25, 0);
-camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 500);
 camera.position.copy(position_camera);
 camera.lookAt(new THREE.Vector3(1, 0, 0)); 
 let cameraHolder = new THREE.Object3D();
