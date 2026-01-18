@@ -5,6 +5,8 @@ import {
 import {OBB} from "./OBB.js";
 import {createOBBHelper, updateOBBHelper} from "../utils.js";
 import { WaypointFollower } from './WaypointFollower.js';
+// import { texturas } from '../main.js';
+import { texturas } from '../basicScene.js';
 
 // Posições de waypoints
 let tracks = {
@@ -332,7 +334,7 @@ function createAntenna(materialAntenna, color){
     const geometry3 = new THREE.BoxGeometry( 0.1, 0.2, 1 );
     const material3 = setDefaultMaterial(color);
     const box = new THREE.Mesh(geometry3, material3);
-    box.position.x = 0.5;
+    box.position.x = 0.4;
     box.rotateX(THREE.MathUtils.degToRad(35));
     box.receiveShadow = true;
     box.castShadow = true;

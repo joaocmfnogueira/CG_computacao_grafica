@@ -37,18 +37,23 @@ scene.add( axesHelper );
 let clock = new THREE.Clock();
 
 let skybox = new CubeTextureLoaderSingleFile().loadSingle('../T1/assets/Sky3.png', 1);
+
 export const texturas = {
     "areaExterna_pista1" : carregarTextura('../T1/assets/grass_18k.jpg'),
     "areaExterna_pista2" : carregarTextura('../assets/textures/sand.jpg'),
     "areaExterna_pista3" : carregarTextura('../T1/assets/volcano_floor.png'),
     "skybox" : skybox,
-    "tunnel" : carregarTextura('../assets/textures/darkcement.jpg', 1, 1)
+    "tunnel" : carregarTextura('../assets/textures/darkcement.jpg', 1, 1),
+    "piso" : carregarTextura('../T1/assets/01tizeta_asphalts.png', 1, 1)
 };
 
 
 createTrack3(scene);
 createHavac(scene);
 
+createHavacEnemy(scene, "rgba(126, 235, 126, 1)", "rgba(12, 15, 188, 1)", "rgba(235, 151, 126, 1)", 0);
+createHavacEnemy(scene, "rgba(204, 153, 13, 1)", "rgba(255, 0, 0, 1)", "rgba(75, 12, 12, 1)", 1);
+createHavacEnemy(scene, "rgba(0, 238, 16, 1)", "rgba(0, 118, 14, 1)", "rgba(112, 0, 87, 1)", 2);
 render();
 function render()
 {

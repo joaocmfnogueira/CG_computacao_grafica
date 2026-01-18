@@ -17,7 +17,6 @@ scene = new THREE.Scene();
 renderer = initRenderer();
 const BLOCK_SIZE = 30;
 
-
 // Camera Setup
 let position_camera = new THREE.Vector3(50, 25, 0);
 camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 500);
@@ -33,7 +32,6 @@ let keyboard = new KeyboardState();
 
 // Game Variables
 let bulletsInGame = []; // Stores all bullets (Player + Bots)
-
 let trackPoints = {
     "Primeiro" : [[-180, 0, -30], [-150, 0, -270], [90, 0, -240], [60, 0, 0]],
     "Segundo" : [[-180, 0, -30], [-150, 0, -270], [-30, 0, -240], [90, 0, -90]],
@@ -98,7 +96,8 @@ export const texturas = {
     "areaExterna_pista2" : carregarTextura('../assets/textures/sand.jpg'),
     "areaExterna_pista3" : carregarTextura('../T1/assets/volcano_floor.png'),
     "skybox" : skybox,
-    "tunnel" : carregarTextura('../assets/textures/darkcement.jpg', 1, 1)
+    "tunnel" : carregarTextura('../assets/textures/darkcement.jpg', 1, 1),
+    "piso" : carregarTextura('../assets/textures/aslfato')
 };
 
 function render() {

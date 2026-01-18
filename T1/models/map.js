@@ -7,8 +7,8 @@ import {OBB} from "./OBB.js";
 import {createOBBHelper} from "../utils.js";
 import { CSG } from "../../libs/other/CSGMesh.js";
 import { MeshBasicMaterial } from '../../build/three.core.js';
-import { texturas } from '../main.js';
-// import { texturas } from '../basicScene.js';
+// import { texturas } from '../main.js';
+import { texturas } from '../basicScene.js';
 
 
 export const collisionSystem = new CollisionSystem();
@@ -1158,6 +1158,10 @@ function createFloor(color) {
     const plane = new THREE.Mesh(geometry, material);
     plane.rotation.x = THREE.MathUtils.degToRad(-90);
     plane.receiveShadow = true;
+
+    const tex = texturas['piso'];
+    plane.material.map = tex;
+
     return plane;
 }
 
