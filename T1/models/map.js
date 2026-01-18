@@ -8,6 +8,8 @@ import {createOBBHelper} from "../utils.js";
 import { CSG } from "../../libs/other/CSGMesh.js";
 import { MeshBasicMaterial } from '../../build/three.core.js';
 import { texturas } from '../main.js';
+// import { texturas } from '../basicScene.js';
+
 
 export const collisionSystem = new CollisionSystem();
 
@@ -932,6 +934,9 @@ function createTunnelWithHoles(scene, x, y, z) {
     finalMesh.position.set(x, y, z);
     finalMesh.updateMatrixWorld(true);
     finalMesh.castShadow = true;
+
+    const tex = texturas['tunnel'];
+    finalMesh.material.map = tex;
 
     scene.add(finalMesh);
     return finalMesh;

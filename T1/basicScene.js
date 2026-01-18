@@ -12,7 +12,7 @@ import {createHavac, createHavacEnemy} from "./models/vehicle.js";
 import{createTrack0, createTrack1,createTrack2,createTrack3} from "./models/map.js";
 import { WaypointFollower } from './models/WaypointFollower.js';
 import KeyboardState from '../libs/util/KeyboardState.js';
-
+import {CubeTextureLoaderSingleFile} from '../../libs/util/cubeTextureLoaderSingleFile.js';
 import { switchTrack_teste } from './control/control.js';
 
 let keyboard = new KeyboardState();
@@ -36,6 +36,15 @@ scene.add( axesHelper );
 
 let clock = new THREE.Clock();
 
+let skybox = new CubeTextureLoaderSingleFile().loadSingle('../T1/assets/Sky3.png', 1);
+export const texturas = {
+    "areaExterna_pista1" : carregarTextura('../T1/assets/grass_18k.jpg'),
+    "areaExterna_pista2" : carregarTextura('../assets/textures/sand.jpg'),
+    "areaExterna_pista3" : carregarTextura('../T1/assets/volcano_floor.png'),
+    "skybox" : skybox,
+    "tunnel" : carregarTextura('../assets/textures/darkcement.jpg', 1, 1)
+};
+
 
 createTrack3(scene);
 createHavac(scene);
@@ -54,4 +63,17 @@ function render()
 
   requestAnimationFrame(render);
   renderer.render(scene, camera) // Render scene
+}
+
+function carregarTextura(path, repeatX = 10, repeatY = 10){
+    const textureLoader = new THREE.TextureLoader();
+    textureLoader.wrapS = THREE.RepeatWrapping;
+    textureLoader.wrapT = THREE.RepeatWrapping;
+    const floor  = textureLoader.load(path);
+    floor.colorSpace = THREE.SRGBColorSpace;
+    floor.wrapS = THREE.RepeatWrapping;
+    floor.wrapT = THREE.RepeatWrapping;
+    floor.repeat.set(repeatX, repeatY);
+    floor.needsUpdate = true;
+    return floor;
 }

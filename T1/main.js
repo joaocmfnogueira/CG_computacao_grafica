@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import Stats from '../build/jsm/libs/stats.module.js';
+import Stats from './models/stats.module.js';
 import KeyboardState from '../libs/util/KeyboardState.js';
 import { createTrack2, createTrack1, createTrack0} from "./models/map.js"
 import { createHavac, createHavacEnemy } from './models/vehicle.js';
@@ -7,7 +7,7 @@ import {applyLateralSlide, createSpeedDisplay, updateSpeedDisplay, createLapsCou
 import {keyboardUpdate, updateVehicleMovement, updateCamera, updateLightMovement} from './control/control.js';
 import { collisionSystem } from './models/map.js';
 import { OBB } from './models/OBB.js'
-import {CubeTextureLoaderSingleFile} from '../../libs/util/cubeTextureLoaderSingleFile.js';
+import {CubeTextureLoaderSingleFile} from './models/cubeTextureLoaderSingleFile.js';
 
 let scene, renderer, camera, light;
 const container = document.getElementById( 'container' );
@@ -28,57 +28,82 @@ cameraHolder.add(camera);
 scene.add(cameraHolder);
 
 light = initLight(scene);
+
 let keyboard = new KeyboardState();
-
-// Carregando as texturas
-
-let skybox = new CubeTextureLoaderSingleFile().loadSingle('../T1/assets/Sky3.png', 1);
-
-export const texturas = {
-    "areaExterna_pista1" : carregarTextura('../T1/assets/grass_18k.jpg'),
-    "areaExterna_pista2" : carregarTextura('../assets/textures/sand.jpg'),
-    "areaExterna_pista3" : carregarTextura('../T1/assets/volcano_floor.png'),
-    "skybox" : skybox
-};
-
-createTrack1(scene);
 
 // Game Variables
 let bulletsInGame = []; // Stores all bullets (Player + Bots)
 
 let trackPoints = {
-  "Primeiro" : [[-180, 0, -30], [-150, 0, -270], [90, 0, -240], [60, 0, 0]],
-  "Segundo" : [[-180, 0, -30], [-150, 0, -270], [-30, 0, -240], [90, 0, -90]],
-  "Terceiro" : [[-90, 0, -30], [-120, 0, -270], [-180, 0, -150], [30, 0, -120]]
+    "Primeiro" : [[-180, 0, -30], [-150, 0, -270], [90, 0, -240], [60, 0, 0]],
+    "Segundo" : [[-180, 0, -30], [-150, 0, -270], [-30, 0, -240], [90, 0, -90]],
+    "Terceiro" : [[-90, 0, -30], [-120, 0, -270], [-180, 0, -150], [30, 0, -120]]
 };
 
 let isPaused = false;
 let clock = new THREE.Clock();
-
-// Create Player
-createHavac(scene);
-
-// Create Enemies
-createHavacEnemy(scene, "rgba(126, 235, 126, 1)", "rgba(12, 15, 188, 1)", "rgba(235, 151, 126, 1)", 0);
-createHavacEnemy(scene, "rgba(204, 153, 13, 1)", "rgba(255, 0, 0, 1)", "rgba(75, 12, 12, 1)", 1);
-createHavacEnemy(scene, "rgba(0, 238, 16, 1)", "rgba(0, 118, 14, 1)", "rgba(112, 0, 87, 1)", 2);
+let gameStarted = false;
+let loadingScreen = null;
+let assetList = null;
+let startButton = null;
 
 const speedDisplay = createSpeedDisplay();
 const lapsDisplay = createLapsCount();
 const checkPointDisplay = createCheckPointCount();
 const bulletDisplay = createBulletCount();
 
-const botRaycaster = new THREE.Raycaster();
+// Carregando as texturas
+const manager = new THREE.LoadingManager();
 
-render();
+manager.onStart = () => {
+    showLoadingScreen();
+};
+
+manager.onProgress = (url, loaded, total) => {
+    const li = document.createElement("li");
+    li.textContent = `✔ ${url}`;
+    assetList.appendChild(li);
+};
+
+manager.onLoad = () => {
+    document.querySelector(".spinner").style.display = "none";
+    document.getElementById("loading-text").textContent = "Carregamento concluído!";
+
+    startButton.style.display = "block";
+
+    startButton.onclick = () => {
+        hideLoadingScreen();
+        initScene();
+
+        if (!gameStarted) {
+            gameStarted = true;
+            requestAnimationFrame(render);
+        }
+    };
+};
+
+manager.onError = (url) => {
+    console.error("Erro ao carregar:", url);
+};
+
+const textureLoader = new THREE.TextureLoader(manager);
+
+let skybox = new CubeTextureLoaderSingleFile(manager).loadSingle('../T1/assets/Sky3.png', 1);
+
+export const texturas = {
+    "areaExterna_pista1" : carregarTextura('../T1/assets/grass_18k.jpg'),
+    "areaExterna_pista2" : carregarTextura('../assets/textures/sand.jpg'),
+    "areaExterna_pista3" : carregarTextura('../T1/assets/volcano_floor.png'),
+    "skybox" : skybox,
+    "tunnel" : carregarTextura('../assets/textures/darkcement.jpg', 1, 1)
+};
 
 function render() {
-   stats.update();
+    requestAnimationFrame(render);
+    if (!gameStarted) return;
+    if (isPaused) return;
+    
    scene.updateMatrixWorld(true);
-   requestAnimationFrame(render);
-
-   if (isPaused) return;
-
    const dt = clock.getDelta();
 
    const SUBSTEPS = 5; 
@@ -91,7 +116,7 @@ function render() {
    if (playerCar) allVehicles.push(playerCar);
    bots.forEach(b => allVehicles.push(b));
 
-   for (let index = 0; index < 5; index++) {
+   for (let index = 0; index < SUBSTEPS; index++) {
             // --- 2. STUN LOGIC ---
     allVehicles.forEach(v => updateStunTimers(subDt, v, (v === playerCar)));
 
@@ -259,6 +284,8 @@ function render() {
 
 //    const axes = new THREE.AxesHelper(20);
 //    playerCar.add(axes);
+   stats.update();
+//    console.log(stats);
    renderer.render(scene, camera);
 }
 
@@ -584,10 +611,13 @@ function checkCheckPointCompletion(vehicle) {
 
 // Funções para controlar o estado do jogo no navegador (pausado, em andamento, ...)
 document.addEventListener('visibilitychange', () => {
+  if (!gameStarted) return;
   if (document.hidden) {
+    console.log("jogo pausado");
     isPaused = true;
     resetKeyboardState();
   } else {
+    console.log("era para o jogo voltar");
     isPaused = false;
     clock.elapsedTime = 0;
     clock.start();
@@ -595,11 +625,13 @@ document.addEventListener('visibilitychange', () => {
 });
 
 window.addEventListener('blur', () => {
+  if (!gameStarted) return;
   isPaused = true;
   resetKeyboardState();
 });
 
 window.addEventListener('focus', () => {
+  if (!gameStarted) return;
   isPaused = false;
   clock.elapsedTime = 0;
   clock.start();
@@ -614,14 +646,136 @@ function resetKeyboardState() {
 }
 
 function carregarTextura(path, repeatX = 10, repeatY = 10){
-    const textureLoader = new THREE.TextureLoader();
-    textureLoader.wrapS = THREE.RepeatWrapping;
-    textureLoader.wrapT = THREE.RepeatWrapping;
-    const floor  = textureLoader.load(path);
-    floor.colorSpace = THREE.SRGBColorSpace;
-    floor.wrapS = THREE.RepeatWrapping;
-    floor.wrapT = THREE.RepeatWrapping;
-    floor.repeat.set(repeatX, repeatY);
-    floor.needsUpdate = true;
-    return floor;
+    const texture = textureLoader.load(path);
+
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    texture.repeat.set(repeatX, repeatY);
+
+    return texture;
+}
+
+function showLoadingScreen() {
+    loadingScreen = document.createElement("div");
+    loadingScreen.id = "loading-screen";
+
+    loadingScreen.innerHTML = `
+        <div class="loading-container">
+            <div class="spinner"></div>
+            <p id="loading-text">Carregando assets...</p>
+
+            <ul id="asset-list"></ul>
+
+            <button id="start-button" style="display:none;">Start</button>
+        </div>
+    `;
+
+    Object.assign(loadingScreen.style, {
+        position: "fixed",
+        top: "0",
+        left: "0",
+        width: "100vw",
+        height: "100vh",
+        backgroundColor: "rgba(0, 0, 0, 0.85)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: "9999"
+    });
+
+    document.body.appendChild(loadingScreen);
+
+    assetList = document.getElementById("asset-list");
+    startButton = document.getElementById("start-button");
+
+    injectLoadingStyles();
+}
+
+
+function hideLoadingScreen() {
+    if (!loadingScreen) return;
+
+    loadingScreen.style.opacity = "0";
+    loadingScreen.style.transition = "opacity 0.5s ease";
+
+    setTimeout(() => {
+        if (loadingScreen && loadingScreen.parentNode) {
+            loadingScreen.parentNode.removeChild(loadingScreen);
+        }
+        loadingScreen = null;
+    }, 500);
+}
+
+function injectLoadingStyles() {
+    if (document.getElementById("loading-style")) return;
+
+    const style = document.createElement("style");
+    style.id = "loading-style";
+    style.textContent = `
+        .loading-container {
+            text-align: center;
+            color: white;
+            font-family: Arial, sans-serif;
+            width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 6px solid #ccc;
+            border-top-color: #00ffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+            font-size: 12px;
+            text-align: left;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        li {
+            margin-bottom: 4px;
+            opacity: 0.85;
+        }
+
+        button {
+            margin-top: 15px;
+            padding: 10px 25px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background: #00ffff;
+            color: black;
+            font-weight: bold;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+
+function initScene(){
+    // criando pista
+    createTrack1(scene);
+
+    // Create Player
+    createHavac(scene);
+
+    // Create Enemies
+    createHavacEnemy(scene, "rgba(126, 235, 126, 1)", "rgba(12, 15, 188, 1)", "rgba(235, 151, 126, 1)", 0);
+    createHavacEnemy(scene, "rgba(204, 153, 13, 1)", "rgba(255, 0, 0, 1)", "rgba(75, 12, 12, 1)", 1);
+    createHavacEnemy(scene, "rgba(0, 238, 16, 1)", "rgba(0, 118, 14, 1)", "rgba(112, 0, 87, 1)", 2);
 }
