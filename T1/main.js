@@ -46,40 +46,43 @@ let gameStarted = false;
 let loadingScreen = null;
 let assetList = null;
 let startButton = null;
+let startButtonClicked = false;
 
 const speedDisplay = createSpeedDisplay();
 const lapsDisplay = createLapsCount();
 const checkPointDisplay = createCheckPointCount();
 const bulletDisplay = createBulletCount();
 
+// --- Queue Logic Variables ---
+let loadedAssetsQueue = [];
+let isThreeJsLoadingFinished = false;
+let isQueueRunning = false;
+
 // Carregando as texturas
 const manager = new THREE.LoadingManager();
 
 manager.onStart = () => {
     showLoadingScreen();
+    // Reset variables on start
+    loadedAssetsQueue = [];
+    isThreeJsLoadingFinished = false;
+    isQueueRunning = false;
 };
 
+// Instead of updating UI immediately, we push to a queue
 manager.onProgress = (url, loaded, total) => {
-    const li = document.createElement("li");
-    li.textContent = `✔ ${url}`;
-    assetList.appendChild(li);
+    loadedAssetsQueue.push(`Processing: ${url}`);
+    
+    // Start the visual loop if it hasn't started yet
+    if (!isQueueRunning) {
+        processQueue();
+    }
 };
 
+// We don't hide the screen here anymore. We just flag that Three.js is done.
+// The Queue processor will handle the UI update when it finishes its delays.
 manager.onLoad = () => {
-    document.querySelector(".spinner").style.display = "none";
-    document.getElementById("loading-text").textContent = "Carregamento concluído!";
-
-    startButton.style.display = "block";
-
-    startButton.onclick = () => {
-        hideLoadingScreen();
-        initScene();
-
-        if (!gameStarted) {
-            gameStarted = true;
-            requestAnimationFrame(render);
-        }
-    };
+    isThreeJsLoadingFinished = true;
 };
 
 manager.onError = (url) => {
@@ -656,18 +659,80 @@ function carregarTextura(path, repeatX = 10, repeatY = 10){
     return texture;
 }
 
+// --- VISUAL QUEUE PROCESSOR (The Delay Logic) ---
+function processQueue() {
+    isQueueRunning = true;
+
+    if (loadedAssetsQueue.length > 0) {
+        // 1. Get the next asset from the queue
+        const currentAsset = loadedAssetsQueue.shift();
+        
+        // 2. Update the UI to show only this specific asset
+        const assetLabel = document.getElementById("current-asset-name");
+        if (assetLabel) assetLabel.textContent = currentAsset;
+
+        // 3. Wait 2 seconds before processing the next one 
+
+// [Image of timer clock]
+
+        setTimeout(processQueue, 1000); 
+
+    } else {
+        // Queue is empty. Check if Three.js is actually done loading.
+        if (isThreeJsLoadingFinished) {
+            showStartScreenState();
+        } else {
+            // Queue is empty, but Three.js is still downloading large files. 
+            // Check again in a short moment.
+            setTimeout(processQueue, 100); 
+        }
+    }
+}
+
+function showStartScreenState() {
+    document.getElementById("loading-text").textContent = "Carregamento concluído!";
+    
+    // Hide the spinner and the asset name text
+    document.querySelector(".spinner").style.display = "none";
+    document.getElementById("current-asset-name").style.display = "none";
+
+    // Show and Setup Button
+    startButton.style.display = "inline-block"; // inline-block helps with centering usually
+    
+    startButton.onclick = () => {
+        if(!startButtonClicked){
+            hideLoadingScreen();
+            initScene();
+
+            if (typeof gameStarted !== 'undefined' && !gameStarted) {
+                gameStarted = true;
+                requestAnimationFrame(render);
+            }
+            startButtonClicked = true;
+        }
+    };
+}
+
+// --- HTML & CSS UPDATES ---
+
 function showLoadingScreen() {
+    // Remove existing if any
+    const existing = document.getElementById("loading-screen");
+    if(existing) existing.remove();
+
     loadingScreen = document.createElement("div");
     loadingScreen.id = "loading-screen";
 
+    // Modified HTML: Removed <ul>, added <p id="current-asset-name">
     loadingScreen.innerHTML = `
         <div class="loading-container">
-            <div class="spinner"></div>
-            <p id="loading-text">Carregando assets...</p>
+            <div id="loading-content">
+                <div class="spinner"></div>
+                <p id="loading-text">Carregando assets...</p>
+                <p id="current-asset-name" style="color: #00ffff; font-size: 12px; height: 20px;">Initializing...</p>
+            </div>
 
-            <ul id="asset-list"></ul>
-
-            <button id="start-button" style="display:none;">Start</button>
+            <button id="start-button" style="display:none;">START</button>
         </div>
     `;
 
@@ -686,19 +751,14 @@ function showLoadingScreen() {
 
     document.body.appendChild(loadingScreen);
 
-    assetList = document.getElementById("asset-list");
     startButton = document.getElementById("start-button");
-
     injectLoadingStyles();
 }
 
-
 function hideLoadingScreen() {
     if (!loadingScreen) return;
-
     loadingScreen.style.opacity = "0";
     loadingScreen.style.transition = "opacity 0.5s ease";
-
     setTimeout(() => {
         if (loadingScreen && loadingScreen.parentNode) {
             loadingScreen.parentNode.removeChild(loadingScreen);
@@ -718,8 +778,10 @@ function injectLoadingStyles() {
             color: white;
             font-family: Arial, sans-serif;
             width: 400px;
-            max-height: 80vh;
-            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Helper for centering flex children */
+            justify-content: center;
         }
 
         .spinner {
@@ -732,31 +794,27 @@ function injectLoadingStyles() {
             margin: 0 auto 15px;
         }
 
-        ul {
-            list-style: none;
-            padding: 0;
-            margin: 10px 0;
-            font-size: 12px;
-            text-align: left;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        li {
-            margin-bottom: 4px;
-            opacity: 0.85;
+        /* Styling for the Single Asset Text */
+        #current-asset-name {
+            margin-top: 5px;
+            opacity: 0.8;
+            white-space: nowrap; 
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
         }
 
         button {
-            margin-top: 15px;
-            padding: 10px 25px;
-            font-size: 16px;
+            margin-top: 20px;
+            padding: 12px 40px;
+            font-size: 18px;
             cursor: pointer;
             border: none;
             border-radius: 5px;
             background: #00ffff;
             color: black;
             font-weight: bold;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
         }
 
         @keyframes spin {
@@ -765,7 +823,6 @@ function injectLoadingStyles() {
     `;
     document.head.appendChild(style);
 }
-
 
 function initScene(){
     // criando pista
