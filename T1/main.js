@@ -30,6 +30,7 @@ light = initLight(scene);
 
 let keyboard = new KeyboardState();
 
+
 // Game Variables
 let bulletsInGame = []; // Stores all bullets (Player + Bots)
 let trackPoints = {
@@ -109,6 +110,9 @@ function render() {
     requestAnimationFrame(render);
     if (!gameStarted) return;
     if (isPaused) return;
+    if (!startButtonClicked) return;
+    
+    
     
    scene.updateMatrixWorld(true);
    const dt = clock.getDelta();
@@ -709,10 +713,12 @@ function showStartScreenState() {
             initScene();
 
             if (typeof gameStarted !== 'undefined' && !gameStarted) {
+                startButtonClicked = true;
                 gameStarted = true;
+                resetKeyboardState();
                 requestAnimationFrame(render);
             }
-            startButtonClicked = true;
+            
         }
     };
 }
