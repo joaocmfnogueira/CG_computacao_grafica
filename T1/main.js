@@ -92,12 +92,12 @@ const textureLoader = new THREE.TextureLoader(manager);
 let skybox = new CubeTextureLoaderSingleFile(manager).loadSingle('../T1/assets/Sky3.png', 1);
 
 export const texturas = {
-    "areaExterna_pista1" : carregarTextura('../T1/assets/grass_18k.jpg'),
+    "areaExterna_pista1" : carregarTextura('../T1/assets/grass_18k.jpg', 20, 20),
     "areaExterna_pista2" : carregarTextura('../assets/textures/sand.jpg'),
-    "areaExterna_pista3" : carregarTextura('../T1/assets/volcano_floor.png'),
+    "areaExterna_pista3" : carregarTextura('../T1/assets/volcano_floor.png', 20, 20),
     "skybox" : skybox,
     "tunnel" : carregarTextura('../assets/textures/darkcement.jpg', 1, 1),
-    "piso" : carregarTextura('../assets/textures/aslfato')
+    "piso" : carregarTextura('../T1/assets/01tizeta_asphalts.png', 4, 4)
 };
 
 function render() {
@@ -674,7 +674,7 @@ function processQueue() {
 
 // [Image of timer clock]
 
-        setTimeout(processQueue, 1000); 
+        setTimeout(processQueue, 500); 
 
     } else {
         // Queue is empty. Check if Three.js is actually done loading.
