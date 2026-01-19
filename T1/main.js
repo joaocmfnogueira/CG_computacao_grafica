@@ -97,8 +97,13 @@ export const texturas = {
     "areaExterna_pista3" : carregarTextura('../T1/assets/volcano_floor.png', 20, 20),
     "skybox" : skybox,
     "tunnel" : carregarTextura('../assets/textures/darkcement.jpg', 1, 1),
-    "piso" : carregarTextura('../T1/assets/01tizeta_asphalts.png', 4, 4)
+    "piso" : carregarTextura('../T1/assets/01tizeta_asphalts.png', 4, 4),
+    "vehicle1" : carregarTextura('../T1/assets/trak2_plate2b.png', 2, 2),
+    "vehicle2" : carregarTextura('../T1/assets/image.png', 4, 4),
+    "vehicle3" : carregarTextura('../T1/assets/image(2).png', 1, 1),
+    "vehicle4" : carregarTextura('../T1/assets/new2-texture.jpg', 1, 1)
 };
+
 
 function render() {
     requestAnimationFrame(render);
@@ -831,7 +836,7 @@ function initScene(){
     createHavac(scene);
 
     // Create Enemies
-    createHavacEnemy(scene, "rgba(126, 235, 126, 1)", "rgba(12, 15, 188, 1)", "rgba(235, 151, 126, 1)", 0);
-    createHavacEnemy(scene, "rgba(204, 153, 13, 1)", "rgba(255, 0, 0, 1)", "rgba(75, 12, 12, 1)", 1);
-    createHavacEnemy(scene, "rgba(0, 238, 16, 1)", "rgba(0, 118, 14, 1)", "rgba(112, 0, 87, 1)", 2);
+    createHavacEnemy(scene, "rgb(82, 123, 236)", "rgb(18, 21, 199)", "rgb(112, 145, 238)", 0);
+    createHavacEnemy(scene, "rgb(240, 83, 83)", "rgba(255, 0, 0, 1)", "rgb(223, 105, 105)", 1);
+    createHavacEnemy(scene, "rgba(0, 238, 16, 1)", "rgba(0, 118, 14, 1)", "rgb(124, 216, 71)", 2);
 }

@@ -5,7 +5,7 @@ import {
 import {OBB} from "./OBB.js";
 import {createOBBHelper, updateOBBHelper} from "../utils.js";
 import { WaypointFollower } from './WaypointFollower.js';
-// import { texturas } from '../main.js';
+import { texturas } from '../main.js';
 // import { texturas } from '../basicScene.js';
 
 // Posições de waypoints
@@ -252,54 +252,64 @@ function createBase(materialBase){
 
         return front;
     }
-
+    const tex = texturas['vehicle3'];
     const back = create_base_back();
 
     const front = create_base_front();
         front.position.x = -2.5;
-    
+    back.material.map = tex;
     back.add(front);
     return back;
 }
 
 function createBody(materialBody){
-    function create_base_back(){
+    function create_base_back(materialBody){
         const boxGeo = new THREE.BoxGeometry(5, 0.3, 3);
-        const box = new THREE.Mesh(boxGeo, materialBody);
+        const backMaterial = materialBody.clone();
+        const box = new THREE.Mesh(boxGeo, backMaterial);
+        const tex = texturas['vehicle1'];
+        box.material.map = tex;
         box.receiveShadow = true;
         box.castShadow = true;
         return box;
     }
 
-    function create_base_front(){
+    function create_base_front(materialBody){
 
         const geometry2 = new THREE.CylinderGeometry( 1.5, 1.5, 0.3, 100); 
-        const cylinder = new THREE.Mesh( geometry2, materialBody );
+        const frontMaterial = materialBody.clone();
+        const cylinder = new THREE.Mesh( geometry2, frontMaterial );
         // cylinder.rotateZ(THREE.MathUtils.degToRad(90));
         // cylinder.rotateX(THREE.MathUtils.degToRad(90));
+        const tex = texturas['vehicle1'];
+        cylinder.material.map = tex;
         cylinder.receiveShadow = true;
         cylinder.castShadow = true;
         return cylinder;
     }
 
-    function create_head(){
+    function create_head(materialBody){
         
         const geometry = new THREE.SphereGeometry(1, 64, 64, 0, Math.PI);
-        const material = materialBody;
+        const material = materialBody.clone();
         const mesh = new THREE.Mesh( geometry, material ) ;
         mesh.rotateX(-Math.PI/2);
+        const tex = texturas['vehicle2'];
+        mesh.material.map = tex;
         // mesh.position.x = 3;
         mesh.receiveShadow = true;
         mesh.castShadow = true;
         return mesh
     }
+    
 
-    const back = create_base_back();
+    const back = create_base_back(materialBody);
 
-    const front = create_base_front();
-        front.position.x = -2.5;
+    const front = create_base_front(materialBody);
+    front.position.x = -2.5;
+    
 
-    const head = create_head();
+    const head = create_head(materialBody);
     head.scale.set(2,1.25,1.2);
     head.position.x = -1;
         // head.position.x = -2;
@@ -320,6 +330,8 @@ function createAntenna(materialAntenna, color){
     const geometry = new THREE.CylinderGeometry( 0.1, 0.1, 0.75 );
     const material = materialAntenna;
     const cone = new THREE.Mesh(geometry, material);
+    const tex = texturas['vehicle3'];
+    const tex2 = texturas['vehicle4'];
     cone.position.y = 0.5;
     cone.position.x = 2;
     cone.receiveShadow = true;
@@ -342,6 +354,10 @@ function createAntenna(materialAntenna, color){
     sphere.position.y = 0.6;
     sphere.add(box);
     cone.add(sphere);
+
+    sphere.material.map = tex2;
+    box.material.map = tex;
+    cone.material.map = tex;
 
     return cone;
 }

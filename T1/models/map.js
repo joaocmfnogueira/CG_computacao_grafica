@@ -7,8 +7,8 @@ import {OBB} from "./OBB.js";
 import {createOBBHelper} from "../utils.js";
 import { CSG } from "../../libs/other/CSGMesh.js";
 import { MeshBasicMaterial } from '../../build/three.core.js';
-// import { texturas } from '../main.js';
-import { texturas } from '../basicScene.js';
+import { texturas } from '../main.js';
+// import { texturas } from '../basicScene.js';
 
 
 export const collisionSystem = new CollisionSystem();
