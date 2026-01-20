@@ -102,9 +102,14 @@ export const texturas = {
     "vehicle1" : carregarTextura('../T1/assets/trak2_plate2b.png', 1, 1),
     "vehicle2" : carregarTextura('../T1/assets/image.png', 4, 4),
     "vehicle3" : carregarTextura('../T1/assets/image(2).png', 1, 1),
-    "vehicle4" : carregarTextura('../T1/assets/new2-texture.jpg', 1, 1)
+    "vehicle4" : carregarTextura('../T1/assets/new2-texture.jpg', 1, 1),
+    "lateral1" : carregarTextura('../assets/textures/stone.jpg', 1, 1),
+    "lateral2" : carregarTextura('../assets/textures/stonewall.jpg', 1, 1),
+    "lateral3" : carregarTextura('../assets/textures/porcelanatoC.png', 1, 1),
+    "mureta1" : carregarTextura('../T1/assets/new2-texture.jpg', 1, 1),
+    "mureta2" : carregarTextura('../T1/assets/new2-texture.jpg', 1, 1),
+    "mureta3" : carregarTextura('../T1/assets/new2-texture.jpg', 1, 1)
 };
-
 
 function render() {
     requestAnimationFrame(render);

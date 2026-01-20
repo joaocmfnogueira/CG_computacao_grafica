@@ -7,8 +7,8 @@ import {OBB} from "./OBB.js";
 import {createOBBHelper} from "../utils.js";
 import { CSG } from "../../libs/other/CSGMesh.js";
 import { MeshBasicMaterial } from '../../build/three.core.js';
-import { texturas } from '../main.js';
-// import { texturas } from '../basicScene.js';
+// import { texturas } from '../main.js';
+import { texturas } from '../basicScene.js';
 
 
 export const collisionSystem = new CollisionSystem();
@@ -1032,8 +1032,17 @@ function createBlock(type, colorFloor, colorWall, type_pattern = 1, colorConer =
         return;
     }
     const cubeGeometry = new THREE.BoxGeometry(30, 30, 10);
-    const material = setDefaultMaterial("rgb(60,60,60)", null);
-    const caixa = new THREE.Mesh(cubeGeometry, material);
+    const tex = texturas['lateral1'];
+    const material = new THREE.MeshBasicMaterial({ map: tex, color:"rgb(100, 100, 100)"});
+    const materialCube = [
+        material,
+        material,
+        material,
+        null,
+        null,
+        null
+    ];
+    const caixa = new THREE.Mesh(cubeGeometry, materialCube);
     caixa.receiveShadow = true;
     caixa.castShadow = true;
     caixa.position.set(0, 0, -5.5);
