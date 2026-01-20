@@ -45,7 +45,7 @@ export const texturas = {
     "skybox" : skybox,
     "tunnel" : carregarTextura('../assets/textures/darkcement.jpg', 1, 1),
     "piso" : carregarTextura('../T1/assets/01tizeta_asphalts.png', 4, 4),
-    "vehicle1" : carregarTextura('../T1/assets/trak2_plate2b.png', 2, 2),
+    "vehicle1" : carregarTextura('../T1/assets/trak2_plate2b.png', 1, 1),
     "vehicle2" : carregarTextura('../T1/assets/image.png', 4, 4),
     "vehicle3" : carregarTextura('../T1/assets/image(2).png', 1, 1),
     "vehicle4" : carregarTextura('../T1/assets/new2-texture.jpg', 1, 1)
