@@ -5,8 +5,8 @@ import {
 import {OBB} from "./OBB.js";
 import {createOBBHelper, updateOBBHelper} from "../utils.js";
 import { WaypointFollower } from './WaypointFollower.js';
-// import { texturas } from '../main.js';
-import { texturas } from '../basicScene.js';
+import { texturas } from '../main.js';
+// import { texturas } from '../basicScene.js';
 
 // Posições de waypoints
 let tracks = {

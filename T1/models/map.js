@@ -7,8 +7,11 @@ import {OBB} from "./OBB.js";
 import {createOBBHelper} from "../utils.js";
 import { CSG } from "../../libs/other/CSGMesh.js";
 import { MeshBasicMaterial } from '../../build/three.core.js';
-// import { texturas } from '../main.js';
-import { texturas } from '../basicScene.js';
+import { texturas } from '../main.js';
+// import { texturas } from '../basicScene.js';
+
+// variavel da pista atual
+let pista_atual = 1;
 
 
 export const collisionSystem = new CollisionSystem();
@@ -37,6 +40,7 @@ export function createTrack0(scene) {
 
 // Cria a primeira pista
 export function createTrack1(scene) {
+    pista_atual = 1;
 
     createGround(scene, 'rgb(51, 255, 51)', "areaExterna_pista1");
     
@@ -243,10 +247,11 @@ export function createTrack1(scene) {
 
 // Cria a segunda pista
 export function createTrack2(scene) {
+    pista_atual = 2;
+
     createGround(scene, 'rgb(246, 255, 160)', "areaExterna_pista2");
     
     createSky(scene);
-
 
     for (let index = 0; index < 8; index++) {
         let block;
@@ -454,6 +459,7 @@ export function createTrack2(scene) {
 
 // Cria a terceira pista
 export function createTrack3(scene) {
+    pista_atual = 3;
 
     createGround(scene, 'rgb(164, 27, 255)', "areaExterna_pista3");
     
@@ -1017,6 +1023,7 @@ function createTree2(scene, x, y, z){
 // Terceiro -> As muretas estão somente nos cantos;
 function createBlock(type, colorFloor, colorWall, type_pattern = 1, colorConer = "rgb(255,255,255)") {
     let floor;
+
     if (type == 1) {
         floor = auxCreateBlock_parallel(colorFloor, colorWall);
     }
@@ -1032,13 +1039,36 @@ function createBlock(type, colorFloor, colorWall, type_pattern = 1, colorConer =
         return;
     }
     const cubeGeometry = new THREE.BoxGeometry(30, 30, 10);
-    const tex = texturas['lateral1'];
-    const material = new THREE.MeshBasicMaterial({ map: tex, color:"rgb(100, 100, 100)"});
+    let tex;
+    let tex2;
+    let material;
+    let material2;
+    let color
+
+    if(pista_atual == 1){
+        tex = texturas['lateral1'];
+        tex2 = texturas['lateral1.5'];
+        color = "rgba(189, 188, 188, 1)";
+        
+    }
+    else if(pista_atual == 2){
+        tex = texturas['lateral2'];
+        tex2 = texturas['lateral2.5'];
+        color = "rgba(255, 255, 255, 1)";
+    }
+    else{
+        tex = texturas['lateral3'];
+        tex2 = texturas['lateral3.5'];
+        color = "rgba(179, 91, 226, 1)";
+    }
+
+    material = new THREE.MeshBasicMaterial({ map: tex, color:color});
+    material2 = new THREE.MeshBasicMaterial({ map: tex2, color:color});
     const materialCube = [
         material,
         material,
-        material,
-        null,
+        material2,
+        material2,
         null,
         null
     ];
