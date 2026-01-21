@@ -7,8 +7,8 @@ import {OBB} from "./OBB.js";
 import {createOBBHelper} from "../utils.js";
 import { CSG } from "../../libs/other/CSGMesh.js";
 import { MeshBasicMaterial } from '../../build/three.core.js';
-import { texturas } from '../main.js';
-// import { texturas } from '../basicScene.js';
+// import { texturas } from '../main.js';
+import { texturas } from '../basicScene.js';
 
 // variavel da pista atual
 let pista_atual = 1;
@@ -51,7 +51,7 @@ export function createTrack1(scene) {
         if(index == 0)
             block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(255,30,30)");
         else if(index == 2)
-            block = createBlock(1, "rgba(108, 20, 20, 1)", "rgb(255,30,30)");
+            block = createBlock(1, "rgba(255, 255, 255, 1)", "rgb(255,30,30)", 1, "rgb(255,255,255)", true);
         else
             block = createBlock(1, "rgb(100,100,100)", "rgb(255,30,30)");
         block.rotateZ(THREE.MathUtils.degToRad(90));
@@ -256,7 +256,7 @@ export function createTrack2(scene) {
     for (let index = 0; index < 8; index++) {
         let block;
         if(index == 2)
-            block = createBlock(1, "rgba(108, 20, 20, 1)", "rgb(255,165,0)");
+            block = createBlock(1, "rgba(250, 250, 250, 1)", "rgb(255,165,0)", 1, "rgb(255,255,255)", true);
         else
             block = createBlock(1, "rgb(190,190,190)", "rgb(255,165,0)");
         block.rotateZ(THREE.MathUtils.degToRad(90));
@@ -468,7 +468,7 @@ export function createTrack3(scene) {
     for (let index = 0; index < 3; index++) {
         let block
         if(index == 0)
-            block = createBlock(1, "rgba(108, 20, 20, 1)", "rgb(100,30,255)");
+            block = createBlock(1, "rgba(255, 255, 255, 1)", "rgb(100,30,255)", 1, "rgb(255,255,255)", true);
         else
             block = createBlock(1, "rgb(200,100,100)", "rgb(100,30,255)");
         block.rotateZ(THREE.MathUtils.degToRad(90));
@@ -1021,11 +1021,12 @@ function createTree2(scene, x, y, z){
 // Primeiro ->  As muretas estão paralelas;
 // Segundo -> As muretas estão adjacentes;
 // Terceiro -> As muretas estão somente nos cantos;
-function createBlock(type, colorFloor, colorWall, type_pattern = 1, colorConer = "rgb(255,255,255)") {
+function createBlock(type, colorFloor, colorWall, type_pattern = 1, colorConer = "rgb(255,255,255)", pista_largada = false) {
     let floor;
 
     if (type == 1) {
-        floor = auxCreateBlock_parallel(colorFloor, colorWall);
+        floor = auxCreateBlock_parallel(colorFloor, colorWall, pista_largada);
+        console.log(pista_largada);
     }
     else if (type == 2) {
         floor = auxCreateBlock_Adjacent(colorFloor, colorWall, type_pattern, colorConer);
@@ -1081,9 +1082,9 @@ function createBlock(type, colorFloor, colorWall, type_pattern = 1, colorConer =
 }
 
 // Função auxiliar para criar o tipo de bloco paralelo
-function auxCreateBlock_parallel(colorFloor, colorWall) {
+function auxCreateBlock_parallel(colorFloor, colorWall, pista_largada) {
 
-    const floor = createFloor(colorFloor);
+    const floor = createFloor(colorFloor, pista_largada);
 
     for (let index = 0; index < 6; index++) {
         const col = (index % 2 === 0) 
@@ -1191,14 +1192,22 @@ function auxCreateBlock_Corners(colorFloor, colorWall) {
 }
 
 // Cria um piso
-function createFloor(color) {
+function createFloor(color, pista_largada) {
     const geometry = new THREE.PlaneGeometry(30, 30);
     const material = setDefaultMaterial(color, null);
     const plane = new THREE.Mesh(geometry, material);
     plane.rotation.x = THREE.MathUtils.degToRad(-90);
     plane.receiveShadow = true;
 
-    const tex = texturas['piso'];
+    let tex;
+
+    if(pista_largada){
+
+        tex = texturas['piso_largada'];
+        console.log("rodou uma vez aqui");
+    }
+    else
+        tex = texturas['piso'];
     plane.material.map = tex;
 
     return plane;
@@ -1206,9 +1215,40 @@ function createFloor(color) {
 
 // Cria uma mureta
 function createWall(color) {
+    let tex;
+    let tex2;
+
+    if(pista_atual == 1)
+        tex = texturas['mureta1'];        
+
+    else if(pista_atual == 2){
+        tex = texturas['mureta2'];
+        tex2 = texturas['mureta2.5'];
+
+    }
+
+    else
+        tex = texturas['mureta3'];
+
+    const material = new THREE.MeshBasicMaterial({ map: tex, color:color});
+
+    let material2;
+    if(pista_atual == 2)
+        material2 = new THREE.MeshBasicMaterial({ map: tex2, color:color});
+    else
+        material2 = material;
+    const materialCube = [
+        material2,
+        material2,
+        material2,
+        material2,
+        material,
+        material2
+    ];
+    
+
     const cubeGeometry = new THREE.BoxGeometry(5, 5, 2);
-    const material = setDefaultMaterial(color, null);
-    const cube = new THREE.Mesh(cubeGeometry, material);
+    const cube = new THREE.Mesh(cubeGeometry, materialCube);
     cube.receiveShadow = true;
     cube.castShadow = true;
     
@@ -1254,15 +1294,15 @@ function debugShowBoundingBoxes(block, scene) {
 //   });
 
 // // helper from OBB
-  block.traverse(child => {
-    if (child.userData && child.userData.obb && child.geometry) {
-      // create a helper and store it so we can update later
-      const helper = createOBBHelper(child.userData.obb);
-      scene.add(helper);
-      child.userData._bbHelper = helper;
-    //   addWallNormalHelper(child, scene, 5, 0x00ff00);
-    }
-  });
+//   block.traverse(child => {
+//     if (child.userData && child.userData.obb && child.geometry) {
+//       // create a helper and store it so we can update later
+//       const helper = createOBBHelper(child.userData.obb);
+//       scene.add(helper);
+//       child.userData._bbHelper = helper;
+//     //   addWallNormalHelper(child, scene, 5, 0x00ff00);
+//     }
+//   });
   
 }
 

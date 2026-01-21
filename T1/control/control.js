@@ -410,9 +410,9 @@ export function switchTrack(trackNumber, scene, cameraHolder) {
    initLight(scene);
    createHavac(scene, trackNumberString);
    
-   createHavacEnemy(scene, "rgba(126, 235, 126, 1)", "rgba(12, 15, 188, 1)", "rgba(235, 151, 126, 1)", 0, trackNumberString);
-   createHavacEnemy(scene, "rgba(204, 153, 13, 1)", "rgba(255, 0, 0, 1)", "rgba(75, 12, 12, 1)", 1, trackNumberString);
-   createHavacEnemy(scene, "rgba(0, 238, 16, 1)", "rgba(0, 118, 14, 1)", "rgba(112, 0, 87, 1)", 2, trackNumberString);
+   createHavacEnemy(scene, "rgb(82, 123, 236)", "rgb(18, 21, 199)", "rgb(112, 145, 238)", 0);
+   createHavacEnemy(scene, "rgb(240, 83, 83)", "rgba(255, 0, 0, 1)", "rgb(223, 105, 105)", 1);
+   createHavacEnemy(scene, "rgba(0, 238, 16, 1)", "rgba(0, 118, 14, 1)", "rgb(124, 216, 71)", 2);
    
    resetVehicle(scene);
 
@@ -429,26 +429,26 @@ export function switchTrack_teste(trackNumber, scene, camera) {
       createTrack1(scene);
       createHavac(scene);
       
-      createHavacEnemy(scene, "rgba(126, 235, 126, 1)", "rgba(12, 15, 188, 1)", "rgba(235, 151, 126, 1)", 0);
-      createHavacEnemy(scene, "rgba(204, 153, 13, 1)", "rgba(255, 0, 0, 1)", "rgba(75, 12, 12, 1)", 1);
-      createHavacEnemy(scene, "rgba(0, 238, 16, 1)", "rgba(0, 118, 14, 1)", "rgba(112, 0, 87, 1)", 2);
+      createHavacEnemy(scene, "rgb(82, 123, 236)", "rgb(18, 21, 199)", "rgb(112, 145, 238)", 0);
+      createHavacEnemy(scene, "rgb(240, 83, 83)", "rgba(255, 0, 0, 1)", "rgb(223, 105, 105)", 1);
+      createHavacEnemy(scene, "rgba(0, 238, 16, 1)", "rgba(0, 118, 14, 1)", "rgb(124, 216, 71)", 2);
    } 
    else if (trackNumber === 2){
       createTrack2(scene);
       createHavac(scene);
       
-      createHavacEnemy(scene, "rgba(126, 235, 126, 1)", "rgba(12, 15, 188, 1)", "rgba(235, 151, 126, 1)", 0);
-      createHavacEnemy(scene, "rgba(204, 153, 13, 1)", "rgba(255, 0, 0, 1)", "rgba(75, 12, 12, 1)", 1);
-      createHavacEnemy(scene, "rgba(0, 238, 16, 1)", "rgba(0, 118, 14, 1)", "rgba(112, 0, 87, 1)", 2);
+      createHavacEnemy(scene, "rgb(82, 123, 236)", "rgb(18, 21, 199)", "rgb(112, 145, 238)", 0);
+      createHavacEnemy(scene, "rgb(240, 83, 83)", "rgba(255, 0, 0, 1)", "rgb(223, 105, 105)", 1);
+      createHavacEnemy(scene, "rgba(0, 238, 16, 1)", "rgba(0, 118, 14, 1)", "rgb(124, 216, 71)", 2);
 
    } 
    else if (trackNumber === 3){
       createTrack3(scene);
       createHavac(scene);
       
-      createHavacEnemy(scene, "rgba(126, 235, 126, 1)", "rgba(12, 15, 188, 1)", "rgba(235, 151, 126, 1)", 0);
-      createHavacEnemy(scene, "rgba(204, 153, 13, 1)", "rgba(255, 0, 0, 1)", "rgba(75, 12, 12, 1)", 1);
-      createHavacEnemy(scene, "rgba(0, 238, 16, 1)", "rgba(0, 118, 14, 1)", "rgba(112, 0, 87, 1)", 2);
+      createHavacEnemy(scene, "rgb(82, 123, 236)", "rgb(18, 21, 199)", "rgb(112, 145, 238)", 0);
+      createHavacEnemy(scene, "rgb(240, 83, 83)", "rgba(255, 0, 0, 1)", "rgb(223, 105, 105)", 1);
+      createHavacEnemy(scene, "rgba(0, 238, 16, 1)", "rgba(0, 118, 14, 1)", "rgb(124, 216, 71)", 2);
    } 
 }
 

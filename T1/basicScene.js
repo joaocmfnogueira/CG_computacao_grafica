@@ -45,6 +45,8 @@ export const texturas = {
     "skybox" : skybox,
     "tunnel" : carregarTextura('../assets/textures/darkcement.jpg', 1, 1),
     "piso" : carregarTextura('../T1/assets/01tizeta_asphalts.png', 4, 4),
+    "piso_largada" : carregarTextura('../T1/assets/bw_marble_tile_04-512x512.png', 4, 4),
+    "piso_checkpoint" : carregarTextura('../T1/assets/bw_marble_tile_04-512x512_0.png', 4, 4),
     "vehicle1" : carregarTextura('../T1/assets/trak2_plate2b.png', 1, 1),
     "vehicle2" : carregarTextura('../T1/assets/image.png', 4, 4),
     "vehicle3" : carregarTextura('../T1/assets/image(2).png', 1, 1),
@@ -55,9 +57,10 @@ export const texturas = {
     "lateral2.5" : carregarTextura('../assets/textures/stonewallrot.jpg', 1, 1),
     "lateral3" : carregarTextura('../T1/assets/trak2_tile1a.png', 1, 1),
     "lateral3.5" : carregarTextura('../T1/assets/trak2_tile1a.png', 1, 1),
-    "mureta1" : carregarTextura('../T1/assets/new2-texture.jpg', 1, 1),
-    "mureta2" : carregarTextura('../T1/assets/new2-texture.jpg', 1, 1),
-    "mureta3" : carregarTextura('../T1/assets/new2-texture.jpg', 1, 1)
+    "mureta1" : carregarTextura('../assets/textures/crate.jpg', 1, 1),
+    "mureta2" : carregarTextura('../assets/textures/marble.png', 1, 1),
+    "mureta2.5" : carregarTextura('../T1/assets/new2-texture.jpg', 1, 1),
+    "mureta3" : carregarTextura('../T1/assets/image3.png', 1, 1)
 };
 
 
