@@ -3,7 +3,7 @@ import Stats from './models/stats.module.js';
 import KeyboardState from '../libs/util/KeyboardState.js';
 import { createTrack2, createTrack1, createTrack0} from "./models/map.js"
 import { createHavac, createHavacEnemy } from './models/vehicle.js';
-import {applyLateralSlide, createSpeedDisplay, updateSpeedDisplay, createLapsCount, updateLapDisplay, showFinishScreen, initLight, initRenderer, createCheckPointCount, updateCheckPointDisplay, createBulletCount, updateBulletDisplay, removeAndDispose} from './utils.js';
+import {applyLateralSlide, createSpeedDisplay, updateSpeedDisplay, createLapsCount, updateLapDisplay, showFinishScreen, initLight, initRenderer, createCheckPointCount, updateCheckPointDisplay, createBulletCount, updateBulletDisplay, removeAndDispose, loadGLBFile} from './utils.js';
 import {keyboardUpdate, updateVehicleMovement, updateCamera, updateLightMovement} from './control/control.js';
 import { collisionSystem } from './models/map.js';
 import { OBB } from './models/OBB.js'

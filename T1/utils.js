@@ -1,5 +1,7 @@
 import { collisionSystem } from './models/map.js';
+import {GLTFLoader} from '../build/jsm/loaders/GLTFLoader.js';
 import * as THREE from 'three';
+import {getMaxSize} from "../libs/util/util.js";
 
 let finishScreen = null;
 let gameCompleted = false;
@@ -439,4 +441,42 @@ export function applyLateralSlide(car, velocityVec, wallNormal, penetrationDepth
 
     // Push car slightly out of the wall
     car.position.add(N.clone().multiplyScalar(penetrationDepth));
+}
+
+export function loadGLBFile(scene, file, desiredScale)
+{
+  let loader = new GLTFLoader( );
+  loader.load( file, function ( gltf ) {
+    let obj = gltf.scene;
+    obj.traverse( function ( child ) {
+      if ( child.isMesh ) {
+          child.castShadow = true;
+      }
+    });
+    obj = normalizeAndRescale(obj, desiredScale);
+    obj = fixPosition(obj);
+    obj.updateMatrixWorld( true )
+    scene.add ( obj );
+    }, null, null);
+}
+
+// Normalize scale and multiple by the newScale
+function normalizeAndRescale(obj, newScale)
+{
+  var scale = getMaxSize(obj); // Available in 'utils.js'
+  obj.scale.set(newScale * (1.0/scale),
+                newScale * (1.0/scale),
+                newScale * (1.0/scale));
+  return obj;
+}
+
+function fixPosition(obj)
+{
+  // Fix position of the object over the ground plane
+  var box = new THREE.Box3().setFromObject( obj );
+  if(box.min.y > 0)
+    obj.translateY(-box.min.y);
+  else
+    obj.translateY(-1*box.min.y);
+  return obj;
 }

@@ -14,6 +14,7 @@ import { WaypointFollower } from './models/WaypointFollower.js';
 import KeyboardState from '../libs/util/KeyboardState.js';
 import {CubeTextureLoaderSingleFile} from '../../libs/util/cubeTextureLoaderSingleFile.js';
 import { switchTrack_teste } from './control/control.js';
+import { loadGLBFile } from './utils.js';
 
 let keyboard = new KeyboardState();
 
@@ -37,6 +38,8 @@ scene.add( axesHelper );
 let clock = new THREE.Clock();
 
 let skybox = new CubeTextureLoaderSingleFile().loadSingle('../T1/assets/Sky3.png', 1);
+
+loadGLBFile(scene, '../../T1/assets/Pyramid.glb', 50);
 
 export const texturas = {
     "areaExterna_pista1" : carregarTextura('../T1/assets/grass_18k.jpg', 20, 20),

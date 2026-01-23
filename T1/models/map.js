@@ -7,8 +7,8 @@ import {OBB} from "./OBB.js";
 import {createOBBHelper} from "../utils.js";
 import { CSG } from "../../libs/other/CSGMesh.js";
 import { MeshBasicMaterial } from '../../build/three.core.js';
-import { texturas } from '../main.js';
-// import { texturas } from '../basicScene.js';
+// import { texturas } from '../main.js';
+import { texturas } from '../basicScene.js';
 
 // variavel da pista atual
 let pista_atual = 1;
@@ -49,7 +49,7 @@ export function createTrack1(scene) {
     for (let index = 0; index < 8; index++) {
         let block;
         if(index == 0)
-            block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(255,30,30)", 1, "rgb(255,255,255)", 2);
+            block = createBlock(1, "rgb(219, 96, 58)", "rgb(255,30,30)", 1, "rgb(255,255,255)", 2);
         else if(index == 2)
             block = createBlock(1, "rgba(255, 255, 255, 1)", "rgb(255,30,30)", 1, "rgb(255,255,255)", 1);
         else
@@ -104,7 +104,7 @@ export function createTrack1(scene) {
     for (let index = 0; index < 8; index++) {
         let block;
         if(index == 0)
-            block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(255,30,30)", 1, "rgb(255,255,255)", 2);
+            block = createBlock(1, "rgb(219, 96, 58)", "rgb(255,30,30)", 1, "rgb(255,255,255)", 2);
         else
             block = createBlock(1, "rgb(100,100,100)", "rgb(255,30,30)");
         block.rotateZ(THREE.MathUtils.degToRad(180));
@@ -132,7 +132,7 @@ export function createTrack1(scene) {
     for (let index = 0; index < 8; index++) {
         let block;
         if(index == 0)
-            block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(255,30,30)", 1, "rgb(255,255,255)", 2);
+            block = createBlock(1, "rgb(219, 96, 58)", "rgb(255,30,30)", 1, "rgb(255,255,255)", 2);
         else
             block = createBlock(1, "rgb(100,100,100)", "rgb(255,30,30)");
         block.rotateZ(THREE.MathUtils.degToRad(270));
@@ -192,7 +192,7 @@ export function createTrack1(scene) {
     for (let index = 0; index < 8; index++) {
         let block;
         if(index == 0)
-            block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(255,30,30)", 1, "rgb(255,255,255)", 2);
+            block = createBlock(1, "rgb(219, 96, 58)", "rgb(255,30,30)", 1, "rgb(255,255,255)", 2);
         else
             block = createBlock(1, "rgb(100,100,100)", "rgb(255,30,30)");
         block.position.set(90, 0, -240 + 30 * index);
