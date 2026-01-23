@@ -58,9 +58,9 @@ export const texturas = {
     "lateral3" : carregarTextura('../T1/assets/trak2_tile1a.png', 1, 1),
     "lateral3.5" : carregarTextura('../T1/assets/trak2_tile1a.png', 1, 1),
     "mureta1" : carregarTextura('../assets/textures/crate.jpg', 1, 1),
-    "mureta2" : carregarTextura('../assets/textures/marble.png', 1, 1),
-    "mureta2.5" : carregarTextura('../T1/assets/new2-texture.jpg', 1, 1),
-    "mureta3" : carregarTextura('../T1/assets/image3.png', 1, 1)
+    "mureta2" : carregarTextura('../T1/assets/wo_marble_tile_08-512x512.png', 1, 1),
+    "mureta2.5" : carregarTextura('../T1/assets/wo_marble_tile_08-512x512.png', 1, 1),
+    "mureta3" : carregarTextura('../T1/assets/new_2.3_mureta.png', 1, 1)
 };
 
 

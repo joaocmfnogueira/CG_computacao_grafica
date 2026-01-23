@@ -7,8 +7,8 @@ import {OBB} from "./OBB.js";
 import {createOBBHelper} from "../utils.js";
 import { CSG } from "../../libs/other/CSGMesh.js";
 import { MeshBasicMaterial } from '../../build/three.core.js';
-// import { texturas } from '../main.js';
-import { texturas } from '../basicScene.js';
+import { texturas } from '../main.js';
+// import { texturas } from '../basicScene.js';
 
 // variavel da pista atual
 let pista_atual = 1;
@@ -49,9 +49,9 @@ export function createTrack1(scene) {
     for (let index = 0; index < 8; index++) {
         let block;
         if(index == 0)
-            block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(255,30,30)");
+            block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(255,30,30)", 1, "rgb(255,255,255)", 2);
         else if(index == 2)
-            block = createBlock(1, "rgba(255, 255, 255, 1)", "rgb(255,30,30)", 1, "rgb(255,255,255)", true);
+            block = createBlock(1, "rgba(255, 255, 255, 1)", "rgb(255,30,30)", 1, "rgb(255,255,255)", 1);
         else
             block = createBlock(1, "rgb(100,100,100)", "rgb(255,30,30)");
         block.rotateZ(THREE.MathUtils.degToRad(90));
@@ -104,7 +104,7 @@ export function createTrack1(scene) {
     for (let index = 0; index < 8; index++) {
         let block;
         if(index == 0)
-            block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(255,30,30)");
+            block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(255,30,30)", 1, "rgb(255,255,255)", 2);
         else
             block = createBlock(1, "rgb(100,100,100)", "rgb(255,30,30)");
         block.rotateZ(THREE.MathUtils.degToRad(180));
@@ -132,7 +132,7 @@ export function createTrack1(scene) {
     for (let index = 0; index < 8; index++) {
         let block;
         if(index == 0)
-            block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(255,30,30)");
+            block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(255,30,30)", 1, "rgb(255,255,255)", 2);
         else
             block = createBlock(1, "rgb(100,100,100)", "rgb(255,30,30)");
         block.rotateZ(THREE.MathUtils.degToRad(270));
@@ -192,7 +192,7 @@ export function createTrack1(scene) {
     for (let index = 0; index < 8; index++) {
         let block;
         if(index == 0)
-            block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(255,30,30)");
+            block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(255,30,30)", 1, "rgb(255,255,255)", 2);
         else
             block = createBlock(1, "rgb(100,100,100)", "rgb(255,30,30)");
         block.position.set(90, 0, -240 + 30 * index);
@@ -256,7 +256,7 @@ export function createTrack2(scene) {
     for (let index = 0; index < 8; index++) {
         let block;
         if(index == 2)
-            block = createBlock(1, "rgba(250, 250, 250, 1)", "rgb(255,165,0)", 1, "rgb(255,255,255)", true);
+            block = createBlock(1, "rgba(250, 250, 250, 1)", "rgb(255,165,0)", 1, "rgb(255,255,255)", 1);
         else
             block = createBlock(1, "rgb(190,190,190)", "rgb(255,165,0)");
         block.rotateZ(THREE.MathUtils.degToRad(90));
@@ -312,7 +312,7 @@ export function createTrack2(scene) {
     for (let index = 0; index < 8; index++) {
         let block;
         if(index == 0)
-            block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(255,165,0)");
+            block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(255,165,0)", 1, "rgb(255,255,255)", 2);
         else
             block = createBlock(1, "rgb(190,190,190)", "rgb(255,165,0)");
         block.rotateZ(THREE.MathUtils.degToRad(180));
@@ -367,7 +367,7 @@ export function createTrack2(scene) {
     for (let index = 0; index < 4; index++) {
         let block;
         if(index == 0)
-            block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(255,165,0)");
+            block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(255,165,0)", 1, "rgb(255,255,255)", 2);
         else
             block = createBlock(1, "rgb(190,190,190)", "rgb(255,165,0)");
         block.rotateZ(THREE.MathUtils.degToRad(270));
@@ -389,7 +389,7 @@ export function createTrack2(scene) {
     for (let index = 0; index < 4; index++) {
         let block;
         if(index == 0)
-            block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(255,165,0)");
+            block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(255,165,0)", 1, "rgb(255,255,255)", 2);
         else
             block = createBlock(1, "rgb(190,190,190)", "rgb(255,165,0)");
         block.position.set(-30, 0, -240 + 30 * index);
@@ -435,7 +435,7 @@ export function createTrack2(scene) {
     for (let index = 0; index < 3; index++) {
         let block;
         if(index == 0)
-            block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(255,165,0)");
+            block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(255,165,0)", 1, "rgb(255,255,255)", 2);
         else
             block = createBlock(1, "rgb(190,190,190)", "rgb(255,165,0)");
         // block.rotateZ(THREE.MathUtils.degToRad(-90))
@@ -468,7 +468,7 @@ export function createTrack3(scene) {
     for (let index = 0; index < 3; index++) {
         let block
         if(index == 0)
-            block = createBlock(1, "rgba(255, 255, 255, 1)", "rgb(100,30,255)", 1, "rgb(255,255,255)", true);
+            block = createBlock(1, "rgba(255, 255, 255, 1)", "rgb(100,30,255)", 1, "rgb(255,255,255)", 1);
         else
             block = createBlock(1, "rgb(200,100,100)", "rgb(100,30,255)");
         block.rotateZ(THREE.MathUtils.degToRad(90));
@@ -530,7 +530,7 @@ export function createTrack3(scene) {
         else{
             let block;
             if(index == 0)
-                block = createBlock(1, "rgba(187, 173, 173, 1)", "rgb(100,30,255)");
+                block = createBlock(1, "rgba(187, 173, 173, 1)", "rgb(100,30,255)", 1, "rgb(255,255,255)", 2);
             else
                 block = createBlock(1, "rgb(200,100,100)", "rgb(100,30,255)");
             block.rotateZ(THREE.MathUtils.degToRad(180));
@@ -628,7 +628,7 @@ export function createTrack3(scene) {
     for (let index = 0; index < 3; index++) {
         let block;
             if(index == 0)
-                block = createBlock(1, "rgba(187, 173, 173, 1)", "rgb(100,30,255)");
+                block = createBlock(1, "rgba(187, 173, 173, 1)", "rgb(100,30,255)", 1, "rgb(255,255,255)", 2);
             else
                 block = createBlock(1, "rgb(200,100,100)", "rgb(100,30,255)");
         block.rotateZ(THREE.MathUtils.degToRad(270));
@@ -708,7 +708,7 @@ export function createTrack3(scene) {
     for (let index = 0; index < 3; index++) {
         let block;
             if(index == 0)
-                block = createBlock(1, "rgba(187, 173, 173, 1)", "rgb(100,30,255)");
+                block = createBlock(1, "rgba(187, 173, 173, 1)", "rgb(100,30,255)", 1, "rgb(255,255,255)", 2);
             else
                 block = createBlock(1, "rgb(200,100,100)", "rgb(100,30,255)");
         block.rotateZ(THREE.MathUtils.degToRad(90));
@@ -831,7 +831,7 @@ export function createTrack3(scene) {
     for (let index = 0; index < 4; index++) {
         let block;
             if(index == 0)
-                block = createBlock(1, "rgba(187, 173, 173, 1)", "rgb(100,30,255)");
+                block = createBlock(1, "rgba(187, 173, 173, 1)", "rgb(100,30,255)", 1, "rgb(255,255,255)", 2);
             else
                 block = createBlock(1, "rgb(200,100,100)", "rgb(100,30,255)");
         block.position.set(30, 0, -120 + 30 * index);
@@ -1021,12 +1021,13 @@ function createTree2(scene, x, y, z){
 // Primeiro ->  As muretas estão paralelas;
 // Segundo -> As muretas estão adjacentes;
 // Terceiro -> As muretas estão somente nos cantos;
-function createBlock(type, colorFloor, colorWall, type_pattern = 1, colorConer = "rgb(255,255,255)", pista_largada = false) {
+// tipo_pista_largada_checkpoint -> 1 se for largada, 2 se for checkpoint
+function createBlock(type, colorFloor, colorWall, type_pattern = 1, colorConer = "rgb(255,255,255)", tipo_pista_largada_checkpoint = 0) {
     let floor;
 
     if (type == 1) {
-        floor = auxCreateBlock_parallel(colorFloor, colorWall, pista_largada);
-        console.log(pista_largada);
+        floor = auxCreateBlock_parallel(colorFloor, colorWall, tipo_pista_largada_checkpoint);
+        // console.log(tipo_pista_largada_checkpoint);
     }
     else if (type == 2) {
         floor = auxCreateBlock_Adjacent(colorFloor, colorWall, type_pattern, colorConer);
@@ -1082,9 +1083,9 @@ function createBlock(type, colorFloor, colorWall, type_pattern = 1, colorConer =
 }
 
 // Função auxiliar para criar o tipo de bloco paralelo
-function auxCreateBlock_parallel(colorFloor, colorWall, pista_largada) {
+function auxCreateBlock_parallel(colorFloor, colorWall, tipo_pista_largada_checkpoint) {
 
-    const floor = createFloor(colorFloor, pista_largada);
+    const floor = createFloor(colorFloor, tipo_pista_largada_checkpoint);
 
     for (let index = 0; index < 6; index++) {
         const col = (index % 2 === 0) 
@@ -1192,7 +1193,7 @@ function auxCreateBlock_Corners(colorFloor, colorWall) {
 }
 
 // Cria um piso
-function createFloor(color, pista_largada) {
+function createFloor(color, tipo_pista_largada_checkpoint) {
     const geometry = new THREE.PlaneGeometry(30, 30);
     const material = setDefaultMaterial(color, null);
     const plane = new THREE.Mesh(geometry, material);
@@ -1201,11 +1202,10 @@ function createFloor(color, pista_largada) {
 
     let tex;
 
-    if(pista_largada){
-
+    if(tipo_pista_largada_checkpoint == 1)
         tex = texturas['piso_largada'];
-        console.log("rodou uma vez aqui");
-    }
+    else if(tipo_pista_largada_checkpoint == 2)
+        tex = texturas['piso_checkpoint'];
     else
         tex = texturas['piso'];
     plane.material.map = tex;

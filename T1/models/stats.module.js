@@ -151,7 +151,7 @@ Stats.Panel = function ( name, fg, bg ) {
 			context.fillText( round( value ) + ' ' + name + ' (' + round( min ) + '-' + round( max ) + ')', TEXT_X, TEXT_Y );
 
 			if(canvas.width > 0 && canvas.height > 0){
-				console.log("porque não está indo aqui");
+				// console.log("porque não está indo aqui");
 				context.drawImage( canvas, GRAPH_X + PR, GRAPH_Y, GRAPH_WIDTH - PR, GRAPH_HEIGHT, GRAPH_X, GRAPH_Y, GRAPH_WIDTH - PR, GRAPH_HEIGHT );
 			}
 
