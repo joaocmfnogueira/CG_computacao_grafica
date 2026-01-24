@@ -7,9 +7,10 @@ import {OBB} from "./OBB.js";
 import {createOBBHelper} from "../utils.js";
 import { CSG } from "../../libs/other/CSGMesh.js";
 import { MeshBasicMaterial } from '../../build/three.core.js';
-// import { texturas } from '../main.js';
-import { texturas } from '../basicScene.js';
-import { objetos3D } from '../basicScene.js';
+import { texturas } from '../main.js';
+import { objetos3D } from '../main.js';
+// import { texturas } from '../basicScene.js';
+// import { objetos3D } from '../basicScene.js';
 
 // variavel da pista atual
 let pista_atual = 1;

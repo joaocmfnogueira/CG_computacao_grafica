@@ -44,7 +44,7 @@ let turnProgressRight = 0;
 let lastShotTime = 0;
 const shotCooldown = 300; // tempo em milissegundos (ex: 300ms)
 
-export function keyboardUpdate(keyboard, vehicle, dt, scene, cameraHolder, bulletsInGame) {
+export function keyboardUpdate(keyboard, vehicle, dt, scene, cameraHolder, bulletsInGame, verificadorInicial) {
    keyboard.update();
    const now = performance.now();
 
@@ -54,6 +54,7 @@ export function keyboardUpdate(keyboard, vehicle, dt, scene, cameraHolder, bulle
    let checkpoints_count = vehicle.userData.checkpoints_count;
    let trackNumber = vehicle.userData.trackNumber;
    let nBullets = vehicle.userData.nBullets;
+   let verificador = verificadorInicial;
 
 
    if(nBullets > 0 && ((keyboard.pressed("Z")) || (keyboard.pressed("space"))) && (now - lastShotTime) >= shotCooldown){
@@ -179,6 +180,7 @@ export function keyboardUpdate(keyboard, vehicle, dt, scene, cameraHolder, bulle
       trackNumber = "Primeiro";
       nBullets = 4;
       bulletsInGame = [];
+      verificador = false;
    } 
    if (keyboard.down("2")){
       switchTrack(2, scene, cameraHolder);
@@ -189,6 +191,7 @@ export function keyboardUpdate(keyboard, vehicle, dt, scene, cameraHolder, bulle
       trackNumber = "Segundo";
       nBullets = 4;
       bulletsInGame = [];
+      verificador = false;
    } 
    if (keyboard.down("3")){
       switchTrack(3, scene, cameraHolder);
@@ -199,6 +202,7 @@ export function keyboardUpdate(keyboard, vehicle, dt, scene, cameraHolder, bulle
       trackNumber = "Terceiro";
       nBullets = 4;
       bulletsInGame = [];
+      verificador = false;
    } 
 
    vehicle.userData.velocity = velocity;
@@ -208,7 +212,7 @@ export function keyboardUpdate(keyboard, vehicle, dt, scene, cameraHolder, bulle
    vehicle.userData.trackNumber = trackNumber;
    vehicle.userData.nBullets = nBullets;
 
-   return {bulletsInGame};
+   return {bulletsInGame, verificador};
 }
 
 export function updateVehicleMovement(dt, vehicle, keyboard) {

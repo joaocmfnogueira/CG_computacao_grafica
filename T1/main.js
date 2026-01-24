@@ -46,6 +46,8 @@ let loadingScreen = null;
 let assetList = null;
 let startButton = null;
 let startButtonClicked = false;
+let verificadorInicial = false;
+let inputEnabled = false;
 
 const speedDisplay = createSpeedDisplay();
 const lapsDisplay = createLapsCount();
@@ -63,6 +65,7 @@ const manager = new THREE.LoadingManager();
 manager.onStart = () => {
     showLoadingScreen();
     // Reset variables on start
+    verificadorInicial = false;
     loadedAssetsQueue = [];
     isThreeJsLoadingFinished = false;
     isQueueRunning = false;
@@ -93,10 +96,10 @@ const textureLoader = new THREE.TextureLoader(manager);
 let skybox = new CubeTextureLoaderSingleFile(manager).loadSingle('../T1/assets/Sky3.png', 1);
 
 export const objetos3D = {
-    "piramides_pista2_1" : await loadGLBFile('../../T1/assets/Pyramid.glb', 50),
-    "piramides_pista2_2" : await loadGLBFile('../../T1/assets/Pyramid.glb', 40),
-    "piramides_pista2_3" : await loadGLBFile('../../T1/assets/Pyramid.glb', 30),
-    "maliTower_pista2" : await loadGLBFile('../../T1/assets/mali_defense_tower.glb', 50),
+    "piramides_pista2_1" : await loadGLBFile('../../T1/assets/Pyramid.glb', 50, manager),
+    "piramides_pista2_2" : await loadGLBFile('../../T1/assets/Pyramid.glb', 40, manager),
+    "piramides_pista2_3" : await loadGLBFile('../../T1/assets/Pyramid.glb', 30, manager),
+    "maliTower_pista2" : await loadGLBFile('../../T1/assets/mali_defense_tower.glb', 50, manager)
 }
 
 export const texturas = {
@@ -126,10 +129,17 @@ export const texturas = {
 
 function render() {
     requestAnimationFrame(render);
-    if (!gameStarted) return;
-    if (isPaused) return;
-    if (!startButtonClicked) return;
+    if (!gameStarted){
+        return;
+    } 
+    if (isPaused){
+        return;
+    } 
+    if (!startButtonClicked){
+        return;
+    } 
     
+    // if (!verificadorInicial) return;
     
     
    scene.updateMatrixWorld(true);
@@ -144,6 +154,17 @@ function render() {
    const allVehicles = [];
    if (playerCar) allVehicles.push(playerCar);
    bots.forEach(b => allVehicles.push(b));
+
+   if(playerCar.userData.velocity > 0 && !verificadorInicial){
+        playerCar.userData.velocity = 0;
+        playerCar.userData.aceleration = 0;
+        resetKeyboardState();
+        verificadorInicial = true;
+        return;
+    }
+
+//    console.log(playerCar.userData.velocity);
+//    console.log(playerCar.userData.aceleration);
 
    for (let index = 0; index < SUBSTEPS; index++) {
             // --- 2. STUN LOGIC ---
@@ -283,9 +304,9 @@ function render() {
     });
 
    // --- 7. HUD & INPUT ---
-   const result = keyboardUpdate(keyboard, playerCar, dt, scene, cameraHolder, bulletsInGame);
-
+   const result = keyboardUpdate(keyboard, playerCar, dt, scene, cameraHolder, bulletsInGame, verificadorInicial);
    bulletsInGame = result.bulletsInGame;
+   verificadorInicial = result.verificador;
 
    // If Player Fired, we need to mark their bullet's shooter to avoid self-collision
    // This loop finds new bullets that don't have a shooter assigned yet
@@ -734,6 +755,7 @@ function showStartScreenState() {
                 startButtonClicked = true;
                 gameStarted = true;
                 resetKeyboardState();
+                verificadorInicial = false;
                 requestAnimationFrame(render);
             }
             
