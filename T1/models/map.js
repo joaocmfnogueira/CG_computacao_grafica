@@ -9,6 +9,7 @@ import { CSG } from "../../libs/other/CSGMesh.js";
 import { MeshBasicMaterial } from '../../build/three.core.js';
 // import { texturas } from '../main.js';
 import { texturas } from '../basicScene.js';
+import { objetos3D } from '../basicScene.js';
 
 // variavel da pista atual
 let pista_atual = 1;
@@ -253,6 +254,8 @@ export function createTrack2(scene) {
     
     createSky(scene);
 
+    createTrack2_objects(scene);
+
     for (let index = 0; index < 8; index++) {
         let block;
         if(index == 2)
@@ -270,34 +273,12 @@ export function createTrack2(scene) {
         const baseX = 60 - 30 * index;
 
         // sorteia qual tipo vai usar +25 ou -25
-        const types = [createTree1, createTree2];
-        const shuffled = types.sort(() => Math.random() - 0.5);
-
-        // gera offset de -5 a +5
-        const randOffset = () => (Math.random() * 10 - 5);
-
-        // posição base do Z (pode ser +25 ou -25 conforme sorte)
-        const baseZ1 = 25;
-        const baseZ2 = -25;
-
-        // --- ÁRVORE 1 ---
-        shuffled[0](
-            scene,
-            baseX + randOffset(),
-            2.5,
-            baseZ1 + randOffset()
-        );
-
-        // --- ÁRVORE 2 ---
-        shuffled[1](
-            scene,
-            baseX + randOffset(),
-            2.5,
-            baseZ2 + randOffset()
-        );
-
+        const baseZ1 = 35;
+        const baseZ2 = -35;
         
-
+        createTree2(scene, baseX, 2.5, baseZ1);
+        if(index != 7)
+            createTree1(scene, baseX, 2.5, baseZ2);
     }
 
     let blockConer = createBlock(2, "rgb(190,190,190)", "rgb(255,165,0)");
@@ -324,34 +305,21 @@ export function createTrack2(scene) {
 
         if(index != 0){
             const baseX1 = -215;
-            const baseX2 = -155;
-
-            // sorteia qual tipo vai usar +25 ou -25
-            const types = [createTree1, createTree2];
-            const shuffled = types.sort(() => Math.random() - 0.5);
-
-            // gera offset de -5 a +5
-            const randOffset = () => (Math.random() * 10 - 5);
+            const baseX2 = -145;
 
             // posição base do Z (pode ser +25 ou -25 conforme sorte)
             const baseZ = -30 - 30 * index;
             
-            // --- ÁRVORE 1 ---
-            shuffled[0](
-                scene,
-                baseX1 + randOffset(),
-                2.5,
-                baseZ + randOffset()
-                
-            );
-            // --- ÁRVORE 2 ---
-            shuffled[1](
-                scene,
-                baseX2 + randOffset(),
-                2.5,
-                baseZ + randOffset()
-                
-            );
+            createTree2(scene, baseX1, 2.5, baseZ);
+            if(index != 7){
+                createTree1(scene, baseX2, 2.5, baseZ);
+            }
+            else if(index == 7){
+                createTree2(scene, baseX1, 2.5, -30);
+                createTree2(scene, baseX1, 2.5, 0);
+            }
+
+            
         }
     }
 
@@ -968,14 +936,61 @@ function createSky(scene) {
     scene.background = texturas['skybox']; 
 }
 
+function createTrack2_objects(scene){
+    // adicionadando os objetos 3d na pista
+    const piramides1 = objetos3D['piramides_pista2_1'].clone(true);
+    scene.add(piramides1);
+    piramides1.position.set(-100, 17, -150);
+    console.log(piramides1);
+
+    const piramides2 = objetos3D['piramides_pista2_2'].clone(true);
+    scene.add(piramides2);
+    piramides2.position.set(-90, 12, -100);
+    piramides2.rotateY(THREE.MathUtils.degToRad(90));
+
+    const piramides3 = objetos3D['piramides_pista2_3'].clone(true);
+    scene.add(piramides3);
+    piramides3.position.set(-80, 7, -190);
+    piramides3.rotateY(THREE.MathUtils.degToRad(180));
+
+    const maliTower = objetos3D['maliTower_pista2'].clone(true);
+    scene.add(maliTower);
+    maliTower.position.set(65, -10, -95);
+    maliTower.rotateY(THREE.MathUtils.degToRad(-90));
+
+    const maliTower2 = objetos3D['maliTower_pista2'].clone(true);
+    scene.add(maliTower2);
+    maliTower2.position.set(-155, -10, -25);
+    maliTower2.rotateY(THREE.MathUtils.degToRad(90));
+
+    const maliTower3 = objetos3D['maliTower_pista2'].clone(true);
+    scene.add(maliTower3);
+    maliTower3.position.set(-155, -10, -245);
+}
+
 function createTree1(scene, x, y, z){
+    let cor1;
+    let cor2;
+    if(pista_atual == 1){
+        cor1 = "rgb(148, 109, 1)";
+        cor2 = "rgb(45, 191, 0)";
+    }
+    else if(pista_atual == 2){
+        cor1 = "rgb(214, 183, 96)";
+        cor2 = "rgb(138, 255, 103)";
+    }
+    else{
+        cor1 = "rgb(126, 79, 229)";
+        cor2 = "rgb(233, 179, 245)";
+    }
+
     const troncoGeometry = new THREE.CylinderGeometry(0.3, 0.5, 6, 18, 18);
-    const troncoMaterial = setDefaultMaterial("rgba(139, 69, 19, 1)");
+    const troncoMaterial = setDefaultMaterial(cor1);
 
     const tronco = new THREE.Mesh(troncoGeometry, troncoMaterial);
 
     const copaGeometry = new THREE.IcosahedronGeometry(4);
-    const copaMaterial = setDefaultMaterial("rgba(70, 214, 77, 1)");
+    const copaMaterial = setDefaultMaterial(cor2);
 
     const copa = new THREE.Mesh(copaGeometry, copaMaterial);
 
@@ -993,13 +1008,27 @@ function createTree1(scene, x, y, z){
 }
 
 function createTree2(scene, x, y, z){
+    let cor1;
+    let cor2;
+    if(pista_atual == 1){
+        cor1 = "rgb(110, 79, 0)";
+        cor2 = "rgb(22, 86, 3)";
+    }
+    else if(pista_atual == 2){
+        cor1 = "rgb(160, 130, 48)";
+        cor2 = "rgb(40, 173, 0)";
+    }
+    else {
+        cor1 = "rgb(17, 0, 87)";
+        cor2 = "rgb(1, 246, 238))";
+    }
     const troncoGeometry = new THREE.CylinderGeometry(0.3, 0.5, 6, 18, 18);
-    const troncoMaterial = setDefaultMaterial("rgba(139, 69, 19, 1)");
+    const troncoMaterial = setDefaultMaterial(cor1);
 
     const tronco = new THREE.Mesh(troncoGeometry, troncoMaterial);
 
     const copaGeometry = new THREE.ConeGeometry(3, 8, 8);
-    const copaMaterial = setDefaultMaterial("rgba(4, 104, 9, 1)");
+    const copaMaterial = setDefaultMaterial(cor2);
 
     const copa = new THREE.Mesh(copaGeometry, copaMaterial);
     // tronco.rotation.x = THREE.MathUtils.degToRad(-90);

@@ -39,7 +39,14 @@ let clock = new THREE.Clock();
 
 let skybox = new CubeTextureLoaderSingleFile().loadSingle('../T1/assets/Sky3.png', 1);
 
-loadGLBFile(scene, '../../T1/assets/Pyramid.glb', 50);
+// loadGLBFile(scene, '../../T1/assets/Pyramid.glb', 50);
+
+export const objetos3D = {
+    "piramides_pista2_1" : await loadGLBFile('../../T1/assets/Pyramid.glb', 50),
+    "piramides_pista2_2" : await loadGLBFile('../../T1/assets/Pyramid.glb', 40),
+    "piramides_pista2_3" : await loadGLBFile('../../T1/assets/Pyramid.glb', 30),
+    "maliTower_pista2" : await loadGLBFile('../../T1/assets/mali_defense_tower.glb', 50),
+}
 
 export const texturas = {
     "areaExterna_pista1" : carregarTextura('../T1/assets/grass_18k.jpg', 20, 20),
@@ -67,7 +74,7 @@ export const texturas = {
 };
 
 
-createTrack3(scene);
+createTrack2(scene);
 createHavac(scene);
 
 createHavacEnemy(scene, "rgb(82, 123, 236)", "rgb(18, 21, 199)", "rgb(112, 145, 238)", 0);

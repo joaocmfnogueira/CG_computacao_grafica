@@ -1,7 +1,7 @@
 import { collisionSystem } from './models/map.js';
-import {GLTFLoader} from '../build/jsm/loaders/GLTFLoader.js';
+import { GLTFLoader } from '../build/jsm/loaders/GLTFLoader.js';
 import * as THREE from 'three';
-import {getMaxSize} from "../libs/util/util.js";
+import { getMaxSize } from "../libs/util/util.js";
 
 let finishScreen = null;
 let gameCompleted = false;
@@ -14,7 +14,7 @@ export function clearScene(scene, options = {}, renderer) {
     }
 
     const { ignore = [] } = options;
-    
+
     const ignoreSet = new Set();
     ignore.forEach(rootIgnored => {
         if (rootIgnored) {
@@ -38,10 +38,10 @@ export function clearScene(scene, options = {}, renderer) {
 }
 
 export function removeAndDispose(object, ignoreSet = null) {
-    if(ignoreSet != null)
-        if(ignoreSet.has(object))
+    if (ignoreSet != null)
+        if (ignoreSet.has(object))
             return
-        
+
     if (!object) return;
 
     const children = [...object.children];
@@ -88,23 +88,23 @@ function disposeMaterial(material) {
 
 // Métodos para criar e atualizar a tela com a velocidade do veículo
 export function createSpeedDisplay() {
-   const speedDiv = document.createElement('div');
-   speedDiv.style.position = 'absolute';
-   speedDiv.style.bottom = '10px';
-   speedDiv.style.right = '10px';
-   speedDiv.style.color = '#44ff44';
-   speedDiv.style.fontFamily = 'Arial, sans-serif';
-   speedDiv.style.fontSize = '24px';
-   speedDiv.style.fontWeight = 'bold';
-   speedDiv.style.backgroundColor = 'rgba(0,0,0,0.7)';
-   speedDiv.style.padding = '15px';
-   speedDiv.style.borderRadius = '10px';
-   speedDiv.style.border = '2px solid #333';
-   speedDiv.style.textShadow = '2px 2px 4px rgba(0,0,0,0.5)';
-   speedDiv.id = 'speedDisplay';
-   document.body.appendChild(speedDiv);
-   
-   return speedDiv;
+    const speedDiv = document.createElement('div');
+    speedDiv.style.position = 'absolute';
+    speedDiv.style.bottom = '10px';
+    speedDiv.style.right = '10px';
+    speedDiv.style.color = '#44ff44';
+    speedDiv.style.fontFamily = 'Arial, sans-serif';
+    speedDiv.style.fontSize = '24px';
+    speedDiv.style.fontWeight = 'bold';
+    speedDiv.style.backgroundColor = 'rgba(0,0,0,0.7)';
+    speedDiv.style.padding = '15px';
+    speedDiv.style.borderRadius = '10px';
+    speedDiv.style.border = '2px solid #333';
+    speedDiv.style.textShadow = '2px 2px 4px rgba(0,0,0,0.5)';
+    speedDiv.id = 'speedDisplay';
+    document.body.appendChild(speedDiv);
+
+    return speedDiv;
 }
 
 export function updateSpeedDisplay(velocity, speedDisplay) {
@@ -114,23 +114,23 @@ export function updateSpeedDisplay(velocity, speedDisplay) {
 
 // Métodos para criar e atualizar a tela de contador de voltas
 export function createLapsCount() {
-   const lapDiv = document.createElement('div');
-   lapDiv.style.position = 'absolute';
-   lapDiv.style.top = '10px';
-   lapDiv.style.right = '10px';
-   lapDiv.style.color = '#44ff44';
-   lapDiv.style.fontFamily = 'Arial, sans-serif';
-   lapDiv.style.fontSize = '24px';
-   lapDiv.style.fontWeight = 'bold';
-   lapDiv.style.backgroundColor = 'rgba(0,0,0,0.7)';
-   lapDiv.style.padding = '15px';
-   lapDiv.style.borderRadius = '10px';
-   lapDiv.style.border = '2px solid #333';
-   lapDiv.style.textShadow = '2px 2px 4px rgba(0,0,0,0.5)';
-   lapDiv.id = 'lapsDisplay';
-   document.body.appendChild(lapDiv);
-   
-   return lapDiv;
+    const lapDiv = document.createElement('div');
+    lapDiv.style.position = 'absolute';
+    lapDiv.style.top = '10px';
+    lapDiv.style.right = '10px';
+    lapDiv.style.color = '#44ff44';
+    lapDiv.style.fontFamily = 'Arial, sans-serif';
+    lapDiv.style.fontSize = '24px';
+    lapDiv.style.fontWeight = 'bold';
+    lapDiv.style.backgroundColor = 'rgba(0,0,0,0.7)';
+    lapDiv.style.padding = '15px';
+    lapDiv.style.borderRadius = '10px';
+    lapDiv.style.border = '2px solid #333';
+    lapDiv.style.textShadow = '2px 2px 4px rgba(0,0,0,0.5)';
+    lapDiv.id = 'lapsDisplay';
+    document.body.appendChild(lapDiv);
+
+    return lapDiv;
 }
 
 export function updateLapDisplay(lap_count, lapDisplay) {
@@ -140,23 +140,23 @@ export function updateLapDisplay(lap_count, lapDisplay) {
 
 // Métodos para criar e atualizar a tela de contador de checkpoints
 export function createCheckPointCount() {
-   const checkpointDiv = document.createElement('div');
-   checkpointDiv.style.position = 'absolute';
-   checkpointDiv.style.top = '80px';
-   checkpointDiv.style.right = '10px';
-   checkpointDiv.style.color = '#44ff44';
-   checkpointDiv.style.fontFamily = 'Arial, sans-serif';
-   checkpointDiv.style.fontSize = '24px';
-   checkpointDiv.style.fontWeight = 'bold';
-   checkpointDiv.style.backgroundColor = 'rgba(0,0,0,0.7)';
-   checkpointDiv.style.padding = '15px';
-   checkpointDiv.style.borderRadius = '10px';
-   checkpointDiv.style.border = '2px solid #333';
-   checkpointDiv.style.textShadow = '2px 2px 4px rgba(0,0,0,0.5)';
-   checkpointDiv.id = 'checkPointDisplay';
-   document.body.appendChild(checkpointDiv);
-   
-   return checkpointDiv;
+    const checkpointDiv = document.createElement('div');
+    checkpointDiv.style.position = 'absolute';
+    checkpointDiv.style.top = '80px';
+    checkpointDiv.style.right = '10px';
+    checkpointDiv.style.color = '#44ff44';
+    checkpointDiv.style.fontFamily = 'Arial, sans-serif';
+    checkpointDiv.style.fontSize = '24px';
+    checkpointDiv.style.fontWeight = 'bold';
+    checkpointDiv.style.backgroundColor = 'rgba(0,0,0,0.7)';
+    checkpointDiv.style.padding = '15px';
+    checkpointDiv.style.borderRadius = '10px';
+    checkpointDiv.style.border = '2px solid #333';
+    checkpointDiv.style.textShadow = '2px 2px 4px rgba(0,0,0,0.5)';
+    checkpointDiv.id = 'checkPointDisplay';
+    document.body.appendChild(checkpointDiv);
+
+    return checkpointDiv;
 }
 
 export function updateCheckPointDisplay(checkpoint_Count, checkPointDisplay) {
@@ -166,23 +166,23 @@ export function updateCheckPointDisplay(checkpoint_Count, checkPointDisplay) {
 
 // Métodos para criar e atualizar a tela de contador de balas
 export function createBulletCount() {
-   const bulletDiv = document.createElement('div');
-   bulletDiv.style.position = 'absolute';
-   bulletDiv.style.top = '150px';
-   bulletDiv.style.right = '10px';
-   bulletDiv.style.color = '#44ff44';
-   bulletDiv.style.fontFamily = 'Arial, sans-serif';
-   bulletDiv.style.fontSize = '24px';
-   bulletDiv.style.fontWeight = 'bold';
-   bulletDiv.style.backgroundColor = 'rgba(0,0,0,0.7)';
-   bulletDiv.style.padding = '15px';
-   bulletDiv.style.borderRadius = '10px';
-   bulletDiv.style.border = '2px solid #333';
-   bulletDiv.style.textShadow = '2px 2px 4px rgba(0,0,0,0.5)';
-   bulletDiv.id = 'bulletDisplay';
-   document.body.appendChild(bulletDiv);
-   
-   return bulletDiv;
+    const bulletDiv = document.createElement('div');
+    bulletDiv.style.position = 'absolute';
+    bulletDiv.style.top = '150px';
+    bulletDiv.style.right = '10px';
+    bulletDiv.style.color = '#44ff44';
+    bulletDiv.style.fontFamily = 'Arial, sans-serif';
+    bulletDiv.style.fontSize = '24px';
+    bulletDiv.style.fontWeight = 'bold';
+    bulletDiv.style.backgroundColor = 'rgba(0,0,0,0.7)';
+    bulletDiv.style.padding = '15px';
+    bulletDiv.style.borderRadius = '10px';
+    bulletDiv.style.border = '2px solid #333';
+    bulletDiv.style.textShadow = '2px 2px 4px rgba(0,0,0,0.5)';
+    bulletDiv.id = 'bulletDisplay';
+    document.body.appendChild(bulletDiv);
+
+    return bulletDiv;
 }
 
 export function updateBulletDisplay(bullet_Count, bulletDisplay) {
@@ -192,78 +192,78 @@ export function updateBulletDisplay(bullet_Count, bulletDisplay) {
 
 // Método para criar a tela de finalização
 export function showFinishScreen(result = "YOU WON THE RACE!!!!") {
-   if (finishScreen) {
-      return;
-   }
-   finishScreen = document.createElement('div');
-   finishScreen.id = 'finishScreen';
-   finishScreen.style.position = 'absolute';
-   finishScreen.style.top = '0';
-   finishScreen.style.left = '0';
-   finishScreen.style.width = '100%';
-   finishScreen.style.height = '100%';
-   finishScreen.style.backgroundColor = 'rgba(0, 0, 0, 0.85)';
-   finishScreen.style.display = 'flex';
-   finishScreen.style.flexDirection = 'column';
-   finishScreen.style.justifyContent = 'center';
-   finishScreen.style.alignItems = 'center';
-   finishScreen.style.color = 'white';
-   finishScreen.style.fontFamily = 'Arial, sans-serif';
-   finishScreen.style.zIndex = '1000';
-   
-   const title = document.createElement('h1');
-   title.textContent = 'RACE COMPLETED!';
-   title.style.fontSize = '4em';
-   title.style.color = '#44ff44';
-   title.style.marginBottom = '20px';
-   title.style.textShadow = '0 0 10px #44ff44';
-   
-   const message = document.createElement('h2');
-   message.textContent = result;
-   message.style.fontSize = '2.5em';
-   message.style.marginBottom = '40px';
-   message.style.color = '#ffffff';
-   
-//    const restartButton = document.createElement('button');
-//    restartButton.textContent = 'RESTART RACE';
-//    restartButton.style.padding = '15px 30px';
-//    restartButton.style.fontSize = '1.5em';
-//    restartButton.style.backgroundColor = '#44ff44';
-//    restartButton.style.color = '#000000';
-//    restartButton.style.border = 'none';
-//    restartButton.style.borderRadius = '10px';
-//    restartButton.style.cursor = 'pointer';
-//    restartButton.style.fontWeight = 'bold';
-//    restartButton.style.transition = 'all 0.3s ease';
-   
-//    restartButton.onmouseover = function() {
-//       this.style.backgroundColor = '#66ff66';
-//       this.style.transform = 'scale(1.05)';
-//    };
-//    restartButton.onmouseout = function() {
-//       this.style.backgroundColor = '#44ff44';
-//       this.style.transform = 'scale(1)';
-//    };
-   
-//    restartButton.onclick = function() {
-//       closeFinishScreen();
-//       resetVehicle(scene);
-//    };
-   
-   finishScreen.appendChild(title);
-   finishScreen.appendChild(message);
-//    finishScreen.appendChild(restartButton);
-   
-   document.body.appendChild(finishScreen);
-   gameCompleted = true;
+    if (finishScreen) {
+        return;
+    }
+    finishScreen = document.createElement('div');
+    finishScreen.id = 'finishScreen';
+    finishScreen.style.position = 'absolute';
+    finishScreen.style.top = '0';
+    finishScreen.style.left = '0';
+    finishScreen.style.width = '100%';
+    finishScreen.style.height = '100%';
+    finishScreen.style.backgroundColor = 'rgba(0, 0, 0, 0.85)';
+    finishScreen.style.display = 'flex';
+    finishScreen.style.flexDirection = 'column';
+    finishScreen.style.justifyContent = 'center';
+    finishScreen.style.alignItems = 'center';
+    finishScreen.style.color = 'white';
+    finishScreen.style.fontFamily = 'Arial, sans-serif';
+    finishScreen.style.zIndex = '1000';
+
+    const title = document.createElement('h1');
+    title.textContent = 'RACE COMPLETED!';
+    title.style.fontSize = '4em';
+    title.style.color = '#44ff44';
+    title.style.marginBottom = '20px';
+    title.style.textShadow = '0 0 10px #44ff44';
+
+    const message = document.createElement('h2');
+    message.textContent = result;
+    message.style.fontSize = '2.5em';
+    message.style.marginBottom = '40px';
+    message.style.color = '#ffffff';
+
+    //    const restartButton = document.createElement('button');
+    //    restartButton.textContent = 'RESTART RACE';
+    //    restartButton.style.padding = '15px 30px';
+    //    restartButton.style.fontSize = '1.5em';
+    //    restartButton.style.backgroundColor = '#44ff44';
+    //    restartButton.style.color = '#000000';
+    //    restartButton.style.border = 'none';
+    //    restartButton.style.borderRadius = '10px';
+    //    restartButton.style.cursor = 'pointer';
+    //    restartButton.style.fontWeight = 'bold';
+    //    restartButton.style.transition = 'all 0.3s ease';
+
+    //    restartButton.onmouseover = function() {
+    //       this.style.backgroundColor = '#66ff66';
+    //       this.style.transform = 'scale(1.05)';
+    //    };
+    //    restartButton.onmouseout = function() {
+    //       this.style.backgroundColor = '#44ff44';
+    //       this.style.transform = 'scale(1)';
+    //    };
+
+    //    restartButton.onclick = function() {
+    //       closeFinishScreen();
+    //       resetVehicle(scene);
+    //    };
+
+    finishScreen.appendChild(title);
+    finishScreen.appendChild(message);
+    //    finishScreen.appendChild(restartButton);
+
+    document.body.appendChild(finishScreen);
+    gameCompleted = true;
 }
 
 export function closeFinishScreen() {
-   if (finishScreen && finishScreen.parentNode) {
-      document.body.removeChild(finishScreen);
-      finishScreen = null;
-   }
-   gameCompleted = false;
+    if (finishScreen && finishScreen.parentNode) {
+        document.body.removeChild(finishScreen);
+        finishScreen = null;
+    }
+    gameCompleted = false;
 }
 
 // Método que cria um helper para o OBB
@@ -298,11 +298,11 @@ export function createOBBHelper(obb, color = "rgba(155, 155, 155, 1)") {
 
     // Edges between corners
     const indices = [
-        0,1, 0,2, 0,4,
-        7,6, 7,5, 7,3,
-        1,3, 1,5,
-        2,3, 2,6,
-        4,5, 4,6
+        0, 1, 0, 2, 0, 4,
+        7, 6, 7, 5, 7, 3,
+        1, 3, 1, 5,
+        2, 3, 2, 6,
+        4, 5, 4, 6
     ];
 
     const vertices = [];
@@ -322,65 +322,64 @@ export function createOBBHelper(obb, color = "rgba(155, 155, 155, 1)") {
 
 // Método de criar a luz principal e secundária do jogo
 export function initLight(scene, castShadow = true, position = new THREE.Vector3(10, 50, 75)) {
-   let power = Math.PI;
-   const ambientLight = new THREE.HemisphereLight(
-      'white', // bright sky color
-      'darkslategrey', // dim ground color
-      0.3 * power, // intensity
-   );
-   scene.add(ambientLight);
-   
-   const mainLight = new THREE.DirectionalLight('white', 1 * power);
-   mainLight.position.copy(position);
-   mainLight.castShadow = castShadow;
-   scene.add(mainLight);
+    let power = Math.PI;
+    const ambientLight = new THREE.HemisphereLight(
+        'white', // bright sky color
+        'darkslategrey', // dim ground color
+        0.3 * power, // intensity
+    );
+    scene.add(ambientLight);
 
-   // Directional ligth's shadow uses an OrthographicCamera to set shadow parameteres
-   // and its left, right, bottom, top, near and far parameters are, respectively,
-   // (-5, 5, -5, 5, 0.5, 500).    
-   const shadow = mainLight.shadow;
-   shadow.mapSize.width = 2048;
-   shadow.mapSize.height = 2048;
-   shadow.camera.left = -150;
-   shadow.camera.right = 150;
-   shadow.camera.top = 150;
-   shadow.camera.bottom = -150;
+    const mainLight = new THREE.DirectionalLight('white', 1 * power);
+    mainLight.position.copy(position);
+    mainLight.castShadow = castShadow;
+    scene.add(mainLight);
 
-   shadow.camera.near = 1;
-   shadow.camera.far = 300;
+    // Directional ligth's shadow uses an OrthographicCamera to set shadow parameteres
+    // and its left, right, bottom, top, near and far parameters are, respectively,
+    // (-5, 5, -5, 5, 0.5, 500).    
+    const shadow = mainLight.shadow;
+    shadow.mapSize.width = 2048;
+    shadow.mapSize.height = 2048;
+    shadow.camera.left = -150;
+    shadow.camera.right = 150;
+    shadow.camera.top = 150;
+    shadow.camera.bottom = -150;
 
-   shadow.bias = -0.0005;
+    shadow.camera.near = 1;
+    shadow.camera.far = 300;
+
+    shadow.bias = -0.0005;
 
 
-   mainLight.name = "light";
-   return mainLight;
+    mainLight.name = "light";
+    return mainLight;
 }
 
 // Método para criar o renderer
-export function initRenderer(color = "rgb(0, 0, 0)", shadowMapType = THREE.PCFSoftShadowMap ) {
+export function initRenderer(color = "rgb(0, 0, 0)", shadowMapType = THREE.PCFSoftShadowMap) {
 
-   //var props = (typeof additionalProperties !== 'undefined' && additionalProperties) ? additionalProperties : {};
-   var renderer = new THREE.WebGLRenderer();
-   //renderer.useLegacyLights = true;
-   renderer.shadowMap.enabled = true;
-//    renderer.shadowMapSoft = true;
-   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    //var props = (typeof additionalProperties !== 'undefined' && additionalProperties) ? additionalProperties : {};
+    var renderer = new THREE.WebGLRenderer();
+    //renderer.useLegacyLights = true;
+    renderer.shadowMap.enabled = true;
+    //    renderer.shadowMapSoft = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-   renderer.setClearColor(new THREE.Color(color));
-   renderer.setSize(window.innerWidth, window.innerHeight);
-   renderer.shadowMap.enabled = true;
-   document.getElementById("webgl-output").appendChild(renderer.domElement);
+    renderer.setClearColor(new THREE.Color(color));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.shadowMap.enabled = true;
+    document.getElementById("webgl-output").appendChild(renderer.domElement);
 
-   return renderer;
+    return renderer;
 }
 
 
 // Métodos para criar e atualizar o helper da caixa de colisão
-export function createBBHelper(bb, color = "rgb(255, 255, 255)")
-{
-   let helper = new THREE.Box3Helper( bb, color );
-   scene.add( helper );
-   return helper;
+export function createBBHelper(bb, color = "rgb(255, 255, 255)") {
+    let helper = new THREE.Box3Helper(bb, color);
+    scene.add(helper);
+    return helper;
 }
 
 export function updateOBBHelper(obb, helper) {
@@ -411,11 +410,11 @@ export function updateOBBHelper(obb, helper) {
     }
 
     const idx = [
-        0,1, 0,2, 0,4,
-        7,6, 7,5, 7,3,
-        1,3, 1,5,
-        2,3, 2,6,
-        4,5, 4,6
+        0, 1, 0, 2, 0, 4,
+        7, 6, 7, 5, 7, 3,
+        1, 3, 1, 5,
+        2, 3, 2, 6,
+        4, 5, 4, 6
     ];
 
     for (let i = 0; i < idx.length; i++) {
@@ -443,40 +442,49 @@ export function applyLateralSlide(car, velocityVec, wallNormal, penetrationDepth
     car.position.add(N.clone().multiplyScalar(penetrationDepth));
 }
 
-export function loadGLBFile(scene, file, desiredScale)
-{
-  let loader = new GLTFLoader( );
-  loader.load( file, function ( gltf ) {
-    let obj = gltf.scene;
-    obj.traverse( function ( child ) {
-      if ( child.isMesh ) {
-          child.castShadow = true;
-      }
-    });
-    obj = normalizeAndRescale(obj, desiredScale);
-    obj = fixPosition(obj);
-    obj.updateMatrixWorld( true )
-    scene.add ( obj );
-    }, null, null);
+export function loadGLBFile(file, desiredScale, manager = null) {
+   return new Promise((resolve, reject) => {
+        let loader;
+        if (manager != null)
+            loader = new GLTFLoader(manager);
+        else
+            loader = new GLTFLoader();
+
+        loader.load(file, function (gltf) {
+            let obj = gltf.scene;
+            obj.traverse(function (child) {
+                if (child.isMesh) {
+                    child.castShadow = true;
+                    child.receiveShadow = true;
+                }
+            });
+
+            obj = normalizeAndRescale(obj, desiredScale);
+            obj = fixPosition(obj);
+            obj.updateMatrixWorld(true);
+            resolve(obj);
+        }, 
+        undefined,
+        (error) => reject(error)
+      );
+   });
 }
 
 // Normalize scale and multiple by the newScale
-function normalizeAndRescale(obj, newScale)
-{
-  var scale = getMaxSize(obj); // Available in 'utils.js'
-  obj.scale.set(newScale * (1.0/scale),
-                newScale * (1.0/scale),
-                newScale * (1.0/scale));
-  return obj;
+function normalizeAndRescale(obj, newScale) {
+    var scale = getMaxSize(obj); // Available in 'utils.js'
+    obj.scale.set(newScale * (1.0 / scale),
+        newScale * (1.0 / scale),
+        newScale * (1.0 / scale));
+    return obj;
 }
 
-function fixPosition(obj)
-{
-  // Fix position of the object over the ground plane
-  var box = new THREE.Box3().setFromObject( obj );
-  if(box.min.y > 0)
-    obj.translateY(-box.min.y);
-  else
-    obj.translateY(-1*box.min.y);
-  return obj;
+function fixPosition(obj) {
+    // Fix position of the object over the ground plane
+    var box = new THREE.Box3().setFromObject(obj);
+    if (box.min.y > 0)
+        obj.translateY(-box.min.y);
+    else
+        obj.translateY(-1 * box.min.y);
+    return obj;
 }
