@@ -96,10 +96,12 @@ const textureLoader = new THREE.TextureLoader(manager);
 let skybox = new CubeTextureLoaderSingleFile(manager).loadSingle('../T1/assets/Sky3.png', 1);
 
 export const objetos3D = {
-    "piramides_pista2_1" : await loadGLBFile('../../T1/assets/Pyramid.glb', 50, manager),
-    "piramides_pista2_2" : await loadGLBFile('../../T1/assets/Pyramid.glb', 40, manager),
-    "piramides_pista2_3" : await loadGLBFile('../../T1/assets/Pyramid.glb', 30, manager),
-    "maliTower_pista2" : await loadGLBFile('../../T1/assets/mali_defense_tower.glb', 50, manager)
+    "towerWood_pista1" : await loadGLBFile('../../T1/assets/wachturm_holz.glb', 50),
+    "barril_pista1" : await loadGLBFile('../../T1/assets/barril.glb', 5),
+    "piramides_pista2_1" : await loadGLBFile('../../T1/assets/Pyramid.glb', 50),
+    "piramides_pista2_2" : await loadGLBFile('../../T1/assets/Pyramid.glb', 40),
+    "piramides_pista2_3" : await loadGLBFile('../../T1/assets/Pyramid.glb', 30),
+    "maliTower_pista2" : await loadGLBFile('../../T1/assets/mali_defense_tower.glb', 50),
 }
 
 export const texturas = {

@@ -7,10 +7,10 @@ import {OBB} from "./OBB.js";
 import {createOBBHelper} from "../utils.js";
 import { CSG } from "../../libs/other/CSGMesh.js";
 import { MeshBasicMaterial } from '../../build/three.core.js';
-import { texturas } from '../main.js';
-import { objetos3D } from '../main.js';
-// import { texturas } from '../basicScene.js';
-// import { objetos3D } from '../basicScene.js';
+// import { texturas } from '../main.js';
+// import { objetos3D } from '../main.js';
+import { texturas } from '../basicScene.js';
+import { objetos3D } from '../basicScene.js';
 
 // variavel da pista atual
 let pista_atual = 1;
@@ -47,6 +47,8 @@ export function createTrack1(scene) {
     createGround(scene, 'rgb(51, 255, 51)', "areaExterna_pista1");
     
     createSky(scene);
+
+    createTrack1_objects(scene);
 
     for (let index = 0; index < 8; index++) {
         let block;
@@ -935,6 +937,38 @@ function createGround(scene, color, tex_name) {
 
 function createSky(scene) {
     scene.background = texturas['skybox']; 
+}
+
+function createTrack1_objects(scene){
+    const towerWood = objetos3D['towerWood_pista1'].clone(true);
+    scene.add(towerWood);
+    towerWood.position.set(-130, -30, -50);
+    console.log(towerWood);
+
+    const towerWood2 = objetos3D['towerWood_pista1'].clone(true);
+    scene.add(towerWood2);
+    towerWood2.position.set(40, -30, -50);
+    console.log(towerWood2);
+
+    const towerWood3 = objetos3D['towerWood_pista1'].clone(true);
+    scene.add(towerWood3);
+    towerWood3.position.set(40, -30, -220);
+    console.log(towerWood3);
+
+    const barril1 = objetos3D['barril_pista1'].clone(true);
+    scene.add(barril1);
+    barril1.position.set(60, -10, -40);
+    console.log(barril1);
+
+    const barril2 = objetos3D['barril_pista1'].clone(true);
+    scene.add(barril2);
+    barril2.position.set(-140, -10, -40);
+    console.log(barril2);
+
+    const barril3 = objetos3D['barril_pista1'].clone(true);
+    scene.add(barril3);
+    barril3.position.set(40, -10, -240);
+    console.log(barril3);
 }
 
 function createTrack2_objects(scene){
