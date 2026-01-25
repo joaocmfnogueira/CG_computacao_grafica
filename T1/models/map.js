@@ -1010,8 +1010,20 @@ function createTrack3_objects(scene){
 
     const pumpkin = objetos3D['pumpkin'].clone(true);
     scene.add(pumpkin);
-    pumpkin.position.set(-40, 0, 0);
-    console.log(pumpkin);
+    pumpkin.position.set(-102, -0.3, 11);
+    pumpkin.rotateY(THREE.MathUtils.degToRad(230));
+
+    const pumpkin2 = objetos3D['pumpkin'].clone(true);
+    scene.add(pumpkin2);
+    pumpkin2.position.set(-78, -0.3, -281);
+    pumpkin2.rotateY(THREE.MathUtils.degToRad(50));
+
+    const pumpkin3 = objetos3D['pumpkin'].clone(true);
+    scene.add(pumpkin3);
+    pumpkin3.position.set(42, -0.3, -162);
+    pumpkin3.rotateY(THREE.MathUtils.degToRad(50));
+
+    // console.log(pumpkin);
 }
 
 // function spawnAranha(scene, pos, rotY = 0) {
