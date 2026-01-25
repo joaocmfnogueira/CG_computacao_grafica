@@ -102,6 +102,7 @@ export const objetos3D = {
     "piramides_pista2_2" : await loadGLBFile('../../T1/assets/Pyramid.glb', 40),
     "piramides_pista2_3" : await loadGLBFile('../../T1/assets/Pyramid.glb', 30),
     "maliTower_pista2" : await loadGLBFile('../../T1/assets/mali_defense_tower.glb', 50),
+    "aranhaEstranha_pista3" : await loadGLBFile('../../T1/assets/maxdamage_scab-low-poly.gltf.glb', 5),
 }
 
 export const texturas = {

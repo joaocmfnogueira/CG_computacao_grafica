@@ -436,6 +436,8 @@ export function createTrack3(scene) {
     
     createSky(scene);
 
+    createTrack3_objects(scene);
+
     for (let index = 0; index < 3; index++) {
         let block
         if(index == 0)
@@ -976,7 +978,6 @@ function createTrack2_objects(scene){
     const piramides1 = objetos3D['piramides_pista2_1'].clone(true);
     scene.add(piramides1);
     piramides1.position.set(-100, 17, -150);
-    console.log(piramides1);
 
     const piramides2 = objetos3D['piramides_pista2_2'].clone(true);
     scene.add(piramides2);
@@ -1002,6 +1003,52 @@ function createTrack2_objects(scene){
     scene.add(maliTower3);
     maliTower3.position.set(-155, -10, -245);
 }
+
+function createTrack3_objects(scene){
+    // adicionadando os objetos 3d na pista
+    // spawnAranha(scene, new THREE.Vector3(-30, 0, 0));
+
+    const pumpkin = objetos3D['pumpkin'].clone(true);
+    scene.add(pumpkin);
+    pumpkin.position.set(-40, 0, 0);
+    console.log(pumpkin);
+}
+
+// function spawnAranha(scene, pos, rotY = 0) {
+//   const container = new THREE.Group();
+//   const aranha = objetos3D['aranhaEstranha_pista3'].clone(true);
+
+//   aranha.traverse(o => {
+//     if (o.isMesh) {
+//       o.frustumCulled = false;
+//       o.castShadow = true;
+//       o.receiveShadow = true;
+//     }
+//     o.matrixAutoUpdate = true;
+//   });
+
+//   // 🔥 normalização
+//   aranha.position.set(0, 0, 0);
+//   aranha.rotation.set(0, 0, 0);
+//   aranha.scale.setScalar(0.01); // ajuste fino aqui
+
+//   // 🔥 recentralização real
+//   const box = new THREE.Box3().setFromObject(aranha);
+//   const center = new THREE.Vector3();
+//   box.getCenter(center);
+//   aranha.position.sub(center);
+
+//   container.add(aranha);
+//   container.position.copy(pos);
+//   container.rotation.y = rotY;
+
+//   console.log("matrixAutoUpdate:", aranha.matrixAutoUpdate);
+// console.log("parent:", aranha.parent);
+
+//   scene.add(container);
+//   return container;
+// }
+
 
 function createTree1(scene, x, y, z){
     let cor1;
