@@ -22,6 +22,8 @@ let position_camera = new THREE.Vector3(50, 25, 0);
 camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 500);
 camera.position.copy(position_camera);
 camera.lookAt(new THREE.Vector3(1, 0, 0)); 
+var listener = new THREE.AudioListener();
+camera.add(listener);
 let cameraHolder = new THREE.Object3D();
 cameraHolder.add(camera);
 scene.add(cameraHolder);
@@ -90,6 +92,66 @@ manager.onLoad = () => {
 manager.onError = (url) => {
     console.error("Erro ao carregar:", url);
 };
+
+let audioLoader = new THREE.AudioLoader(manager);
+
+// create a audio source of music theme
+const track01 = new THREE.Audio(listener);
+audioLoader.load('../../0_assets_T3/01 Bad to the Bone.mp3', function (buffer) {
+   track01.setBuffer(buffer);
+   track01.setLoop(true);
+   track01.setVolume(0.3);
+});
+
+const track02 = new THREE.Audio(listener);
+audioLoader.load('../../0_assets_T3/02 Paranoid.mp3', function (buffer) {
+   track02.setBuffer(buffer);
+   track02.setLoop(true);
+   track02.setVolume(0.3);
+});
+
+const track03 = new THREE.Audio(listener);
+audioLoader.load('../../0_assets_T3/04 Peter Gunn.mp3', function (buffer) {
+   track03.setBuffer(buffer);
+   track03.setLoop(true);
+   track03.setVolume(0.3);
+});
+
+// Audio of the last lap
+const ultimaVolta = new THREE.Audio(listener);
+audioLoader.load('../../0_assets_T3/lastLap.mp3', function (buffer) {
+   ultimaVolta.setBuffer(buffer);
+   ultimaVolta.setVolume(0.3);
+});
+
+// Audio of the start of the race
+const start1 = new THREE.Audio(listener);
+audioLoader.load('../../0_assets_T3/start01.mp3', function (buffer) {
+   start1.setBuffer(buffer);
+   start1.setVolume(0.3);
+});
+
+const start2 = new THREE.Audio(listener);
+audioLoader.load('../../0_assets_T3/start02.mp3', function (buffer) {
+   start2.setBuffer(buffer);
+   start2.setVolume(0.3);
+});
+
+// Create sound effects of the bullet     
+const disparo = new THREE.PositionalAudio(listener);
+audioLoader.load('../../T1/assets/Futuristic Shotgun Single Shot.wav', function (buffer) {
+   disparo.setBuffer(buffer);
+   disparo.setVolume(0.3);
+}); 
+
+const atingido = new THREE.PositionalAudio(listener);
+audioLoader.load('../../T1/assets/explosion09.wav', function (buffer) {
+   atingido.setBuffer(buffer);
+   atingido.setVolume(0.3);
+}); 
+
+
+
 
 const textureLoader = new THREE.TextureLoader(manager);
 
