@@ -944,33 +944,28 @@ function createSky(scene) {
 function createTrack1_objects(scene){
     const towerWood = objetos3D['towerWood_pista1'].clone(true);
     scene.add(towerWood);
-    towerWood.position.set(-130, -30, -50);
-    console.log(towerWood);
+    towerWood.position.set(-130, -10, -50);
 
     const towerWood2 = objetos3D['towerWood_pista1'].clone(true);
     scene.add(towerWood2);
-    towerWood2.position.set(40, -30, -50);
-    console.log(towerWood2);
+    towerWood2.position.set(40, -10, -50);
 
     const towerWood3 = objetos3D['towerWood_pista1'].clone(true);
     scene.add(towerWood3);
-    towerWood3.position.set(40, -30, -220);
-    console.log(towerWood3);
+    towerWood3.position.set(40, -10, -220);
+    towerWood3.rotateY(THREE.MathUtils.degToRad(180));
 
     const barril1 = objetos3D['barril_pista1'].clone(true);
     scene.add(barril1);
     barril1.position.set(60, -10, -40);
-    console.log(barril1);
 
     const barril2 = objetos3D['barril_pista1'].clone(true);
     scene.add(barril2);
-    barril2.position.set(-140, -10, -40);
-    console.log(barril2);
+    barril2.position.set(-150, -10, -40);
 
     const barril3 = objetos3D['barril_pista1'].clone(true);
     scene.add(barril3);
-    barril3.position.set(40, -10, -240);
-    console.log(barril3);
+    barril3.position.set(-10, -10, -220);
 }
 
 function createTrack2_objects(scene){
@@ -1023,43 +1018,25 @@ function createTrack3_objects(scene){
     pumpkin3.position.set(42, -0.3, -162);
     pumpkin3.rotateY(THREE.MathUtils.degToRad(50));
 
+    const wranglerman = objetos3D['wranglerman'].clone(true);
+    scene.add(wranglerman);
+    wranglerman.position.set(-30, -10, -50);
+    wranglerman.rotateY(THREE.MathUtils.degToRad(50));
+
+    const wranglerman2 = objetos3D['wranglerman'].clone(true);
+    scene.add(wranglerman2);
+    wranglerman2.position.set(-30, -10, -250);
+    wranglerman2.rotateY(THREE.MathUtils.degToRad(20));
+
+    const wranglerman3 = objetos3D['wranglerman'].clone(true);
+    scene.add(wranglerman3);
+    wranglerman3.position.set(-130, -10, -200);
+    wranglerman3.rotateY(THREE.MathUtils.degToRad(100));
+
     // console.log(pumpkin);
 }
 
-// function spawnAranha(scene, pos, rotY = 0) {
-//   const container = new THREE.Group();
-//   const aranha = objetos3D['aranhaEstranha_pista3'].clone(true);
 
-//   aranha.traverse(o => {
-//     if (o.isMesh) {
-//       o.frustumCulled = false;
-//       o.castShadow = true;
-//       o.receiveShadow = true;
-//     }
-//     o.matrixAutoUpdate = true;
-//   });
-
-//   // 🔥 normalização
-//   aranha.position.set(0, 0, 0);
-//   aranha.rotation.set(0, 0, 0);
-//   aranha.scale.setScalar(0.01); // ajuste fino aqui
-
-//   // 🔥 recentralização real
-//   const box = new THREE.Box3().setFromObject(aranha);
-//   const center = new THREE.Vector3();
-//   box.getCenter(center);
-//   aranha.position.sub(center);
-
-//   container.add(aranha);
-//   container.position.copy(pos);
-//   container.rotation.y = rotY;
-
-//   console.log("matrixAutoUpdate:", aranha.matrixAutoUpdate);
-// console.log("parent:", aranha.parent);
-
-//   scene.add(container);
-//   return container;
-// }
 
 
 function createTree1(scene, x, y, z){
