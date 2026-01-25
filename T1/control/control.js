@@ -11,6 +11,7 @@ import { initLight} from '../utils.js';
 import {OBB} from "../models/OBB.js";
 import { createOBBHelper } from '../utils.js';
 import { OrbitControls } from '../../build/jsm/controls/OrbitControls.js';
+import {shotBuffer, listener} from '../main.js'
 
 // import { collisionSystem } from './models/map.js';
 
@@ -44,7 +45,7 @@ let turnProgressRight = 0;
 let lastShotTime = 0;
 const shotCooldown = 300; // tempo em milissegundos (ex: 300ms)
 
-export function keyboardUpdate(keyboard, vehicle, dt, scene, cameraHolder, bulletsInGame, verificadorInicial) {
+export function keyboardUpdate(keyboard, vehicle, dt, scene, cameraHolder, bulletsInGame, verificadorInicial, deveTocarInicio, lastLapSound, soundtrack, soundtrack_played, soundtrack_muted) {
    keyboard.update();
    const now = performance.now();
 
@@ -55,6 +56,18 @@ export function keyboardUpdate(keyboard, vehicle, dt, scene, cameraHolder, bulle
    let trackNumber = vehicle.userData.trackNumber;
    let nBullets = vehicle.userData.nBullets;
    let verificador = verificadorInicial;
+   let deveToca = deveTocarInicio;
+   let lastLap = lastLapSound;
+   let soundT = soundtrack;
+   let soundPlayed = soundtrack_played;
+   let muted = soundtrack_muted;
+
+   if(keyboard.down("Q")){
+      if(muted)
+         muted = false
+      else
+         muted = true;
+   }
 
 
    if(nBullets > 0 && ((keyboard.pressed("Z")) || (keyboard.pressed("space"))) && (now - lastShotTime) >= shotCooldown){
@@ -106,6 +119,11 @@ export function keyboardUpdate(keyboard, vehicle, dt, scene, cameraHolder, bulle
                //   updateOBBHelper(bullet.userData.obb, obbHelper);
              };
          // console.log("ue");
+         const disparo = new THREE.PositionalAudio(listener);
+         disparo.setBuffer(shotBuffer);
+         disparo.setVolume(1);
+         vehicle.add(disparo);
+         disparo.play();
          bulletsInGame.push(bullet);
          nBullets--;
    }
@@ -181,6 +199,10 @@ export function keyboardUpdate(keyboard, vehicle, dt, scene, cameraHolder, bulle
       nBullets = 4;
       bulletsInGame = [];
       verificador = false;
+      deveToca = true;
+      lastLap = false;
+      soundT = 1;
+      soundPlayed = false;
    } 
    if (keyboard.down("2")){
       switchTrack(2, scene, cameraHolder);
@@ -192,6 +214,10 @@ export function keyboardUpdate(keyboard, vehicle, dt, scene, cameraHolder, bulle
       nBullets = 4;
       bulletsInGame = [];
       verificador = false;
+      deveToca = true;
+      lastLap = false;
+      soundT = 2;
+      soundPlayed = false;
    } 
    if (keyboard.down("3")){
       switchTrack(3, scene, cameraHolder);
@@ -203,6 +229,11 @@ export function keyboardUpdate(keyboard, vehicle, dt, scene, cameraHolder, bulle
       nBullets = 4;
       bulletsInGame = [];
       verificador = false;
+      deveToca = true;
+      lastLap = false;
+      soundT = 3;
+      soundPlayed = false;
+
    } 
 
    vehicle.userData.velocity = velocity;
@@ -212,7 +243,7 @@ export function keyboardUpdate(keyboard, vehicle, dt, scene, cameraHolder, bulle
    vehicle.userData.trackNumber = trackNumber;
    vehicle.userData.nBullets = nBullets;
 
-   return {bulletsInGame, verificador};
+   return {bulletsInGame, verificador, deveToca, lastLap, soundT, soundPlayed, muted};
 }
 
 export function updateVehicleMovement(dt, vehicle, keyboard) {

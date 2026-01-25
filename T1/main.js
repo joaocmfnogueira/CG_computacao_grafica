@@ -22,7 +22,7 @@ let position_camera = new THREE.Vector3(50, 25, 0);
 camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 500);
 camera.position.copy(position_camera);
 camera.lookAt(new THREE.Vector3(1, 0, 0)); 
-var listener = new THREE.AudioListener();
+export var listener = new THREE.AudioListener();
 camera.add(listener);
 let cameraHolder = new THREE.Object3D();
 cameraHolder.add(camera);
@@ -31,7 +31,8 @@ scene.add(cameraHolder);
 light = initLight(scene);
 
 let keyboard = new KeyboardState();
-
+let somInicio = "Primeiro";
+let deveTocarInicio = true;
 
 // Game Variables
 let bulletsInGame = []; // Stores all bullets (Player + Bots)
@@ -41,6 +42,11 @@ let trackPoints = {
     "Terceiro" : [[-90, 0, -30], [-120, 0, -270], [-180, 0, -150], [30, 0, -120]]
 };
 
+
+let soundtrack = 1;
+let soundtrack_played = false;
+let soundtrack_muted = false;
+let lastLapSound = false;
 let isPaused = false;
 let clock = new THREE.Clock();
 let gameStarted = false;
@@ -67,6 +73,7 @@ const manager = new THREE.LoadingManager();
 manager.onStart = () => {
     showLoadingScreen();
     // Reset variables on start
+    lastLapSound = false;
     verificadorInicial = false;
     loadedAssetsQueue = [];
     isThreeJsLoadingFinished = false;
@@ -93,24 +100,24 @@ manager.onError = (url) => {
     console.error("Erro ao carregar:", url);
 };
 
-let audioLoader = new THREE.AudioLoader(manager);
+export let audioLoader = new THREE.AudioLoader(manager);
 
 // create a audio source of music theme
-const track01 = new THREE.Audio(listener);
+export const track01 = new THREE.Audio(listener);
 audioLoader.load('../../0_assets_T3/01 Bad to the Bone.mp3', function (buffer) {
    track01.setBuffer(buffer);
    track01.setLoop(true);
    track01.setVolume(0.3);
 });
 
-const track02 = new THREE.Audio(listener);
+export const track02 = new THREE.Audio(listener);
 audioLoader.load('../../0_assets_T3/02 Paranoid.mp3', function (buffer) {
    track02.setBuffer(buffer);
    track02.setLoop(true);
    track02.setVolume(0.3);
 });
 
-const track03 = new THREE.Audio(listener);
+export const track03 = new THREE.Audio(listener);
 audioLoader.load('../../0_assets_T3/04 Peter Gunn.mp3', function (buffer) {
    track03.setBuffer(buffer);
    track03.setLoop(true);
@@ -125,32 +132,18 @@ audioLoader.load('../../0_assets_T3/lastLap.mp3', function (buffer) {
 });
 
 // Audio of the start of the race
-const start1 = new THREE.Audio(listener);
-audioLoader.load('../../0_assets_T3/start01.mp3', function (buffer) {
-   start1.setBuffer(buffer);
-   start1.setVolume(0.3);
-});
+let start1Buffer;
+audioLoader.load('../../0_assets_T3/start01.mp3', buffer => start1Buffer = buffer);
 
-const start2 = new THREE.Audio(listener);
-audioLoader.load('../../0_assets_T3/start02.mp3', function (buffer) {
-   start2.setBuffer(buffer);
-   start2.setVolume(0.3);
-});
+let start2Buffer;
+audioLoader.load('../../0_assets_T3/start02.mp3', buffer => start2Buffer= buffer);
 
 // Create sound effects of the bullet     
-const disparo = new THREE.PositionalAudio(listener);
-audioLoader.load('../../T1/assets/Futuristic Shotgun Single Shot.wav', function (buffer) {
-   disparo.setBuffer(buffer);
-   disparo.setVolume(0.3);
-}); 
+export let shotBuffer;
+audioLoader.load('../../T1/assets/Futuristic Shotgun Single Shot.wav', buffer => shotBuffer = buffer); 
 
-const atingido = new THREE.PositionalAudio(listener);
-audioLoader.load('../../T1/assets/explosion09.wav', function (buffer) {
-   atingido.setBuffer(buffer);
-   atingido.setVolume(0.3);
-}); 
-
-
+let atingidoBuffer;
+audioLoader.load('../../T1/assets/explosion09.wav', buffer => atingidoBuffer = buffer); 
 
 
 const textureLoader = new THREE.TextureLoader(manager);
@@ -204,9 +197,56 @@ function render() {
     if (!startButtonClicked){
         return;
     } 
+
+    if(deveTocarInicio){
+        if(somInicio == "Primeiro"){
+            const start1 = new THREE.Audio(listener);
+            start1.setBuffer(start1Buffer);
+            start1.setVolume(0.3);
+            start1.play();
+            somInicio = "Segundo";
+        }
+        else{
+            const start2 = new THREE.Audio(listener);
+            start2.setBuffer(start2Buffer);
+            start2.setVolume(0.3);
+            start2.play();
+            somInicio = "Primeiro";
+        }
+        deveTocarInicio = false;
+        console.log("devia estar tocando");
+    }
     
-    // if (!verificadorInicial) return;
-    
+    if(soundtrack_muted){
+        track01.setVolume(0);
+        track02.setVolume(0);
+        track03.setVolume(0);
+    }
+    else{
+        track01.setVolume(0.3);
+        track02.setVolume(0.3);
+        track03.setVolume(0.3);
+    }
+
+    if(!soundtrack_played){
+        if(soundtrack == 1){
+            track02.stop();
+            track03.stop();
+            track01.play();
+        }
+        else if(soundtrack == 2){
+            track01.stop();
+            track03.stop();
+            track02.play();
+        }
+        else{
+            track01.stop();
+            track02.stop();
+            track03.play();
+        }
+
+        soundtrack_played = true;
+    }
     
    scene.updateMatrixWorld(true);
    const dt = clock.getDelta();
@@ -370,10 +410,14 @@ function render() {
     });
 
    // --- 7. HUD & INPUT ---
-   const result = keyboardUpdate(keyboard, playerCar, dt, scene, cameraHolder, bulletsInGame, verificadorInicial);
+   const result = keyboardUpdate(keyboard, playerCar, dt, scene, cameraHolder, bulletsInGame, verificadorInicial, deveTocarInicio , lastLapSound, soundtrack, soundtrack_played, soundtrack_muted);
    bulletsInGame = result.bulletsInGame;
    verificadorInicial = result.verificador;
-
+   deveTocarInicio = result.deveToca;
+   lastLapSound = result.lastLap;
+   soundtrack = result.soundT;
+   soundtrack_played = result.soundPlayed;
+   soundtrack_muted = result.muted;
    // If Player Fired, we need to mark their bullet's shooter to avoid self-collision
    // This loop finds new bullets that don't have a shooter assigned yet
    bulletsInGame.forEach(b => {
@@ -391,6 +435,11 @@ function render() {
    updateLapDisplay(playerCar.userData.laps_count, lapsDisplay);
    updateCheckPointDisplay(playerCar.userData.checkpoints_count, checkPointDisplay);
    updateBulletDisplay(playerCar.userData.nBullets, bulletDisplay);
+
+   if(playerCar.userData.laps_count == 3 && !lastLapSound){
+        ultimaVolta.play();
+        lastLapSound = true;
+   }
 
    if(playerCar.userData.laps_count == 4) showFinishScreen();
    bots.forEach(botMesh => {
@@ -636,7 +685,13 @@ function updateBotShooting(botMesh, targets, scene) {
         const angleDeg = THREE.MathUtils.radToDeg(angle);
 
         if (angleDeg < 10) {
-            // ATIRAR!
+            // disparo
+            const disparo = new THREE.PositionalAudio(listener);
+            disparo.setBuffer(shotBuffer);
+            disparo.setVolume(1);
+
+            botMesh.add(disparo);
+            disparo.play();
             createBulletInteraction(botMesh, scene);
             
             // Atualiza estado do bot
@@ -668,6 +723,10 @@ function applyBulletHit(vehicleObj, isPlayer = false) {
         }
     }
     if (isPlayer) {
+        const atingido = new THREE.PositionalAudio(listener);
+        atingido.setBuffer(atingidoBuffer);
+        atingido.setVolume(50);
+        atingido.play();
         vehicleObj.userData.velocity *= 0.3;
         vehicleObj.userData.aceleration = 0; 
     } else {
