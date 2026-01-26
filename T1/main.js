@@ -219,7 +219,6 @@ function render() {
             somInicio = "Primeiro";
         }
         deveTocarInicio = false;
-        console.log("devia estar tocando");
     }
     
     if(soundtrack_muted){
@@ -387,7 +386,7 @@ function render() {
                 playerCar.userData.movimentY = 0;
             }
             else if(playerCar.userData.isInAir && playerCar.position.y < 0){
-                console.log(playerCar.position.y);
+                // console.log(playerCar.position.y);
                 playerCar.userData.isInAir = false;
                 playerCar.position.y = 0.25;
                 // checkExternalAreaCollisionSimple(scene, playerCar);
