@@ -999,12 +999,13 @@ export function checkExternalAreaCollisionSimple(scene, vehicle) {
     });
 
     if (collided) {
-        vehicle.position.set(-210, 0, -150);
+        vehicle.position.set(-210, 0.25, -150);
 
         // opcional
         if (vehicle.userData.velocity) {
             vehicle.userData.velocity = 0;
             vehicle.userData.movimentY = 0;
+
         }
     }
 }
