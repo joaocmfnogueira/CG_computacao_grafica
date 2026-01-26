@@ -176,19 +176,6 @@ export function keyboardUpdate(keyboard, vehicle, dt, scene, cameraHolder, bulle
    aceleration *= 0.9 * dt;
    if (Math.abs(aceleration) < 0.5) aceleration = 0;
 
-
-   // Reset/troca de pista 
-   // if (keyboard.down("R")){
-   //    resetVehicle(scene);
-   //    velocity = 0;
-   //    aceleration = 0;
-   //    laps_count = 0;
-   //    checkpoints_count = 0;
-   //    nBullets = 4;
-   //    bulletsInGame = [];
-
-   //    // trackNumber = 0;
-   // } 
    if (keyboard.down("1")){
       switchTrack(1, scene, cameraHolder);
       velocity = 0;
@@ -300,21 +287,12 @@ export function updateLightMovement(scene, vehicle, light) {
    // Aplica nova posição da luz (mantendo a mesma direção base)
    light.position.copy(newLightPos);
    light.updateMatrixWorld();
-
-   // const dirHelper = new THREE.DirectionalLightHelper(light, 10); // 10 = tamanho da seta
-   // scene.add(dirHelper);
-
-   // const shadowHelper = new THREE.CameraHelper(light.shadow.camera);
-   // scene.add(shadowHelper);
-
-   // console.log(light.position);
 }
 
 export function updateCamera(dt, scene, velocity, aceleration, keyboard, cameraHolder, isColided) {
     const vehicle = scene.getObjectByName("veiculo_principal");
     if (!vehicle) return;
 
-    // --- JITTER FIX START: Initialize Smoothing State ---
     // We store a "smoothed" position/rotation inside the cameraHolder's userData
     // This acts as a buffer between the jittery physics car and the camera.
     if (!cameraHolder.userData.smoothPosition) {
@@ -322,22 +300,15 @@ export function updateCamera(dt, scene, velocity, aceleration, keyboard, cameraH
         cameraHolder.userData.smoothQuaternion = vehicle.quaternion.clone();
     }
 
-    // 1. Determine how tightly we follow the car
-    // If colliding, we lower the speed (2.0) to ignore vibrations.
-    // If normal, we follow quickly (10.0) to feel responsive.
+    // Determine how tightly we follow the car
     const smoothingSpeed = isColided ? 2.0 : 10.0; 
     
-    // 2. Update the "Ghost" position/rotation
-    // We LERP (Linear Interpolate) towards the real car, filtering out high-frequency noise.
+    // LERP towards the real car, filtering out high-frequency noise.
     cameraHolder.userData.smoothPosition.lerp(vehicle.position, smoothingSpeed * dt);
     cameraHolder.userData.smoothQuaternion.slerp(vehicle.quaternion, smoothingSpeed * dt);
 
-    // 3. Define the source for calculations
-    // INSTEAD of using 'vehicle', we use our smooth ghost values.
     const sourcePos = cameraHolder.userData.smoothPosition;
     const sourceQuat = cameraHolder.userData.smoothQuaternion;
-    // --- JITTER FIX END ---
-
 
     // Calculate target distance based on acceleration
     const speedFactor = Math.abs(velocity) / MAX_FORWARD_SPEED;
@@ -398,7 +369,6 @@ export function updateCamera(dt, scene, velocity, aceleration, keyboard, cameraH
     // Update Camera Position
     const camera = cameraHolder.children[0];
     if (camera) {
-        // NOTE: We now use 'sourceQuat' and 'sourcePos' instead of vehicle.quaternion/position
         
         const behindOffset = new THREE.Vector3(currentCameraDistance, 0, 0);
         behindOffset.applyQuaternion(sourceQuat);
@@ -451,7 +421,6 @@ export function switchTrack(trackNumber, scene, cameraHolder) {
    
    resetVehicle(scene);
 
-   // cameraHolder was preserved, so just re-add it
    scene.add(cameraHolder);
 }
 

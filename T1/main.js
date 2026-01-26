@@ -63,7 +63,7 @@ const lapsDisplay = createLapsCount();
 const checkPointDisplay = createCheckPointCount();
 const bulletDisplay = createBulletCount();
 
-// --- Queue Logic Variables ---
+// Queue Logic Variables 
 let loadedAssetsQueue = [];
 let isThreeJsLoadingFinished = false;
 let isQueueRunning = false;
@@ -73,7 +73,6 @@ const manager = new THREE.LoadingManager();
 
 manager.onStart = () => {
     showLoadingScreen();
-    // Reset variables on start
     lastLapSound = false;
     verificadorInicial = false;
     loadedAssetsQueue = [];
@@ -81,7 +80,6 @@ manager.onStart = () => {
     isQueueRunning = false;
 };
 
-// Instead of updating UI immediately, we push to a queue
 manager.onProgress = (url, loaded, total) => {
     loadedAssetsQueue.push(`Processing: ${url}`);
     
@@ -91,7 +89,6 @@ manager.onProgress = (url, loaded, total) => {
     }
 };
 
-// We don't hide the screen here anymore. We just flag that Three.js is done.
 // The Queue processor will handle the UI update when it finishes its delays.
 manager.onLoad = () => {
     isThreeJsLoadingFinished = true;
@@ -103,7 +100,7 @@ manager.onError = (url) => {
 
 export let audioLoader = new THREE.AudioLoader(manager);
 
-// create a audio source of music theme
+// create music theme audio
 export const track01 = new THREE.Audio(listener);
 audioLoader.load('../../0_assets_T3/01 Bad to the Bone.mp3', function (buffer) {
    track01.setBuffer(buffer);
@@ -295,7 +292,7 @@ function render() {
 
             let bulletRemoved = false;
 
-            // A. Wall Collision
+            // Wall Collision
             if (collisionSystem.checkbulletcolision(bullet.userData.obb)) {
                 removeAndDispose(bullet);
                 scene.remove(bullet);
@@ -303,7 +300,7 @@ function render() {
                 bulletRemoved = true;
             }
 
-            // B. Vehicle Collision
+            // Vehicle Collision
             if (!bulletRemoved) {
                 for (const vehicle of allVehicles) {
                     // Skip if this vehicle fired the bullet
@@ -311,11 +308,8 @@ function render() {
                     
                     // Ensure vehicle OBB is up to date
                     if (!vehicle.userData.obb) vehicle.userData.obb = new OBB();
-                    // We update vehicle OBBs in their own movement loops, but safety check:
-                    // vehicle.userData.obb.fromBox3(vehicle.geometry.boundingBox).applyMatrix4(vehicle.matrixWorld);
 
                     if (vehicle.userData.obb && bullet.userData.obb.intersectsOBB(vehicle.userData.obb)) {
-                        // HIT!
                         applyBulletHit(vehicle, (vehicle === playerCar));
                         
                         removeAndDispose(bullet);
@@ -331,20 +325,18 @@ function render() {
         bots.forEach(botMesh => {
                 if (!botMesh) return;
 
-                // Shoot at Player or other Bots
                 updateBotShooting(botMesh, allVehicles, scene);
 
-                // Move
                 const botFollower = botMesh.userData.follower;
                 botFollower.update(subDt);
                 botMesh.updateMatrixWorld();
 
-                // Update OBB correctly
                 if (!botMesh.userData.obb) botMesh.userData.obb = new OBB();
                 botMesh.userData.obb.fromBox3(botMesh.geometry.boundingBox);
                 botMesh.userData.obb.applyMatrix4(botMesh.matrixWorld);
 
                 botMesh.userData.velocity = botFollower.currentSpeed;
+
                 // Wall Collision
                 const [isColided, angle, normal, wall] = checkCarCollision(botMesh, botMesh.userData.obb);
                 if (isColided) {
@@ -378,18 +370,15 @@ function render() {
             }
             if(playerCar.userData.movimentY > 0 && playerCar.userData.isInAir){
                 playerCar.translateY(0.1);
-                playerCar.userData.movimentY -= 0.1;
-                // console.log(playerCar.userData.movimentY);
+                playerCar.userData.movimentY -= 0.2;
             }
             else if(playerCar.userData.movimentY <= 0 && playerCar.userData.isInAir && playerCar.position.y > 0){
                 playerCar.translateY(-0.1);
                 playerCar.userData.movimentY = 0;
             }
             else if(playerCar.userData.isInAir && playerCar.position.y < 0){
-                // console.log(playerCar.position.y);
                 playerCar.userData.isInAir = false;
                 playerCar.position.y = 0.25;
-                // checkExternalAreaCollisionSimple(scene, playerCar);
             }
             checkExternalAreaCollisionSimple(scene, playerCar);
 
@@ -419,8 +408,6 @@ function render() {
    bulletsInGame.forEach(b => {
        if (!b.userData.shooter && playerCar) {
            b.userData.shooter = playerCar;
-           // If the player control.js spawns bullet at -6, it might still hit. 
-           // Ideally update control.js offset too.
        }
    });
    playerCar.updateMatrixWorld(true);
@@ -459,18 +446,15 @@ function checkVehicleToVehicleCollision(vehicles) {
             if (!v1.userData.obb || !v2.userData.obb) continue;
 
             if (v1.userData.obb.intersectsOBB(v2.userData.obb)) {
-                // Simple Repulsion: Push them away from each other
                 const p1 = v1.position;
                 const p2 = v2.position;
                 
                 const dir = new THREE.Vector3().subVectors(p1, p2).normalize();
                 
-                // Nudge both cars apart
-                const pushForce = 0.2; // Adjustment amount
+                const pushForce = 0.2; 
                 v1.position.addScaledVector(dir, pushForce);
                 v2.position.addScaledVector(dir, -pushForce);
                 
-                // Update OBBs immediately so they don't stick
                 v1.userData.obb.applyMatrix4(v1.matrixWorld);
                 v2.userData.obb.applyMatrix4(v2.matrixWorld);
             }
@@ -613,10 +597,10 @@ function createBulletInteraction(shooter, scene) {
 }
 
 function updateBotShooting(botMesh, targets, scene) {
-    // 1. Checa se tem munição (NOVO)
+    // 1. Checa se tem munição
     if (botMesh.userData.nBullets <= 0) return;
 
-    // 2. Cooldown (1 segundo entre tiros)
+    // 2. Cooldown 
     const now = Date.now();
     if (botMesh.userData.lastShotTime && now - botMesh.userData.lastShotTime < 1000) {
         return;
@@ -713,7 +697,6 @@ function checkLapCompletion(vehicle) {
       vehicle.userData.checkpoints_count = 0;
       console.log(`Lap ${vehicle.userData.laps_count} completed!`);
       vehicle.userData.nBullets = 4;
-    //   console.log("AAAAAAAAAAAAAAAAAA");
    }
 }
 
@@ -721,8 +704,7 @@ function checkCheckPointCompletion(vehicle) {
   const carPos = vehicle.getWorldPosition(new THREE.Vector3());
   const R = 12.5;
   let points = trackPoints[vehicle.userData.trackNumber];
-    // console.log(Array.isArray(points));
-    // console.log(points);
+
     if (vehicle.userData.checkpoints_count >= points.length) return;
 
     const checkpoint = points[vehicle.userData.checkpoints_count];
@@ -982,7 +964,6 @@ function updateAnimatedWater(scene, dt) {
 }
 
 export function checkExternalAreaCollisionSimple(scene, vehicle) {
-    // Bounding box do veículo (uma só)
     const vehicleBox = new THREE.Box3().setFromObject(vehicle);
 
     let collided = false;
@@ -1000,7 +981,6 @@ export function checkExternalAreaCollisionSimple(scene, vehicle) {
     if (collided) {
         vehicle.position.set(-210, 0.25, -150);
 
-        // opcional
         if (vehicle.userData.velocity) {
             vehicle.userData.velocity = 0;
             vehicle.userData.movimentY = 0;
