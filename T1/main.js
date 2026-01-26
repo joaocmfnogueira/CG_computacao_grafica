@@ -8,6 +8,7 @@ import {keyboardUpdate, updateVehicleMovement, updateCamera, updateLightMovement
 import { collisionSystem } from './models/map.js';
 import { OBB } from './models/OBB.js'
 import {CubeTextureLoaderSingleFile} from './models/cubeTextureLoaderSingleFile.js';
+import { Water } from '../build/jsm/objects/Water.js';
 
 let scene, renderer, camera, light;
 const container = document.getElementById( 'container' );
@@ -161,6 +162,10 @@ export const objetos3D = {
     "wranglerman" : await loadGLBFile('../../T1/assets/wranglerman.glb', 10, manager),
 }
 
+export const aguaFrames = Array.from({ length: 40 }, (_, i) =>
+    carregarTextura(`../T1/assets/Agua/${String(i).padStart(4, '0')}.png`,1, 1)
+);
+
 export const texturas = {
     "areaExterna_pista1" : carregarTextura('../T1/assets/grass_18k.jpg', 20, 20),
     "areaExterna_pista2" : carregarTextura('../assets/textures/sand.jpg'),
@@ -271,6 +276,9 @@ function render() {
 
 //    console.log(playerCar.userData.velocity);
 //    console.log(playerCar.userData.aceleration);
+
+    updateAnimatedWater(scene, dt);
+
 
    for (let index = 0; index < SUBSTEPS; index++) {
             // --- 2. STUN LOGIC ---
@@ -1010,4 +1018,24 @@ function initScene(){
     createHavacEnemy(scene, "rgb(82, 123, 236)", "rgb(18, 21, 199)", "rgb(112, 145, 238)", 0);
     createHavacEnemy(scene, "rgb(240, 83, 83)", "rgba(255, 0, 0, 1)", "rgb(223, 105, 105)", 1);
     createHavacEnemy(scene, "rgba(0, 238, 16, 1)", "rgba(0, 118, 14, 1)", "rgb(124, 216, 71)", 2);
+}
+
+function updateAnimatedWater(scene, dt) {
+    scene.traverse(obj => {
+        if (!obj.userData.anim) return;
+
+        const anim = obj.userData.anim;
+
+        anim.timer += dt;
+
+        if (anim.timer >= anim.frameDuration) {
+            anim.currentFrame =
+                (anim.currentFrame + 1) % anim.frames.length;
+
+            obj.material.map = anim.frames[anim.currentFrame];
+            obj.material.needsUpdate = true;
+
+            anim.timer = 0;
+        }
+    });
 }

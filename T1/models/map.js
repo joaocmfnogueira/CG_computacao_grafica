@@ -9,11 +9,13 @@ import { CSG } from "../../libs/other/CSGMesh.js";
 import { MeshBasicMaterial } from '../../build/three.core.js';
 import { texturas } from '../main.js';
 import { objetos3D } from '../main.js';
+import { aguaFrames } from '../main.js';
 // import { texturas } from '../basicScene.js';
 // import { objetos3D } from '../basicScene.js';
 
 // variavel da pista atual
 let pista_atual = 1;
+
 
 
 export const collisionSystem = new CollisionSystem();
@@ -297,6 +299,8 @@ export function createTrack2(scene) {
         let block;
         if(index == 0)
             block = createBlock(1, "rgba(192, 90, 0, 1)", "rgb(255,165,0)", 1, "rgb(255,255,255)", 2);
+        else if(index > 2)
+            block = createBlock(1, "rgb(190,190,190)", "rgb(255,165,0)", 1, "rgb(255,255,255)", 0, true);
         else
             block = createBlock(1, "rgb(190,190,190)", "rgb(255,165,0)");
         block.rotateZ(THREE.MathUtils.degToRad(180));
@@ -997,6 +1001,8 @@ function createTrack2_objects(scene){
     const maliTower3 = objetos3D['maliTower_pista2'].clone(true);
     scene.add(maliTower3);
     maliTower3.position.set(-155, -10, -245);
+
+    // Criação da pista de água
 }
 
 function createTrack3_objects(scene){
@@ -1122,11 +1128,11 @@ function createTree2(scene, x, y, z){
 // Segundo -> As muretas estão adjacentes;
 // Terceiro -> As muretas estão somente nos cantos;
 // tipo_pista_largada_checkpoint -> 1 se for largada, 2 se for checkpoint
-function createBlock(type, colorFloor, colorWall, type_pattern = 1, colorConer = "rgb(255,255,255)", tipo_pista_largada_checkpoint = 0) {
+function createBlock(type, colorFloor, colorWall, type_pattern = 1, colorConer = "rgb(255,255,255)", tipo_pista_largada_checkpoint = 0, tem_agua) {
     let floor;
 
     if (type == 1) {
-        floor = auxCreateBlock_parallel(colorFloor, colorWall, tipo_pista_largada_checkpoint);
+        floor = auxCreateBlock_parallel(colorFloor, colorWall, tipo_pista_largada_checkpoint, tem_agua);
         // console.log(tipo_pista_largada_checkpoint);
     }
     else if (type == 2) {
@@ -1163,29 +1169,47 @@ function createBlock(type, colorFloor, colorWall, type_pattern = 1, colorConer =
         tex2 = texturas['lateral3.5'];
         color = "rgba(179, 91, 226, 1)";
     }
-
+    
     material = new THREE.MeshBasicMaterial({ map: tex, color:color});
     material2 = new THREE.MeshBasicMaterial({ map: tex2, color:color});
-    const materialCube = [
+    if(tem_agua)
+        material.side = 2;
+    let materialCube
+    if(!tem_agua) {
+        materialCube = [
         material,
         material,
         material2,
         material2,
         null,
         null
-    ];
+        ];
+    }
+    else{
+        materialCube = [
+        material,
+        material,
+        null,
+        null,
+        null,
+        null
+        ];
+    }
     const caixa = new THREE.Mesh(cubeGeometry, materialCube);
     caixa.receiveShadow = true;
     caixa.castShadow = true;
     caixa.position.set(0, 0, -5.5);
+    
+
+    
     floor.add(caixa);
     return floor;
 }
 
 // Função auxiliar para criar o tipo de bloco paralelo
-function auxCreateBlock_parallel(colorFloor, colorWall, tipo_pista_largada_checkpoint) {
+function auxCreateBlock_parallel(colorFloor, colorWall, tipo_pista_largada_checkpoint, tem_agua = false) {
 
-    const floor = createFloor(colorFloor, tipo_pista_largada_checkpoint);
+    const floor = createFloor(colorFloor, tipo_pista_largada_checkpoint, tem_agua);
 
     for (let index = 0; index < 6; index++) {
         const col = (index % 2 === 0) 
@@ -1293,7 +1317,7 @@ function auxCreateBlock_Corners(colorFloor, colorWall) {
 }
 
 // Cria um piso
-function createFloor(color, tipo_pista_largada_checkpoint) {
+function createFloor(color, tipo_pista_largada_checkpoint, tem_agua) {
     const geometry = new THREE.PlaneGeometry(30, 30);
     const material = setDefaultMaterial(color, null);
     const plane = new THREE.Mesh(geometry, material);
@@ -1301,14 +1325,29 @@ function createFloor(color, tipo_pista_largada_checkpoint) {
     plane.receiveShadow = true;
 
     let tex;
-
+    
     if(tipo_pista_largada_checkpoint == 1)
         tex = texturas['piso_largada'];
     else if(tipo_pista_largada_checkpoint == 2)
         tex = texturas['piso_checkpoint'];
     else
         tex = texturas['piso'];
-    plane.material.map = tex;
+
+    if(!tem_agua)
+        plane.material.map = tex;
+    else{
+        plane.material.map = aguaFrames[0];
+        plane.material.transparent = true;
+        plane.material.opacity = 0.9;
+        plane.name = "agua";
+
+        plane.userData.anim = {
+            frames: aguaFrames,
+            currentFrame: 0,
+            timer: 0,
+            frameDuration: 1 / 8 // 8 FPS (ajuste aqui)
+        };
+    }
 
     return plane;
 }
