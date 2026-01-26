@@ -259,7 +259,6 @@ function render() {
    const SUBSTEPS = 5; 
    const subDt = dt / SUBSTEPS;
 
-   // --- 1. GATHER ALL VEHICLES ---
    const playerCar = scene.getObjectByName("veiculo_principal");
    const bots = [scene.getObjectByName("enemy0"), scene.getObjectByName("enemy1"), scene.getObjectByName("enemy2")].filter(b => b !== undefined);
    const allVehicles = [];
@@ -281,14 +280,11 @@ function render() {
 
 
    for (let index = 0; index < SUBSTEPS; index++) {
-            // --- 2. STUN LOGIC ---
+
     allVehicles.forEach(v => updateStunTimers(subDt, v, (v === playerCar)));
 
-    // --- 3. VEHICLE-TO-VEHICLE COLLISION ---
-    // This prevents cars from driving inside each other
     checkVehicleToVehicleCollision(allVehicles);
 
-    // --- 4. BULLET LOGIC ---
     for (let i = bulletsInGame.length - 1; i >= 0; i--) {
             const bullet = bulletsInGame[i];
             bullet.translateX(-150 * subDt); 
@@ -332,7 +328,6 @@ function render() {
                 }
             }
     }
-    // --- 5. BOT LOGIC (Physics + Shooting) ---
     
         bots.forEach(botMesh => {
                 if (!botMesh) return;
@@ -360,11 +355,7 @@ function render() {
                     // if (Math.abs(botFollower.currentSpeed) < 5) botFollower.currentSpeed = 5; 
                 }
             });
-        
-
-    // --- 6. PLAYER PHYSICS ---
-        
-    
+                
         updateVehicleMovement(subDt, playerCar, keyboard);
         updateLightMovement(scene, playerCar, scene.getObjectByName("light"));
         
@@ -383,9 +374,7 @@ function render() {
    if(playerCar.userData.trackNumber == "Terceiro"){
             const jumpPort = scene.getObjectByName("jumpPort");
             if(playerCar.userData.obb.intersectsOBB(jumpPort.userData.obb)){
-                // TODO:Criar função da logica do jump port aqui
                 jumpPort_moviment(playerCar);
-                console.log("Colidiu aqui");
                 playerCar.userData.isInAir = true;
             }
             if(playerCar.userData.movimentY > 0 && playerCar.userData.isInAir){
@@ -394,7 +383,6 @@ function render() {
                 // console.log(playerCar.userData.movimentY);
             }
             else if(playerCar.userData.movimentY <= 0 && playerCar.userData.isInAir && playerCar.position.y > 0){
-                console.log("ue");
                 playerCar.translateY(-0.1);
                 playerCar.userData.movimentY = 0;
             }
@@ -402,7 +390,10 @@ function render() {
                 console.log(playerCar.position.y);
                 playerCar.userData.isInAir = false;
                 playerCar.position.y = 0.25;
+                // checkExternalAreaCollisionSimple(scene, playerCar);
             }
+            checkExternalAreaCollisionSimple(scene, playerCar);
+
         }
    
    if (playerCar) {
@@ -417,7 +408,6 @@ function render() {
         checkCheckPointCompletion(botMesh);
     });
 
-   // --- 7. HUD & INPUT ---
    const result = keyboardUpdate(keyboard, playerCar, dt, scene, cameraHolder, bulletsInGame, verificadorInicial, deveTocarInicio , lastLapSound, soundtrack, soundtrack_played, soundtrack_muted);
    bulletsInGame = result.bulletsInGame;
    verificadorInicial = result.verificador;
@@ -426,8 +416,7 @@ function render() {
    soundtrack = result.soundT;
    soundtrack_played = result.soundPlayed;
    soundtrack_muted = result.muted;
-   // If Player Fired, we need to mark their bullet's shooter to avoid self-collision
-   // This loop finds new bullets that don't have a shooter assigned yet
+
    bulletsInGame.forEach(b => {
        if (!b.userData.shooter && playerCar) {
            b.userData.shooter = playerCar;
@@ -491,7 +480,8 @@ function checkVehicleToVehicleCollision(vehicles) {
 }
 
 function jumpPort_moviment(vehicle){
-    vehicle.userData.movimentY = vehicle.userData.velocity;
+    vehicle.userData.movimentY = vehicle.userData.velocity + 5;
+    vehicle.userData.velociy += 3;
     // vehicle.translateY(vehicle.userData.velocity);
 
 }
@@ -568,9 +558,6 @@ function applyCollisionResponse(car, angle, normal, dt) {
 
     const wallNormal = normal.clone().normalize();
 
-    /* ======================
-       PUSH OUT DA PAREDE
-    ====================== */
     const projection = velocityVec.dot(wallNormal);
     if (projection < 0) {
         const pushFactor =
@@ -582,10 +569,6 @@ function applyCollisionResponse(car, angle, normal, dt) {
         base.position.addScaledVector(wallNormal, 0.05);
     }
     // console.log("colidindo");
-
-    /* ======================
-       TRATAMENTO POR ÂNGULO
-    ====================== */
     if (angle < 30) {
         // impacto frontal → freada forte
         follower.currentSpeed *= 0.3;
@@ -593,43 +576,6 @@ function applyCollisionResponse(car, angle, normal, dt) {
         // colisão lateral → vira para fora da parede
 
         follower.currentSpeed *= 0.9;
-
-        /* ======================
-           DIREÇÃO DE FUGA
-        ====================== */
-        // let escapeDir = wallNormal.clone();
-        // escapeDir.y = 0;
-        // escapeDir.normalize();
-
-        // // garante que não fique de ré
-        // if (escapeDir.dot(forward) < 0) {
-        //     escapeDir.negate();
-        // }
-
-        // /* ======================
-        //    ROTACIONA PARA FORA
-        // ====================== */
-        // const xAxis = escapeDir.clone().negate();
-        // const yAxis = new THREE.Vector3(0, 1, 0);
-        // const zAxis = new THREE.Vector3()
-        //     .crossVectors(xAxis, yAxis)
-        //     .normalize();
-        // xAxis.crossVectors(yAxis, zAxis).normalize();
-
-        // const targetMat = new THREE.Matrix4().makeBasis(
-        //     xAxis, yAxis, zAxis
-        // );
-        // const targetQuat = new THREE.Quaternion()
-        //     .setFromRotationMatrix(targetMat);
-
-        // // slerp mais agressivo que o player
-        // base.quaternion.slerp(targetQuat, 0.35);
-
-        // // temporariamente vira melhor
-        // follower.turnSpeed = Math.min(
-        //     follower.turnSpeed * 1.3,
-        //     4.5
-        // );
     }
 
     if (follower.currentSpeed < 0.1) {
@@ -800,7 +746,6 @@ document.addEventListener('visibilitychange', () => {
     isPaused = true;
     resetKeyboardState();
   } else {
-    console.log("era para o jogo voltar");
     isPaused = false;
     clock.elapsedTime = 0;
     clock.start();
@@ -839,7 +784,6 @@ function carregarTextura(path, repeatX = 10, repeatY = 10){
     return texture;
 }
 
-// --- VISUAL QUEUE PROCESSOR (The Delay Logic) ---
 function processQueue() {
     isQueueRunning = true;
 
@@ -895,8 +839,6 @@ function showStartScreenState() {
         }
     };
 }
-
-// --- HTML & CSS UPDATES ---
 
 function showLoadingScreen() {
     // Remove existing if any
@@ -1038,4 +980,31 @@ function updateAnimatedWater(scene, dt) {
             anim.timer = 0;
         }
     });
+}
+
+export function checkExternalAreaCollisionSimple(scene, vehicle) {
+    // Bounding box do veículo (uma só)
+    const vehicleBox = new THREE.Box3().setFromObject(vehicle);
+
+    let collided = false;
+
+    scene.traverse(obj => {
+        if (!obj.name.startsWith("areaExternaColisao")) return;
+
+        const areaBox = new THREE.Box3().setFromObject(obj);
+
+        if (vehicleBox.intersectsBox(areaBox)) {
+            collided = true;
+        }
+    });
+
+    if (collided) {
+        vehicle.position.set(-210, 0, -150);
+
+        // opcional
+        if (vehicle.userData.velocity) {
+            vehicle.userData.velocity = 0;
+            vehicle.userData.movimentY = 0;
+        }
+    }
 }

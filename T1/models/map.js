@@ -756,6 +756,54 @@ export function createTrack3(scene) {
             registerWallsForCollision(block);
             debugShowBoundingBoxes(block, scene);
         }
+        else if(index == 1){
+            const geometry = new THREE.PlaneGeometry(30, 30);
+            const material = setDefaultMaterial("rgb(0,0,0)", null);
+            const plane = new THREE.Mesh(geometry, material);
+            plane.position.set(-60 + 30 * index, 0.25, -150)
+            plane.rotation.x = THREE.MathUtils.degToRad(-90);
+            plane.visible = false;
+            plane.name = "areaExternaColisao1";
+            scene.add(plane);
+
+            const geometry2 = new THREE.PlaneGeometry(30, 30);
+            const material2 = setDefaultMaterial("rgb(0,0,0)", null);
+            const plane2 = new THREE.Mesh(geometry2, material2);
+            plane2.position.set(-60 + 30 * index, 0.25, -120)
+            plane2.rotation.x = THREE.MathUtils.degToRad(-90);
+            plane2.visible = false;
+            plane2.name = "areaExternaColisao2";
+            scene.add(plane2);
+
+            const geometry3 = new THREE.PlaneGeometry(30, 30);
+            const material3 = setDefaultMaterial("rgb(0,0,0)", null);
+            const plane3 = new THREE.Mesh(geometry3, material3);
+            plane3.position.set(-60 + 30 * index, 0.25, -180)
+            plane3.rotation.x = THREE.MathUtils.degToRad(-90);
+            plane3.visible = false;
+            plane3.name = "areaExternaColisao3";
+            scene.add(plane3);
+
+            const geometry4 = new THREE.PlaneGeometry(30, 30);
+            const material4 = setDefaultMaterial("rgb(0,0,0)", null);
+            const plane4 = new THREE.Mesh(geometry4, material4);
+            plane4.position.set(-60 + 30 * index + 30, 0.25, -180)
+            plane4.rotation.x = THREE.MathUtils.degToRad(-90);
+            plane4.visible = false;
+            plane4.name = "areaExternaColisao4";
+            scene.add(plane4);
+
+            const geometry5 = new THREE.PlaneGeometry(30, 30);
+            const material5 = setDefaultMaterial("rgb(0,0,0)", null);
+            const plane5 = new THREE.Mesh(geometry5, material5);
+            plane5.position.set(-60 + 30 * index - 30, 0.25, -180)
+            plane5.rotation.x = THREE.MathUtils.degToRad(-90);
+            plane5.visible = false;
+            plane5.name = "areaExternaColisao5";
+            scene.add(plane5);
+
+            
+        }
         else if(index != 1){
             let block = createBlock(1, "rgb(200,100,100)", "rgb(100,30,255)");
             block.rotateZ(THREE.MathUtils.degToRad(270));
